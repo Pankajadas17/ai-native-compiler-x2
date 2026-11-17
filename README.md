@@ -19,7 +19,7 @@ The chip's resources and what the deployment engine uses of them:
 
 The engine bitstream is the same for every model. A model is deployed by programming the X2 cells and running a host program.
 
-## The agents
+# The agents
 
 | Agent | Job | Decided by |
 |:-----:|-----|------------|
