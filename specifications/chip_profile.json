@@ -1,0 +1,320 @@
+{
+  "schema": "bm_verif.chip_profile/1",
+  "status": "derived_from_chip_repo",
+  "source": {
+    "repo": "sky130-reram-fpga",
+    "commit": "e0790eb11a1e95914f2beb8f175396a0924144ed",
+    "submodules": {
+      "ip/fabulous-tiles": "0651993fdbd40d464a5f683881ba1e5c0db7b453",
+      "ip/sky130_bmlabs_reram": "cfa1cb85d5ab9d665dbbcaf79bb80c900fc09976"
+    },
+    "files": {
+      "ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v": "a86f5cb35c4ed0f46e928e48bc17542c2455945d913cbd591f120f6d76fe08e6",
+      "ip/sky130_bmlabs_reram/verilog/behavioral/sky130_bmlabs_reram__cim32x32.sv": "f182fef54a92e7ab97218df8c03148a4143373658ff70521efa67beae18afe44",
+      "user_designs/fabrics/classic_fabric_reram/constraints.pcf": "8edd16df67213d82bd36bf02541eecda68c346dfa479a0d1fda1d64b3cd89529",
+      "user_designs/fabrics/classic_fabric_reram/macro/sky130A/fabulous/.FABulous/bel.txt": "f2b682f1e3b2af1b637bbe75d6e4efcbfa8c07a5ef598106712ba86f2f03a6b5",
+      "user_designs/fabrics/classic_fabric_reram/macro/sky130A/fabulous/.FABulous/bel.v2.txt": "cf5a81c3bff1cb06ce1e2b4dcebc44a99f3f31694f259f4791db6a2a794ad49b"
+    },
+    "input_digest": "626e26b0d8bfea9fec6744595ea722b03c9acaa5dd3c08dfed8cbaee5bfef877"
+  },
+  "fabric": {
+    "name": "classic_fabric_reram",
+    "grid": {
+      "columns": 21,
+      "rows": 20
+    },
+    "resources": {
+      "FABULOUS_LC": 2160,
+      "GBUF": 4,
+      "IOBUF": 36,
+      "MACC_8x8_20": 18,
+      "RAM_32x4_2R_1W": 36,
+      "RERAM_CIM_32x32": 2,
+      "SYS_RESET": 1
+    }
+  },
+  "io": {
+    "iobuf_sites": 36,
+    "iobuf_site_list": [
+      "X0Y1/A",
+      "X0Y1/B",
+      "X0Y2/A",
+      "X0Y2/B",
+      "X0Y3/A",
+      "X0Y3/B",
+      "X0Y4/A",
+      "X0Y4/B",
+      "X0Y5/A",
+      "X0Y5/B",
+      "X0Y6/A",
+      "X0Y6/B",
+      "X0Y7/A",
+      "X0Y7/B",
+      "X0Y8/A",
+      "X0Y8/B",
+      "X0Y9/A",
+      "X0Y9/B",
+      "X0Y10/A",
+      "X0Y10/B",
+      "X0Y11/A",
+      "X0Y11/B",
+      "X0Y12/A",
+      "X0Y12/B",
+      "X0Y13/A",
+      "X0Y13/B",
+      "X0Y14/A",
+      "X0Y14/B",
+      "X0Y15/A",
+      "X0Y15/B",
+      "X0Y16/A",
+      "X0Y16/B",
+      "X0Y17/A",
+      "X0Y17/B",
+      "X0Y18/A",
+      "X0Y18/B"
+    ],
+    "general_pins": [
+      "all[0]",
+      "all[1]",
+      "all[2]",
+      "all[3]",
+      "all[4]",
+      "all[5]",
+      "all[6]",
+      "all[7]",
+      "all[8]",
+      "all[9]",
+      "all[10]",
+      "all[11]",
+      "all[12]",
+      "all[13]",
+      "all[14]",
+      "all[15]",
+      "all[16]",
+      "all[17]",
+      "all[18]",
+      "all[19]",
+      "all[20]",
+      "all[21]",
+      "all[22]",
+      "all[23]",
+      "all[24]",
+      "all[25]",
+      "all[26]",
+      "all[27]"
+    ],
+    "general_pin_sites": {
+      "all[0]": "X0Y1/A",
+      "all[1]": "X0Y1/B",
+      "all[2]": "X0Y2/A",
+      "all[3]": "X0Y2/B",
+      "all[4]": "X0Y3/A",
+      "all[5]": "X0Y3/B",
+      "all[6]": "X0Y4/A",
+      "all[7]": "X0Y5/B",
+      "all[8]": "X0Y6/A",
+      "all[9]": "X0Y6/B",
+      "all[10]": "X0Y7/A",
+      "all[11]": "X0Y7/B",
+      "all[12]": "X0Y8/A",
+      "all[13]": "X0Y8/B",
+      "all[14]": "X0Y9/A",
+      "all[15]": "X0Y9/B",
+      "all[16]": "X0Y10/A",
+      "all[17]": "X0Y10/B",
+      "all[18]": "X0Y11/A",
+      "all[19]": "X0Y11/B",
+      "all[20]": "X0Y12/A",
+      "all[21]": "X0Y12/B",
+      "all[22]": "X0Y13/A",
+      "all[23]": "X0Y13/B",
+      "all[24]": "X0Y14/A",
+      "all[25]": "X0Y14/B",
+      "all[26]": "X0Y15/A",
+      "all[27]": "X0Y15/B"
+    },
+    "other_pin_groups": {
+      "For general tests": {
+        "clk1": "X0Y1/A",
+        "clk2": "X0Y1/B",
+        "ena": "X0Y2/A",
+        "rst": "X0Y2/B",
+        "e[0]": "X0Y3/A",
+        "e[1]": "X0Y3/B",
+        "e[2]": "X0Y4/A",
+        "e[3]": "X0Y4/B",
+        "a[0]": "X0Y5/A",
+        "a[1]": "X0Y5/B",
+        "a[2]": "X0Y6/A",
+        "a[3]": "X0Y6/B",
+        "a[4]": "X0Y7/A",
+        "a[5]": "X0Y7/B",
+        "b[0]": "X0Y8/A",
+        "b[1]": "X0Y8/B",
+        "b[2]": "X0Y9/A",
+        "b[3]": "X0Y9/B",
+        "b[4]": "X0Y10/A",
+        "b[5]": "X0Y10/B",
+        "c[0]": "X0Y11/A",
+        "c[1]": "X0Y11/B",
+        "c[2]": "X0Y12/A",
+        "c[3]": "X0Y12/B",
+        "c[4]": "X0Y13/A",
+        "c[5]": "X0Y13/B",
+        "c[6]": "X0Y14/A",
+        "c[7]": "X0Y14/B"
+      },
+      "For the register_file test": {
+        "addr_a[0]": "X0Y3/A",
+        "addr_a[1]": "X0Y3/B",
+        "addr_a[2]": "X0Y4/A",
+        "addr_a[3]": "X0Y4/B",
+        "addr_a[4]": "X0Y5/A",
+        "addr_b[0]": "X0Y5/B",
+        "addr_b[1]": "X0Y6/A",
+        "addr_b[2]": "X0Y6/B",
+        "addr_b[3]": "X0Y7/A",
+        "addr_b[4]": "X0Y7/B",
+        "addr_c[0]": "X0Y8/A",
+        "addr_c[1]": "X0Y8/B",
+        "word_a[0]": "X0Y9/A",
+        "word_a[1]": "X0Y9/B",
+        "word_a[2]": "X0Y10/A",
+        "word_a[3]": "X0Y10/B",
+        "word_b[0]": "X0Y11/A",
+        "word_b[1]": "X0Y11/B",
+        "word_b[2]": "X0Y12/A",
+        "word_b[3]": "X0Y12/B",
+        "word_c[0]": "X0Y13/A",
+        "word_c[1]": "X0Y13/B",
+        "word_c[2]": "X0Y14/A",
+        "word_c[3]": "X0Y14/B"
+      },
+      "For the macc_8x8_20 test": {
+        "product[0]": "X0Y11/A",
+        "product[1]": "X0Y11/B",
+        "product[2]": "X0Y12/A",
+        "product[3]": "X0Y12/B",
+        "product[4]": "X0Y13/A",
+        "product[5]": "X0Y13/B",
+        "product[6]": "X0Y14/A",
+        "product[7]": "X0Y14/B",
+        "product[8]": "X0Y3/A",
+        "product[9]": "X0Y3/B",
+        "product[10]": "X0Y4/A",
+        "product[11]": "X0Y4/B"
+      }
+    }
+  },
+  "x2": {
+    "primitive": "RERAM_CIM_32x32",
+    "count": 2,
+    "sites": [
+      "X20Y6/A",
+      "X20Y14/A"
+    ],
+    "rows": 32,
+    "cols": 32,
+    "rows_cols_basis": "2 ** width(ROW_INDEX), 2 ** width(COL_INDEX) in the Yosys primitive",
+    "pwm_bits": 8,
+    "result_bits": 21,
+    "buses": {
+      "MODE": {
+        "direction": "input",
+        "width": 2
+      },
+      "ROW_INDEX": {
+        "direction": "input",
+        "width": 5
+      },
+      "COL_INDEX": {
+        "direction": "input",
+        "width": 5
+      },
+      "PWM_DATA": {
+        "direction": "input",
+        "width": 8
+      },
+      "ERROR": {
+        "direction": "output",
+        "width": 2
+      },
+      "RESULT_DATA": {
+        "direction": "output",
+        "width": 21
+      }
+    },
+    "single_wires": {
+      "CLK": "input",
+      "RST": "input",
+      "CMD_VALID": "input",
+      "CMD_READY": "output",
+      "COMPUTE_LAST": "input",
+      "COMPUTE_ALL_COLUMNS": "input",
+      "BUSY": "output",
+      "COMMAND_ACCEPTED": "output",
+      "COMPUTE_PENDING": "output",
+      "ERROR_VALID": "output",
+      "OPERATION_DONE": "output",
+      "PROGRAM_READBACK_ACTIVE": "output",
+      "RESULT_VALID": "output",
+      "RESULT_READY": "input",
+      "RESULT_LAST": "output"
+    },
+    "parameters": {
+      "TARGET_SET1": 16,
+      "TARGET_SET2": 16,
+      "TARGET_RESET1": 16,
+      "TARGET_RESET2": 16,
+      "NO_OF_CLK_CYCLES": 10,
+      "COUNTER_VALUE": 10,
+      "TDC_TIME_OUT": 7,
+      "TDC_DEAD_TIME": 2
+    },
+    "config_bits_per_block": 93,
+    "config_fields": {
+      "COUNTER_VALUE": 10,
+      "NO_OF_CLK_CYCLES": 10,
+      "TARGET_RESET1": 16,
+      "TARGET_RESET2": 16,
+      "TARGET_SET1": 16,
+      "TARGET_SET2": 16,
+      "TDC_DEAD_TIME": 2,
+      "TDC_TIME_OUT": 7
+    },
+    "behavioral_model": {
+      "module": "sky130_bmlabs_reram__cim32x32",
+      "parameters": {
+        "READ_DELAY": 160,
+        "PROGRAM_DELAY": 360,
+        "COMPUTE_DELAY": 450,
+        "INITIAL_CELL_LEVEL": 3619
+      },
+      "modes": {
+        "RESET": 0,
+        "READ": 1,
+        "COMPUTE": 2,
+        "SET": 3
+      },
+      "result_format_msb_first": [
+        {
+          "field": "mode",
+          "width": 2
+        },
+        {
+          "field": "column",
+          "width": 5
+        },
+        {
+          "field": "count",
+          "width": 14
+        }
+      ]
+    }
+  },
+  "not_in_repo": [
+    "INT8 activation/weight -> PWM value and count -> output scaling (team answer needed)",
+    "meaning of the eight X2 parameters (TARGET_SET1 ... TDC_DEAD_TIME) as numbers to choose",
+    "analog effects: the behavioral model says they are not simulated"
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "design": "chain_relu8",
+  "top": "relu8_chip",
+  "rtl": [
+    "relu8_chip.v"
+  ],
+  "stages": {
+    "synth": {
+      "exit": 0,
+      "seconds": 0.18
+    },
+    "pnr": {
+      "exit": 0,
+      "seconds": 1.08
+    },
+    "bitstream": {
+      "exit": 2,
+      "seconds": 0.05
+    }
+  },
+  "status": "failed",
+  "failure": {
+    "stage": "bitstream",
+    "cause": "python_module_missing",
+    "evidence": "sky130A\nclassic_fabric_reram\nclassic\npython3 /tmp/crlf/repo/user_designs/scripts/bit_gen.py \\\n-genBitstream \\\nrelu8_chip.fasm \\\n/tmp/crlf/repo/user_designs/fabrics/classic_fabric_reram/macro/sky130A/fabulous/bitStreamSpec.bin \\\nrelu8_chip.bit\nTraceback (most recent call last):\n  File \"/tmp/crlf/repo/user_designs/scripts/bit_gen.py\", line 7, in <module>\n    from fasm import (\n    ...<4 lines>...\n    )\nModuleNotFoundError: No module named 'fasm'\nmake: *** [/tmp/crlf/repo/user_designs/makefile.include:90: bitstream] Error 1"
+  },
+  "multiplier_map": {
+    "file": "chip/techmap/MACC_8x8_20_map_signed.v",
+    "args": "8 8 2 2 12",
+    "replaces": "ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/techmap/MACC_8x8_20_map.v",
+    "why": "the repo map is unsigned-only (signed multiplies wider than 8 bits were wrong)"
+  },
+  "pins": {
+    "needed": 17,
+    "available": 36,
+    "fits": true,
+    "by_port": {
+      "clk": 1,
+      "x": 8,
+      "y": 8
+    },
+    "assignment": {
+      "clk": "X0Y1/A",
+      "x[0]": "X0Y1/B",
+      "x[1]": "X0Y2/A",
+      "x[2]": "X0Y2/B",
+      "x[3]": "X0Y3/A",
+      "x[4]": "X0Y3/B",
+      "x[5]": "X0Y4/A",
+      "x[6]": "X0Y4/B",
+      "x[7]": "X0Y5/A",
+      "y[0]": "X0Y5/B",
+      "y[1]": "X0Y6/A",
+      "y[2]": "X0Y6/B",
+      "y[3]": "X0Y7/A",
+      "y[4]": "X0Y7/B",
+      "y[5]": "X0Y8/A",
+      "y[6]": "X0Y8/B",
+      "y[7]": "X0Y9/A"
+    }
+  },
+  "utilisation": {
+    "FABULOUS_LC": {
+      "used": 15,
+      "available": 2160
+    },
+    "IOBUF": {
+      "used": 17,
+      "available": 36
+    },
+    "RAM_32x4_2R_1W": {
+      "used": 0,
+      "available": 36
+    },
+    "MACC_8x8_20": {
+      "used": 0,
+      "available": 18
+    },
+    "RERAM_CIM_32x32": {
+      "used": 0,
+      "available": 2
+    },
+    "GBUF": {
+      "used": 1,
+      "available": 4
+    },
+    "SYS_RESET": {
+      "used": 0,
+      "available": 1
+    }
+  },
+  "chip_repo_read_only": true
+}

@@ -1,0 +1,8 @@
+counter.bit
+Traceback (most recent call last):
+  File "<repo>/user_designs/scripts/bit_gen.py", line 7, in <module>
+    from fasm import (
+    ...<4 lines>...
+    )
+ModuleNotFoundError: No module named 'fasm'
+make: *** [<repo>/user_designs/makefile.include:90: bitstream] Error 1

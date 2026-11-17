@@ -1,0 +1,52 @@
+{
+  "version": "1.0-chip",
+  "status": "chip numbers derived from sky130-reram-fpga via chip_profile.json (input digest 626e26b0d8bfea9f); weights.magnitude_bits and weights.sign_factor follow BMsemi_Model DeepGate and are not stated by the chip repo",
+  "x2": {
+    "rows": 32,
+    "cols": 32,
+    "blocks": 2,
+    "sites": [
+      "X20Y6/A",
+      "X20Y14/A"
+    ],
+    "cell_bits": 4,
+    "input_bits": 8,
+    "result_count_bits": 14,
+    "timing_cycles": {
+      "read": 160,
+      "program": 360,
+      "compute": 450
+    },
+    "basis": {
+      "rows/cols": "2**width(ROW_INDEX/COL_INDEX) in RERAM_CIM_32x32.v; array_state[0:31] in ip/sky130_bmlabs_reram/verilog/behavioral/sky130_bmlabs_reram__cim32x32.sv",
+      "blocks": "two RERAM_CIM_32x32 BELs in .FABulous/bel.txt (X20Y6, X20Y14)",
+      "cell_bits": "4: DECISION (user, 2026-11-13) to follow BMsemi DeepGate 4-bit banks (BMsemi_Model/projects/1_foundation/PE/variants/deep_gate/Crossbar_array.py l.127, 165). NOT what the chip repo models: its behavioral X2 computes with 1-bit cells (ip/sky130_bmlabs_reram/verilog/behavioral/sky130_bmlabs_reram__cim32x32.sv l.802, l.847-848), so 4-bit plans cannot be checked in that simulation. Pending team confirmation of the silicon cell precision.",
+      "input_bits": "i_pwm_data[7:0] (ip/sky130_bmlabs_reram/verilog/behavioral/sky130_bmlabs_reram__cim32x32.sv l.38), unsigned",
+      "timing_cycles": "READ/PROGRAM/COMPUTE_DELAY parameters (ip/sky130_bmlabs_reram/verilog/behavioral/sky130_bmlabs_reram__cim32x32.sv l.14-16): behavioral model, not silicon"
+    }
+  },
+  "weights": {
+    "dtype": "int8_signed",
+    "magnitude_bits": 8,
+    "sign_factor": 2,
+    "cells_per_weight_formula": "sign_factor * ceil(magnitude_bits / x2.cell_bits)",
+    "basis": "BMsemi_Model/projects/1_foundation/PE/variants/deep_gate/Crossbar_array.py l.29-30: signed INT8 weights split into positive/negative banks (w = w_pos - w_neg); l.127/165 store each magnitude as two 4-bit banks, i.e. 8 magnitude bits. With x2.cell_bits = 4: 2 x ceil(8 / 4) = 4 cells per weight.",
+    "open_question": "silicon cell precision: deep_gate/Crossbar_array.py uses 4-bit banks (4 cells per weight); the X2 behavioral model computes with 1-bit cells (16 cells per weight)."
+  },
+  "efpga": {
+    "luts": 2160,
+    "flip_flops": 2160,
+    "macc_blocks": 18,
+    "ram_32x4_blocks": 36,
+    "global_buffers": 4,
+    "io_pins": 36,
+    "basis": "BEL counts in .FABulous/bel.txt (one LUT4 + FF per FABULOUS_LC); io_pins = IOBUF sites, the team confirmed all[0..27] in constraints.pcf are example assignments only. Per-operator resource estimates still need RTL (run_chip_flow.py)."
+  },
+  "activation_bytes": 1,
+  "activation_bytes_basis": "X2 inputs are 8-bit (ip/sky130_bmlabs_reram/verilog/behavioral/sky130_bmlabs_reram__cim32x32.sv l.38); DeepGate activations are unsigned INT8 (Crossbar_array.py l.28). compiler_graph.json itself records no dtype.",
+  "compiler_v2": {
+    "pe_rows": 64,
+    "default_tile_cols": 32,
+    "basis": "BMsemi_Model bm_models/core/mapping.py PEGeometry default (64 x 32, the 'YOLO26 / FP4LLM' geometry, mapping.py l.4-6/20-21). Used ONLY to check the compiler's own tile counts (compiler_expected_tiles); the chip is 32 x 32."
+  }
+}

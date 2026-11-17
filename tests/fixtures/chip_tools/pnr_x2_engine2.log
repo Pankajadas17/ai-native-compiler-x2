@@ -1,0 +1,2 @@
+Info: Max frequency for clock '$abc$9528$aiger$o1': 8.81 MHz (FAIL at 12.00 MHz)
+Info: Max frequency for clock '$abc$9528$aiger$o1': 16.67 MHz (PASS at 12.00 MHz)

@@ -1,0 +1,6 @@
+Real FABulous run by the project owner (2026-11-10), Ubuntu on WSL2, FABulous 2.2.0, OSS CAD Suite 2026-06-25
+(Yosys 0.66+154, nextpnr-generic 0.10-82). Demo project `FABulous create-project demo`, design sequential_16bit_en.v,
+`compile_design` -> "Compile flow completed successfully." Files copied unmodified from demo/user_design/:
+  nextpnr_log.txt = sequential_16bit_en_npnr_log.txt        design.fasm = sequential_16bit_en.fasm
+The .bin and fabric CSV from this run are audited with run_bitstream_audit.py (not stored here: 8.8 MB spec).
+Tests that mutate these files say so explicitly: a mutated log is NOT a real failing log.

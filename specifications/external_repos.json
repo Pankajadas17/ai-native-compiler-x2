@@ -1,0 +1,18 @@
+{
+ "note": "the cloned repos are NOT in this repository; clone these commits next to the code (read-only)",
+ "BMsemi_Model": {
+  "remote": "https://github.com/BMsemi/BMsemi_Model.git",
+  "commit": "0dfebfff887aeef5148f35829754bf9fb330cf51",
+  "submodules": [],
+  "local_changes": false
+ },
+ "sky130-reram-fpga": {
+  "remote": "https://github.com/mole99/sky130-reram-fpga.git",
+  "commit": "e0790eb11a1e95914f2beb8f175396a0924144ed",
+  "submodules": [
+   "0651993fdbd40d464a5f683881ba1e5c0db7b453 ip/fabulous-tiles (0651993)",
+   "cfa1cb85d5ab9d665dbbcaf79bb80c900fc09976 ip/sky130_bmlabs_reram (heads/main)"
+  ],
+  "local_changes": false
+ }
+}

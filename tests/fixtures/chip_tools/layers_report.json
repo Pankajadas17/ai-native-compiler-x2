@@ -1,0 +1,149 @@
+{
+  "all_exact": true,
+  "rows": [
+    {
+      "layer": "shape_16_3_3_3_1",
+      "attrs": {
+        "K": 16,
+        "C": 3,
+        "R": 3,
+        "S": 3,
+        "groups": 1
+      },
+      "positions": 2,
+      "weights": "random INT8 (seeded)",
+      "bits4": {
+        "tiles": 2,
+        "exact": true,
+        "cell_rule": "ASSUMED sum(pwm*level)"
+      },
+      "bits1": {
+        "tiles": 8,
+        "single": {
+          "pass": true,
+          "model_match": true,
+          "numpy_exact": true,
+          "cycles": 791563,
+          "predicted": 791667
+        },
+        "alternate": {
+          "pass": true,
+          "model_match": true,
+          "numpy_exact": true,
+          "cycles": 375909,
+          "predicted": 375941
+        },
+        "latency_cut_percent": 52.5,
+        "max_model_error_percent": 0.013
+      }
+    },
+    {
+      "layer": "shape_16_16_3_3_16",
+      "attrs": {
+        "K": 16,
+        "C": 16,
+        "R": 3,
+        "S": 3,
+        "groups": 16
+      },
+      "positions": 2,
+      "weights": "random INT8 (seeded)",
+      "bits4": {
+        "tiles": 6,
+        "exact": true,
+        "cell_rule": "ASSUMED sum(pwm*level)"
+      },
+      "bits1": {
+        "tiles": 8,
+        "single": {
+          "pass": true,
+          "model_match": true,
+          "numpy_exact": true,
+          "cycles": 272101,
+          "predicted": 272205
+        },
+        "alternate": {
+          "pass": true,
+          "model_match": true,
+          "numpy_exact": true,
+          "cycles": 135156,
+          "predicted": 135190
+        },
+        "latency_cut_percent": 50.3,
+        "max_model_error_percent": 0.038
+      }
+    },
+    {
+      "layer": "shape_24_16_1_1_1",
+      "attrs": {
+        "K": 24,
+        "C": 16,
+        "R": 1,
+        "S": 1,
+        "groups": 1
+      },
+      "positions": 2,
+      "weights": "random INT8 (seeded)",
+      "bits4": {
+        "tiles": 3,
+        "exact": true,
+        "cell_rule": "ASSUMED sum(pwm*level)"
+      },
+      "bits1": {
+        "tiles": 12,
+        "single": {
+          "pass": true,
+          "model_match": true,
+          "numpy_exact": true,
+          "cycles": 720257,
+          "predicted": 720421
+        },
+        "alternate": {
+          "pass": true,
+          "model_match": true,
+          "numpy_exact": true,
+          "cycles": 350108,
+          "predicted": 350173
+        },
+        "latency_cut_percent": 51.4,
+        "max_model_error_percent": 0.023
+      }
+    },
+    {
+      "layer": "shape_10_32_1_1_1",
+      "attrs": {
+        "K": 10,
+        "C": 32,
+        "R": 1,
+        "S": 1,
+        "groups": 1
+      },
+      "positions": 2,
+      "weights": "random INT8 (seeded)",
+      "bits4": {
+        "tiles": 2,
+        "exact": true,
+        "cell_rule": "ASSUMED sum(pwm*level)"
+      },
+      "bits1": {
+        "tiles": 5,
+        "single": {
+          "pass": true,
+          "model_match": true,
+          "numpy_exact": true,
+          "cycles": 579061,
+          "predicted": 579120
+        },
+        "alternate": {
+          "pass": true,
+          "model_match": true,
+          "numpy_exact": true,
+          "cycles": 317516,
+          "predicted": 317542
+        },
+        "latency_cut_percent": 45.2,
+        "max_model_error_percent": 0.01
+      }
+    }
+  ]
+}

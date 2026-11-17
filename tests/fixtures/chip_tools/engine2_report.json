@@ -1,0 +1,101 @@
+{
+  "all_pass": true,
+  "rows": [
+    {
+      "pass": true,
+      "model_match": true,
+      "numpy_exact": true,
+      "cycles": 374437,
+      "layer": "conv",
+      "layout": "single",
+      "tiles": 4,
+      "predicted": 374481,
+      "model_error_percent": 0.01
+    },
+    {
+      "pass": true,
+      "model_match": true,
+      "numpy_exact": true,
+      "cycles": 172450,
+      "layer": "conv",
+      "layout": "alternate",
+      "tiles": 4,
+      "predicted": 172458,
+      "model_error_percent": 0.0,
+      "measured_cut_percent": 53.9,
+      "predicted_cut_percent": 53.9
+    },
+    {
+      "pass": true,
+      "model_match": true,
+      "numpy_exact": true,
+      "cycles": 135146,
+      "layer": "dw",
+      "layout": "single",
+      "tiles": 4,
+      "predicted": 135190,
+      "model_error_percent": 0.03
+    },
+    {
+      "pass": true,
+      "model_match": true,
+      "numpy_exact": true,
+      "cycles": 68315,
+      "layer": "dw",
+      "layout": "alternate",
+      "tiles": 4,
+      "predicted": 68325,
+      "model_error_percent": 0.01,
+      "measured_cut_percent": 49.5,
+      "predicted_cut_percent": 49.5
+    },
+    {
+      "pass": true,
+      "model_match": true,
+      "numpy_exact": true,
+      "cycles": 238406,
+      "layer": "pw",
+      "layout": "single",
+      "tiles": 8,
+      "predicted": 238510,
+      "model_error_percent": 0.04
+    },
+    {
+      "pass": true,
+      "model_match": true,
+      "numpy_exact": true,
+      "cycles": 122496,
+      "layer": "pw",
+      "layout": "alternate",
+      "tiles": 8,
+      "predicted": 122540,
+      "model_error_percent": 0.04,
+      "measured_cut_percent": 48.6,
+      "predicted_cut_percent": 48.6
+    },
+    {
+      "pass": true,
+      "model_match": true,
+      "numpy_exact": true,
+      "cycles": 309211,
+      "layer": "fc",
+      "layout": "single",
+      "tiles": 5,
+      "predicted": 309270,
+      "model_error_percent": 0.02
+    },
+    {
+      "pass": true,
+      "model_match": true,
+      "numpy_exact": true,
+      "cycles": 174880,
+      "layer": "fc",
+      "layout": "alternate",
+      "tiles": 5,
+      "predicted": 174904,
+      "model_error_percent": 0.01,
+      "measured_cut_percent": 43.4,
+      "predicted_cut_percent": 43.4
+    }
+  ]
+}

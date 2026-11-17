@@ -1,0 +1,72 @@
+{
+ "name": "public_edge5x5",
+ "meta": {
+  "source": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository",
+  "assumptions": [
+   "binary image and kernels"
+  ]
+ },
+ "nodes": [
+  {
+   "name": "input",
+   "op": "input",
+   "inputs": [],
+   "shape": [
+    1,
+    1,
+    28,
+    28
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "edge_5x5",
+   "op": "conv2d",
+   "inputs": [
+    "input"
+   ],
+   "shape": [
+    1,
+    2,
+    28,
+    28
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 2,
+    "C": 1,
+    "R": 5,
+    "S": 5,
+    "stride": 1,
+    "padding": 2,
+    "groups": 1,
+    "weight_dtype": "binary"
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "output",
+   "op": "output",
+   "inputs": [
+    "edge_5x5"
+   ],
+   "shape": [
+    1,
+    2,
+    28,
+    28
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  }
+ ]
+}

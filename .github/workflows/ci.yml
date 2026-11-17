@@ -1,0 +1,66 @@
+# CI for the PUBLIC repository (runs only there, so the private working repo spends no Actions minutes).
+#   tests     on every push / pull request: the test suite in public mode (no private BMsemi_Model), with the pinned
+#             chip repo and Yosys (yowasp) for the Verilog checks. This job is the README badge.
+#   pipeline  on demand (Actions tab -> ci -> Run workflow) and weekly: the whole `python3 bm.py pipeline --rebuild`
+#             with the OSS CAD Suite; the pipeline report is attached to the run. About 20-30 minutes.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 1"
+
+jobs:
+  tests:
+    if: github.repository == 'Pankajadas17/ai-native-compiler-x2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Chip repository (read-only, at the pinned commit)
+        run: |
+          COMMIT=$(python -c "import json; print(json.load(open('specifications/external_repos.json'))['sky130-reram-fpga']['commit'])")
+          git clone https://github.com/mole99/sky130-reram-fpga sky130-reram-fpga
+          git -C sky130-reram-fpga checkout "$COMMIT"
+          git -C sky130-reram-fpga submodule update --init --recursive
+      - name: Python packages
+        run: pip install -r requirements.txt yowasp-yosys
+      - name: Tests (public mode)
+        run: python -m pytest -q
+
+  pipeline:
+    if: github.repository == 'Pankajadas17/ai-native-compiler-x2' && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Chip repository (read-only, at the pinned commit)
+        run: |
+          COMMIT=$(python -c "import json; print(json.load(open('specifications/external_repos.json'))['sky130-reram-fpga']['commit'])")
+          git clone https://github.com/mole99/sky130-reram-fpga sky130-reram-fpga
+          git -C sky130-reram-fpga checkout "$COMMIT"
+          git -C sky130-reram-fpga submodule update --init --recursive
+      - name: OSS CAD Suite (Yosys, nextpnr, Icarus, SymbiYosys, Verilator)
+        uses: YosysHQ/setup-oss-cad-suite@v3
+      - name: Python environments (project + the chip flow's bitstream python)
+        run: |
+          pip install -r requirements.txt
+          python -m venv ~/chipenv
+          ~/chipenv/bin/pip install fasm numpy
+      - name: Whole pipeline (public mode)
+        run: python3 bm.py pipeline --rebuild
+      - name: Pipeline report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-report
+          path: reports/pipeline/

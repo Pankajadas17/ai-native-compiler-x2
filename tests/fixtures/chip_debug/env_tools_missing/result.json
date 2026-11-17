@@ -1,0 +1,58 @@
+{
+ "op": "relu8",
+ "verdict": "NOT RUN",
+ "stages": [
+  {
+   "stage": "rtl",
+   "status": "pass",
+   "detail": "reports/rtl/relu8.v re-checked in Yosys vs NumPy: 256 vectors",
+   "seconds": 0.5
+  },
+  {
+   "stage": "prep",
+   "status": "pass",
+   "detail": "wrapper check (chip pins, direct): 256 vectors through 17/36 pins == NumPy, 16 flip-flop bits",
+   "seconds": 0.4
+  },
+  {
+   "stage": "env",
+   "status": "blocked",
+   "detail": "Ubuntu is missing: fasm or numpy in /tmp/nofasm/bin/python (pip install fasm numpy), fasm or numpy in the Makefile's python3 (/tmp/nofasm/bin/python3)",
+   "seconds": 0.2
+  },
+  {
+   "stage": "flow",
+   "status": "not_run",
+   "detail": "not run: env was blocked",
+   "seconds": 0.0
+  },
+  {
+   "stage": "sim",
+   "status": "not_run",
+   "detail": "not run: env was blocked",
+   "seconds": 0.0
+  },
+  {
+   "stage": "check",
+   "status": "not_run",
+   "detail": "not run: env was blocked",
+   "seconds": 0.0
+  }
+ ],
+ "facts": {
+  "wrapper_check": {
+   "status": "pass",
+   "stage": "function",
+   "errors": [],
+   "vectors": 256,
+   "flop_bits": 16,
+   "pins": 17
+  }
+ },
+ "diagnosis": {
+  "rule_based_candidates": [
+   "chip_tools_missing"
+  ],
+  "source": "rules (no LLM)"
+ }
+}

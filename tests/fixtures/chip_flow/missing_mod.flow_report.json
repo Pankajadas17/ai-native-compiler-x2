@@ -1,0 +1,20 @@
+{
+  "design": "missing_mod",
+  "top": "missing_mod",
+  "rtl": [
+    "missing_mod.v"
+  ],
+  "stages": {
+    "synth": {
+      "exit": 2,
+      "seconds": 0.06
+    }
+  },
+  "status": "failed",
+  "failure": {
+    "stage": "synth",
+    "cause": "unknown_module",
+    "evidence": "\n2.11. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v\nParsing Verilog input from `REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v' to AST representation.\nGenerating RTLIL representation for module `\\RAM_32x4_2R_1W'.\nSuccessfully finished Verilog frontend.\n\n2.12. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v\nParsing Verilog input from `REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v' to AST representation.\nGenerating RTLIL representation for module `\\MACC_8x8_20'.\nSuccessfully finished Verilog frontend.\n\n2.13. Executing Verilog-2005 frontend: REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v\nParsing Verilog input from `REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v' to AST representation.\nGenerating RTLIL representation for module `\\RERAM_CIM_32x32'.\nSuccessfully finished Verilog frontend.\n\n2.14. Executing HIERARCHY pass (managing design hierarchy).\n\n2.15. Executing AST frontend in derive mode using pre-parsed AST for module `\\missing_mod'.\nGenerating RTLIL representation for module `\\missing_mod'.\n\n2.15.1. Analyzing design hierarchy..\nTop module:  \\missing_mod\nERROR: Module `\\not_a_real_cell' referenced in module `\\missing_mod' in cell `\\u0' is not part of the design.\nmake: *** [REPO/user_designs/makefile.include:55: synth] Error 1"
+  },
+  "chip_repo_read_only": true
+}

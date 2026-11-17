@@ -1,0 +1,118 @@
+--- a/chip/chip_flow.py
++++ b/chip/chip_flow.py
+@@ -207,12 +207,38 @@
+     return r.returncode, r.stdout + r.stderr, round(time.time() - t0, 2)
+ 
+ 
+-def run_flow(name, rtl_files, top, profile, repo=None, out_root=DEFAULT_OUT, env=None):
++MIN_YOSYS = (0, 70)          # the repo's synth options (-ff ...) need Yosys 0.70+; 0.66 fails with "Unknown option"
++
++
++def tool_env(base=None):
++    """PATH with the chip toolchain first: $CHIP_PY's folder (default ~/chipenv/bin) and $CHIP_CAD/bin (default
++    ~/tools/chip/oss-cad-suite/bin), when they exist. Same order as the chain's stage scripts: the repo Makefile runs
++    bit_gen.py with the first python3 (needs fasm), and an older Yosys elsewhere on PATH must not win."""
+     import os
++    env = dict(base if base is not None else os.environ)
++    home = Path(env.get("HOME", str(Path.home())))
++    py = Path(env.get("CHIP_PY", home / "chipenv" / "bin" / "python"))
++    cad = Path(env.get("CHIP_CAD", home / "tools" / "chip" / "oss-cad-suite")) / "bin"
++    first = [str(d) for d in (py.parent, cad) if d.is_dir()]
++    env["PATH"] = os.pathsep.join(first + [env.get("PATH", "")])
++    return env
++
++
++def yosys_version(text):
++    m = re.search(r"Yosys (\d+)\.(\d+)", text or "")
++    return (int(m.group(1)), int(m.group(2))) if m else None
++
++
++def run_flow(name, rtl_files, top, profile, repo=None, out_root=DEFAULT_OUT, env=None):
+     repo = repo if isinstance(repo, ChipRepo) else ChipRepo(repo)
+-    missing = [t for t in TOOLS if not shutil.which(t)]
++    env = tool_env(env)
++    missing = [t for t in TOOLS if not shutil.which(t, path=env["PATH"])]
+     if missing:
+-        raise RuntimeError(f"tools not on PATH: {missing} (run in the Ubuntu terminal after the export line)")
++        raise RuntimeError(f"tools not found: {missing} (looked in $CHIP_PY's folder, $CHIP_CAD/bin and PATH)")
++    ver = yosys_version(subprocess.run([shutil.which("yosys", path=env["PATH"]), "-V"], capture_output=True, text=True).stdout)
++    if ver is None or ver < MIN_YOSYS:
++        raise RuntimeError(f"Yosys {ver} found at {shutil.which('yosys', path=env['PATH'])}; the chip flow needs "
++                           f"{MIN_YOSYS[0]}.{MIN_YOSYS[1]}+ (set CHIP_CAD to the chip OSS CAD Suite, default ~/tools/chip/oss-cad-suite)")
+     if not re.fullmatch(r"[A-Za-z0-9_]+", name):
+         raise ValueError("design name: letters, digits and _ only")
+     work = Path(out_root) / name
+@@ -232,7 +258,6 @@
+     (work / "Makefile").write_text(MAKEFILE.format(name=name, top=top, rtl=" ".join(rtl_local),
+                                                    multiplier_map=mul_map, multiplier_args=mul_args),
+                                    encoding="ascii", newline="\n")
+-    env = dict(env or os.environ)
+     env["REPO"] = str(repo.root)
+     env["PYTHONDONTWRITEBYTECODE"] = "1"
+ 
+--- a/verification/chip_chain.py
++++ b/verification/chip_chain.py
+@@ -440,6 +440,10 @@
+ 
+ 
+ def judge(report, timing, sim):
++    """Timing is checked against the PROJECT clock (chip/x2_facts.py clock_mhz), not nextpnr's built-in 12 MHz target."""
++    from chip import x2_facts
++    clock = x2_facts.value("clock_mhz")
++    timing = {c: dict(t, target_mhz=clock, ok=t["fmax_mhz"] >= clock) for c, t in (timing or {}).items()}
+     """check stage: (status, detail, facts) from the flow report, timing and the netlist simulation."""
+     facts = {"utilisation": report.get("utilisation"), "pins": report.get("pins"), "bitstream_audit": report.get("bitstream_audit"),
+              "bitstream_bytes": report.get("bitstream_bytes"), "fasm_features": report.get("fasm_features"), "fmax": timing,
+--- a/compiler/x2_schedule.py
++++ b/compiler/x2_schedule.py
+@@ -21,9 +21,12 @@
+ """
+ from itertools import combinations
+ 
++from chip import x2_facts
+ from compiler.ir import MATRIX_OPS
+ 
+-PROGRAM_CMD, MVM, BEAT = 365, 511, 3                  # cycles; fitted constants (tests/test_x2_schedule.py re-fits them)
++# cycles; the fitted constants of the BEHAVIORAL model (tests/test_x2_schedule.py re-fits them). tile_costs reads the current
++# values from chip/x2_facts.py, so a silicon number put in specifications/x2_overrides.json is used without a code change.
++PROGRAM_CMD, MVM, BEAT = (x2_facts.FACTS[k]["value"] for k in ("program_cycles_per_cell", "mvm_cycles", "beat_cycles"))
+ CALIBRATION = ("cycles = 365 * program commands + 511 * MVMs + 3.1 * input beats: least-squares fit to the 4 X2 engine "
+                "simulations (conv, dw, pw, fc; BM behavioral X2, 1-bit cells), max error 1.6 cycles")
+ ASSUMPTIONS = ["both X2 blocks at once: built (x2_engine2.v) and measured on 4 layers within 0.05 % (BM behavioral X2, 1-bit cells); "
+@@ -39,13 +42,13 @@
+ def tile_costs(chip, hw):
+     """{layer: [{"cells", "rows", "program", "compute"}, ...]} from each layer's placement (recomputed, not trusted)."""
+     out = {}
++    pc, mv, bt = (x2_facts.value(k) for k in ("program_cycles_per_cell", "mvm_cycles", "beat_cycles"))
+     for name, v in chip["layers"].items():
+         tiles = []
+         for blocks in v["placement"]:
+             cells = sum(b[5] * b[6] for b in blocks)
+             rows = max(b[3] + b[5] for b in blocks)
+-            tiles.append({"cells": cells, "rows": rows, "program": cells * PROGRAM_CMD,
+-                          "compute": v["mvms_per_tile"] * (MVM + BEAT * rows)})
++            tiles.append({"cells": cells, "rows": rows, "program": cells * pc, "compute": v["mvms_per_tile"] * (mv + bt * rows)})
+         out[name] = tiles
+     return out
+ 
+@@ -128,7 +131,8 @@
+         return errs, None
+     sim = simulate(costs, deps, clean, resident, blocks)
+     one_time = sum(c["program"] for L in resident for c in costs[L])
+-    metrics = dict(sim, resident_program_once_upper=one_time, blocks_streaming=sorted(str_blocks),
++    mhz = x2_facts.value("clock_mhz")
++    metrics = dict(sim, latency_us=round(sim["latency_cycles"] / mhz, 1), clock_mhz=mhz, resident_program_once_upper=one_time, blocks_streaming=sorted(str_blocks),
+                    resident_blocks={str(k): list(v) for k, v in sorted(res_blocks.items())}, tiles=len(clean),
+                    blocks_used=len(set(res_blocks) | str_blocks), runs_on_built_x2_engine=len(set(res_blocks) | str_blocks) <= 1)
+     return [], metrics
+--- a/agents/mapping_agent.py
++++ b/agents/mapping_agent.py
+@@ -200,7 +200,7 @@
+                    "tiles": sched["tiles"], "today": {"resident": chip["resident"], "policy": "single_block", "metrics": today_m},
+                    "latency_reduction_vs_today_percent": gain, "code_best": {"resident": best["resident"], "policy": best["policy"],
+                                                                              "metrics": best_m}, "candidates_tried": tried,
+-                   "llm": llm, "cost_model": xs.CALIBRATION, "assumptions": xs.ASSUMPTIONS,
++                   "llm": llm, "cost_model": xs.CALIBRATION, "assumptions": xs.ASSUMPTIONS, "x2_facts": xs.x2_facts.summary(),
+                    "evidence_level": "calibrated behavioral-model schedule estimate (NOT a simulation of the schedule, NOT silicon)"}
+ 
+ 

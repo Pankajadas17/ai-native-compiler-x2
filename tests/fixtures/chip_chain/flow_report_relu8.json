@@ -1,0 +1,99 @@
+{
+  "design": "chain_relu8",
+  "top": "relu8_chip",
+  "rtl": [
+    "relu8_chip.v"
+  ],
+  "stages": {
+    "synth": {
+      "exit": 0,
+      "seconds": 0.19
+    },
+    "pnr": {
+      "exit": 0,
+      "seconds": 1.14
+    },
+    "bitstream": {
+      "exit": 0,
+      "seconds": 0.92
+    },
+    "hex": {
+      "exit": 0,
+      "seconds": 0.05
+    }
+  },
+  "status": "ok",
+  "failure": null,
+  "pins": {
+    "needed": 17,
+    "available": 36,
+    "fits": true,
+    "by_port": {
+      "clk": 1,
+      "x": 8,
+      "y": 8
+    },
+    "assignment": {
+      "clk": "X0Y1/A",
+      "x[0]": "X0Y1/B",
+      "x[1]": "X0Y2/A",
+      "x[2]": "X0Y2/B",
+      "x[3]": "X0Y3/A",
+      "x[4]": "X0Y3/B",
+      "x[5]": "X0Y4/A",
+      "x[6]": "X0Y4/B",
+      "x[7]": "X0Y5/A",
+      "y[0]": "X0Y5/B",
+      "y[1]": "X0Y6/A",
+      "y[2]": "X0Y6/B",
+      "y[3]": "X0Y7/A",
+      "y[4]": "X0Y7/B",
+      "y[5]": "X0Y8/A",
+      "y[6]": "X0Y8/B",
+      "y[7]": "X0Y9/A"
+    }
+  },
+  "utilisation": {
+    "FABULOUS_LC": {
+      "used": 15,
+      "available": 2160
+    },
+    "IOBUF": {
+      "used": 17,
+      "available": 36
+    },
+    "RAM_32x4_2R_1W": {
+      "used": 0,
+      "available": 36
+    },
+    "MACC_8x8_20": {
+      "used": 0,
+      "available": 18
+    },
+    "RERAM_CIM_32x32": {
+      "used": 0,
+      "available": 2
+    },
+    "GBUF": {
+      "used": 1,
+      "available": 4
+    },
+    "SYS_RESET": {
+      "used": 0,
+      "available": 1
+    }
+  },
+  "fasm_features": 413,
+  "bitstream_bytes": 35304,
+  "bitstream_expected_bytes": 35304,
+  "bitstream_audit": {
+    "structural_ok": true,
+    "failed_checks": [],
+    "required_bits": 345,
+    "set_bits": 345,
+    "missing": 0,
+    "unexplained": 0,
+    "unparsed_fasm_lines": 0
+  },
+  "chip_repo_read_only": true
+}

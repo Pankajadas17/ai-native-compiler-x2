@@ -1,0 +1,35 @@
+{
+  "what": "FABulous demo design compiled to a real bitstream",
+  "design": "sequential_16bit_en",
+  "note": "FABulous 2.2.0 demo project; compile_design on user_design/sequential_16bit_en.v. FAB_PDK removed from .FABulous/.env (no PDK needed for a bitstream). Generated files are FABulous demo outputs (Apache-2.0 project).",
+  "tools": {
+    "FABulous": "2.2.0",
+    "yosys": "0.66+154",
+    "nextpnr-generic": "0.10-82-g2b560ad0",
+    "oss-cad-suite": "2026-06-25",
+    "iverilog": "14.0 devel"
+  },
+  "spec_reduced": "only features referenced by the FASM (full spec is ~9 MB)",
+  "files": {
+    "design.bin": {
+      "size": 12024,
+      "sha256": "e481de7310d519daae3b354cc138859f0f29e8b98d6dac4dafd17f49f3b4efb8"
+    },
+    "design.fasm": {
+      "size": 53087,
+      "sha256": "a50fd5f98eea93605d7badade025be365ba1597c19b65852485891f3ce495bc8"
+    },
+    "fabric.csv": {
+      "size": 2930,
+      "sha256": "5a5a3f658dceb67ec6e3cdef4deae6fe87ba9a88cf5c01c490f869550040416f"
+    },
+    "spec_reduced.json": {
+      "size": 51353,
+      "sha256": "85aeceb9fec5d6d2469d3c38ec7ca2c6680c79b593e9575b51fc74d1c05b75e8"
+    },
+    "nextpnr_log.txt": {
+      "size": 10079,
+      "sha256": "a946db105c5de19b52c4398fc5e6621708cd80831b0380c0c7c49777b8a81b10"
+    }
+  }
+}

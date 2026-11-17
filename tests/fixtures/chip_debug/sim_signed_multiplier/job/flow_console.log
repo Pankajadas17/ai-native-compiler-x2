@@ -1,0 +1,3 @@
+design                   status  pins         failure                          utilisation (used/available)
+chain_requant_i32_i8     ok      pins 26/36                                    FABULOUS_LC 134/2160, IOBUF 26/36, MACC_8x8_20 4/18, GBUF 1/4 | V0 3597/3597 bits
+reports: /tmp/p13/bm_verif/chip_build/<design>/flow_report.json

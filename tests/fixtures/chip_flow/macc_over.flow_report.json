@@ -1,0 +1,84 @@
+{
+  "design": "macc_over",
+  "top": "macc_over",
+  "rtl": [
+    "macc_over.v"
+  ],
+  "stages": {
+    "synth": {
+      "exit": 0,
+      "seconds": 0.73
+    },
+    "pnr": {
+      "exit": 2,
+      "seconds": 1.19
+    }
+  },
+  "status": "failed",
+  "failure": {
+    "stage": "pnr",
+    "cause": "over_capacity",
+    "evidence": "Info: constrained 'a[0]' to bel 'X0Y1/B'\nInfo: constrained 'a[1]' to bel 'X0Y2/A'\nInfo: constrained 'a[2]' to bel 'X0Y2/B'\nInfo: constrained 'a[3]' to bel 'X0Y3/A'\nInfo: constrained 'a[4]' to bel 'X0Y3/B'\nInfo: constrained 'a[5]' to bel 'X0Y4/A'\nInfo: constrained 'a[6]' to bel 'X0Y4/B'\nInfo: constrained 'a[7]' to bel 'X0Y5/A'\nInfo: constrained 'q' to bel 'X0Y5/B'\nInfo: Finished applying constraints from 'BM_VERIF/chip_build/macc_over/design.pcf'\nInfo: Checksum: 0x891ae5f6\n\nInfo: Device utilisation:\nInfo: \t         FABULOUS_LC:     589/   2160    27%\nInfo: \t               IOBUF:      10/     36    27%\nInfo: \t      RAM_32x4_2R_1W:       0/     36     0%\nInfo: \t         MACC_8x8_20:      20/     18   111%\nInfo: \t     RERAM_CIM_32x32:       0/      2     0%\nInfo: \t                GBUF:       1/      4    25%\nInfo: \t           SYS_RESET:       0/      1     0%\n\nInfo: Placed 10 cells based on constraints.\nERROR: Unable to place cell '$rtl/macc_over.v:10$mul$37', no BELs remaining to implement cell type 'MACC_8x8_20'\n0 warnings, 1 error\nmake: *** [REPO/user_designs/makefile.include:76: pnr] Error 125",
+    "details": {
+      "over": {
+        "MACC_8x8_20": {
+          "used": 20,
+          "available": 18
+        }
+      }
+    }
+  },
+  "pins": {
+    "needed": 10,
+    "available": 36,
+    "fits": true,
+    "by_port": {
+      "clk": 1,
+      "a": 8,
+      "q": 1
+    },
+    "assignment": {
+      "clk": "X0Y1/A",
+      "a[0]": "X0Y1/B",
+      "a[1]": "X0Y2/A",
+      "a[2]": "X0Y2/B",
+      "a[3]": "X0Y3/A",
+      "a[4]": "X0Y3/B",
+      "a[5]": "X0Y4/A",
+      "a[6]": "X0Y4/B",
+      "a[7]": "X0Y5/A",
+      "q": "X0Y5/B"
+    }
+  },
+  "utilisation": {
+    "FABULOUS_LC": {
+      "used": 589,
+      "available": 2160
+    },
+    "IOBUF": {
+      "used": 10,
+      "available": 36
+    },
+    "RAM_32x4_2R_1W": {
+      "used": 0,
+      "available": 36
+    },
+    "MACC_8x8_20": {
+      "used": 20,
+      "available": 18
+    },
+    "RERAM_CIM_32x32": {
+      "used": 0,
+      "available": 2
+    },
+    "GBUF": {
+      "used": 1,
+      "available": 4
+    },
+    "SYS_RESET": {
+      "used": 0,
+      "available": 1
+    }
+  },
+  "chip_repo_read_only": true
+}

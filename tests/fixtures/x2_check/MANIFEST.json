@@ -1,0 +1,8 @@
+{
+  "what": "Icarus simulator logs of the BM Labs X2 behavioral model driven by sim/x2_vector_tb.sv with the vectors from chip/x2_check.all_scenarios()",
+  "behavioral_model": "ip/sky130_bmlabs_reram/verilog/behavioral/sky130_bmlabs_reram__cim32x32.sv",
+  "behavioral_model_lf_sha256": "f182fef54a92e7ab97218df8c03148a4143373658ff70521efa67beae18afe44",
+  "sky130_bmlabs_reram_commit": "cfa1cb85d5ab9d665dbbcaf79bb80c900fc09976",
+  "simulator": "Icarus Verilog version 14.0 (devel) (s20260301-948-gbd5af2914-dirty)",
+  "recorded": "2026-11-12, in the assistant's Linux sandbox"
+}

@@ -1,0 +1,6710 @@
+{
+  "creator": "Yosys 0.70+368 (git sha1 7cf88aca6, Release, Clang /usr/bin/clang++ 21.1.8)",
+  "modules": {
+    "$__ABC9_BARRIER": {
+      "attributes": {
+        "abc9_box_id": "00000000000000000000000000000011",
+        "blackbox": "00000000000000000000000000000001",
+        "abc9_box": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:10.1-14.10"
+      },
+      "ports": {
+        "I": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "O": {
+          "direction": "output",
+          "bits": [ 3 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$110": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 3 ]
+          }
+        },
+        "$specify$94": {
+          "hide_name": 1,
+          "type": "$specify2",
+          "parameters": {
+            "DST_WIDTH": "00000000000000000000000000000001",
+            "FULL": "0",
+            "SRC_DST_PEN": "0",
+            "SRC_DST_POL": "0",
+            "SRC_WIDTH": "00000000000000000000000000000001",
+            "T_FALL_MAX": "00000000000000000000000000000000",
+            "T_FALL_MIN": "00000000000000000000000000000000",
+            "T_FALL_TYP": "00000000000000000000000000000000",
+            "T_RISE_MAX": "00000000000000000000000000000000",
+            "T_RISE_MIN": "00000000000000000000000000000000",
+            "T_RISE_TYP": "00000000000000000000000000000000"
+          },
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:12.5-12.18"
+          },
+          "port_directions": {
+            "DST": "input",
+            "EN": "input",
+            "SRC": "input"
+          },
+          "connections": {
+            "DST": [ 3 ],
+            "EN": [ "1" ],
+            "SRC": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "I": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:10.31-10.32"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:10.41-10.42"
+          }
+        }
+      }
+    },
+    "$__ABC9_DELAY": {
+      "attributes": {
+        "abc9_box_id": "00000000000000000000000000000100",
+        "blackbox": "00000000000000000000000000000001",
+        "abc9_box": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:2.1-7.10"
+      },
+      "parameter_default_values": {
+        "DELAY": "00000000000000000000000000000000"
+      },
+      "ports": {
+        "I": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "O": {
+          "direction": "output",
+          "bits": [ 3 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$112": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 3 ]
+          }
+        },
+        "$specify$93": {
+          "hide_name": 1,
+          "type": "$specify2",
+          "parameters": {
+            "DST_WIDTH": "00000000000000000000000000000001",
+            "FULL": "0",
+            "SRC_DST_PEN": "0",
+            "SRC_DST_POL": "0",
+            "SRC_WIDTH": "00000000000000000000000000000001",
+            "T_FALL_MAX": "00000000000000000000000000000000",
+            "T_FALL_MIN": "00000000000000000000000000000000",
+            "T_FALL_TYP": "00000000000000000000000000000000",
+            "T_RISE_MAX": "00000000000000000000000000000000",
+            "T_RISE_MIN": "00000000000000000000000000000000",
+            "T_RISE_TYP": "00000000000000000000000000000000"
+          },
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:5.5-5.22"
+          },
+          "port_directions": {
+            "DST": "input",
+            "EN": "input",
+            "SRC": "input"
+          },
+          "connections": {
+            "DST": [ 3 ],
+            "EN": [ "1" ],
+            "SRC": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "I": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:2.29-2.30"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:2.39-2.40"
+          }
+        }
+      }
+    },
+    "$__ABC9_SCC_BREAKER": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:16.1-18.10"
+      },
+      "parameter_default_values": {
+        "WIDTH": "00000000000000000000000000000000"
+      },
+      "ports": {
+        "I": {
+          "direction": "input",
+          "offset": -1,
+          "upto": 1,
+          "bits": [ 2, 3 ]
+        },
+        "O": {
+          "direction": "output",
+          "offset": -1,
+          "upto": 1,
+          "bits": [ 4, 5 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$108": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z", "z" ],
+            "Y": [ 4, 5 ]
+          }
+        }
+      },
+      "netnames": {
+        "I": {
+          "hide_name": 0,
+          "bits": [ 2, 3 ],
+          "offset": -1,
+          "upto": 1,
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:16.47-16.48"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 4, 5 ],
+          "offset": -1,
+          "upto": 1,
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:16.69-16.70"
+          }
+        }
+      }
+    },
+    "$__DFF_N__$abc9_flop": {
+      "attributes": {
+        "abc9_box_id": "00000000000000000000000000000010",
+        "whitebox": "00000000000000000000000000000001",
+        "abc9_flop": "00000000000000000000000000000001",
+        "abc9_box": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:21.1-27.10"
+      },
+      "ports": {
+        "C": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "D": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "Q": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "n1": {
+          "direction": "output",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$106": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3 ],
+            "Y": [ 5 ]
+          }
+        },
+        "$specify$95": {
+          "hide_name": 1,
+          "type": "$specrule",
+          "parameters": {
+            "DST_PEN": "1",
+            "DST_POL": "1",
+            "DST_WIDTH": "00000000000000000000000000000001",
+            "SRC_PEN": "0",
+            "SRC_POL": "0",
+            "SRC_WIDTH": "00000000000000000000000000000001",
+            "TYPE": "$setup",
+            "T_LIMIT2_MAX": "00000000000000000000000000000000",
+            "T_LIMIT2_MIN": "00000000000000000000000000000000",
+            "T_LIMIT2_TYP": "00000000000000000000000000000000",
+            "T_LIMIT_MAX": "00000000000000000000000000000000",
+            "T_LIMIT_MIN": "00000000000000000000000000000000",
+            "T_LIMIT_TYP": "00000000000000000000000000000000"
+          },
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:24.5-24.29"
+          },
+          "port_directions": {
+            "DST": "input",
+            "DST_EN": "input",
+            "SRC": "input",
+            "SRC_EN": "input"
+          },
+          "connections": {
+            "DST": [ 2 ],
+            "DST_EN": [ "1" ],
+            "SRC": [ 3 ],
+            "SRC_EN": [ "1" ]
+          }
+        },
+        "$specify$96": {
+          "hide_name": 1,
+          "type": "$specify3",
+          "parameters": {
+            "DAT_DST_PEN": "0",
+            "DAT_DST_POL": "0",
+            "DST_WIDTH": "00000000000000000000000000000001",
+            "EDGE_EN": "1",
+            "EDGE_POL": "1",
+            "FULL": "0",
+            "SRC_DST_PEN": "0",
+            "SRC_DST_POL": "0",
+            "SRC_WIDTH": "00000000000000000000000000000001",
+            "T_FALL_MAX": "00000000000000000000000000000000",
+            "T_FALL_MIN": "00000000000000000000000000000000",
+            "T_FALL_TYP": "00000000000000000000000000000000",
+            "T_RISE_MAX": "00000000000000000000000000000000",
+            "T_RISE_MIN": "00000000000000000000000000000000",
+            "T_RISE_TYP": "00000000000000000000000000000000"
+          },
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:25.5-25.31"
+          },
+          "port_directions": {
+            "DAT": "input",
+            "DST": "input",
+            "EN": "input",
+            "SRC": "input"
+          },
+          "connections": {
+            "DAT": [ 3 ],
+            "DST": [ 5 ],
+            "EN": [ "1" ],
+            "SRC": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "C": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:21.36-21.37"
+          }
+        },
+        "D": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:21.39-21.40"
+          }
+        },
+        "Q": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:21.42-21.43"
+          }
+        },
+        "n1": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:21.52-21.54"
+          }
+        }
+      }
+    },
+    "$__DFF_P__$abc9_flop": {
+      "attributes": {
+        "abc9_box_id": "00000000000000000000000000000001",
+        "whitebox": "00000000000000000000000000000001",
+        "abc9_flop": "00000000000000000000000000000001",
+        "abc9_box": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:30.1-36.10"
+      },
+      "ports": {
+        "C": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "D": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "Q": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "n1": {
+          "direction": "output",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$102": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3 ],
+            "Y": [ 5 ]
+          }
+        },
+        "$specify$97": {
+          "hide_name": 1,
+          "type": "$specrule",
+          "parameters": {
+            "DST_PEN": "1",
+            "DST_POL": "1",
+            "DST_WIDTH": "00000000000000000000000000000001",
+            "SRC_PEN": "0",
+            "SRC_POL": "0",
+            "SRC_WIDTH": "00000000000000000000000000000001",
+            "TYPE": "$setup",
+            "T_LIMIT2_MAX": "00000000000000000000000000000000",
+            "T_LIMIT2_MIN": "00000000000000000000000000000000",
+            "T_LIMIT2_TYP": "00000000000000000000000000000000",
+            "T_LIMIT_MAX": "00000000000000000000000000000000",
+            "T_LIMIT_MIN": "00000000000000000000000000000000",
+            "T_LIMIT_TYP": "00000000000000000000000000000000"
+          },
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:33.5-33.29"
+          },
+          "port_directions": {
+            "DST": "input",
+            "DST_EN": "input",
+            "SRC": "input",
+            "SRC_EN": "input"
+          },
+          "connections": {
+            "DST": [ 2 ],
+            "DST_EN": [ "1" ],
+            "SRC": [ 3 ],
+            "SRC_EN": [ "1" ]
+          }
+        },
+        "$specify$98": {
+          "hide_name": 1,
+          "type": "$specify3",
+          "parameters": {
+            "DAT_DST_PEN": "0",
+            "DAT_DST_POL": "0",
+            "DST_WIDTH": "00000000000000000000000000000001",
+            "EDGE_EN": "1",
+            "EDGE_POL": "1",
+            "FULL": "0",
+            "SRC_DST_PEN": "0",
+            "SRC_DST_POL": "0",
+            "SRC_WIDTH": "00000000000000000000000000000001",
+            "T_FALL_MAX": "00000000000000000000000000000000",
+            "T_FALL_MIN": "00000000000000000000000000000000",
+            "T_FALL_TYP": "00000000000000000000000000000000",
+            "T_RISE_MAX": "00000000000000000000000000000000",
+            "T_RISE_MIN": "00000000000000000000000000000000",
+            "T_RISE_TYP": "00000000000000000000000000000000"
+          },
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:34.5-34.31"
+          },
+          "port_directions": {
+            "DAT": "input",
+            "DST": "input",
+            "EN": "input",
+            "SRC": "input"
+          },
+          "connections": {
+            "DAT": [ 3 ],
+            "DST": [ 5 ],
+            "EN": [ "1" ],
+            "SRC": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "C": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:30.36-30.37"
+          }
+        },
+        "D": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:30.39-30.40"
+          }
+        },
+        "Q": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:30.42-30.43"
+          }
+        },
+        "n1": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/abc9_model.v:30.52-30.54"
+          }
+        }
+      }
+    },
+    "$__FABULOUS_IBUF": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:5.1-6.10"
+      },
+      "ports": {
+        "PAD": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "OUT": {
+          "direction": "output",
+          "bits": [ 3 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$377": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "OUT": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:5.45-5.48"
+          }
+        },
+        "PAD": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:5.33-5.36"
+          }
+        }
+      }
+    },
+    "$__FABULOUS_IOBUF": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:17.1-18.10"
+      },
+      "ports": {
+        "PAD": {
+          "direction": "inout",
+          "bits": [ 2 ]
+        },
+        "OUT": {
+          "direction": "output",
+          "bits": [ 3 ]
+        },
+        "IN": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "EN": {
+          "direction": "input",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$369": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$370": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "EN": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:17.67-17.69"
+          }
+        },
+        "IN": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:17.57-17.59"
+          }
+        },
+        "OUT": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:17.46-17.49"
+          }
+        },
+        "PAD": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:17.34-17.37"
+          }
+        }
+      }
+    },
+    "$__FABULOUS_OBUF": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:9.1-10.10"
+      },
+      "ports": {
+        "PAD": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "IN": {
+          "direction": "input",
+          "bits": [ 3 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$375": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "IN": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:9.45-9.47"
+          }
+        },
+        "PAD": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:9.34-9.37"
+          }
+        }
+      }
+    },
+    "$__FABULOUS_TBUF": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:13.1-14.10"
+      },
+      "ports": {
+        "PAD": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "IN": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "EN": {
+          "direction": "input",
+          "bits": [ 4 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$373": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "EN": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:13.55-13.57"
+          }
+        },
+        "IN": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:13.45-13.47"
+          }
+        },
+        "PAD": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v:13.34-13.37"
+          }
+        }
+      }
+    },
+    "$paramod\\LUT4_HA\\INIT=16'0000000000000000\\I0MUX=1'1": {
+      "attributes": {
+        "hdlname": "LUT4_HA",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.1-39.10"
+      },
+      "parameter_default_values": {
+        "I0MUX": "1",
+        "INIT": "0000000000000000"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "Co": {
+          "direction": "output",
+          "bits": [ 3 ]
+        },
+        "I0": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "I1": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "I2": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "I3": {
+          "direction": "input",
+          "bits": [ 7 ]
+        },
+        "Ci": {
+          "direction": "input",
+          "bits": [ 8 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$436": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 3 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$437": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "Ci": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.52-27.54"
+          }
+        },
+        "Co": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.26-27.28"
+          }
+        },
+        "I0": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.36-27.38"
+          }
+        },
+        "I1": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.40-27.42"
+          }
+        },
+        "I2": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.44-27.46"
+          }
+        },
+        "I3": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.48-27.50"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.23-27.24"
+          }
+        }
+      }
+    },
+    "$paramod\\LUT4_HA\\INIT=16'1001011010010110\\I0MUX=1'1": {
+      "attributes": {
+        "hdlname": "LUT4_HA",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.1-39.10"
+      },
+      "parameter_default_values": {
+        "I0MUX": "1",
+        "INIT": "1001011010010110"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "Co": {
+          "direction": "output",
+          "bits": [ 3 ]
+        },
+        "I0": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "I1": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "I2": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "I3": {
+          "direction": "input",
+          "bits": [ 7 ]
+        },
+        "Ci": {
+          "direction": "input",
+          "bits": [ 8 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$429": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 3 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$430": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "Ci": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.52-27.54"
+          }
+        },
+        "Co": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.26-27.28"
+          }
+        },
+        "I0": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.36-27.38"
+          }
+        },
+        "I1": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.40-27.42"
+          }
+        },
+        "I2": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.44-27.46"
+          }
+        },
+        "I3": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.48-27.50"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.23-27.24"
+          }
+        }
+      }
+    },
+    "FABULOUS_LC": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:79.1-110.10"
+      },
+      "parameter_default_values": {
+        "DFF_ENABLE": "0",
+        "INIT": "0000000000000000",
+        "K": "00000000000000000000000000000100"
+      },
+      "ports": {
+        "CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "I": {
+          "direction": "input",
+          "bits": [ 3, 4, 5, 6 ]
+        },
+        "O": {
+          "direction": "output",
+          "bits": [ 7 ]
+        },
+        "Q": {
+          "direction": "output",
+          "bits": [ 8 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$320": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 7 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$321": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 8 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:84.9-84.12"
+          }
+        },
+        "I": {
+          "hide_name": 0,
+          "bits": [ 3, 4, 5, 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:85.17-85.18"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:86.10-86.11"
+          }
+        },
+        "Q": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:87.10-87.11"
+          }
+        }
+      }
+    },
+    "GBUF": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "keep": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/GBUF/yosys/primitives/GBUF.v:16.1-25.10"
+      },
+      "parameter_default_values": {
+        "INVERT": "0"
+      },
+      "ports": {
+        "IN": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "OUT": {
+          "direction": "output",
+          "bits": [ 3 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$279": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "IN": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/GBUF/yosys/primitives/GBUF.v:19.12-19.14"
+          }
+        },
+        "OUT": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "clkbuf_driver": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/GBUF/yosys/primitives/GBUF.v:20.32-20.35"
+          }
+        }
+      }
+    },
+    "IBUF": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/IBUF/yosys/primitives/IBUF.v:16.1-36.10"
+      },
+      "parameter_default_values": {
+        "OUT_REG": "0"
+      },
+      "ports": {
+        "CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "OUT": {
+          "direction": "output",
+          "bits": [ 3 ]
+        },
+        "PAD": {
+          "direction": "input",
+          "bits": [ 4 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$290": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IBUF/yosys/primitives/IBUF.v:19.28-19.31"
+          }
+        },
+        "OUT": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/IBUF/yosys/primitives/IBUF.v:20.10-20.13"
+          }
+        },
+        "PAD": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "iopad_external_pin": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IBUF/yosys/primitives/IBUF.v:21.34-21.37"
+          }
+        }
+      }
+    },
+    "IDDR": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v:16.1-53.10"
+      },
+      "parameter_default_values": {
+        "INIT_Q0": "0",
+        "INIT_Q1": "0"
+      },
+      "ports": {
+        "CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "EN": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "SR": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "D": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "Q0": {
+          "direction": "output",
+          "bits": [ 6 ]
+        },
+        "Q1": {
+          "direction": "output",
+          "bits": [ 7 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$270": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 6 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$271": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 7 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v:20.28-20.31"
+          }
+        },
+        "D": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v:23.10-23.11"
+          }
+        },
+        "EN": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v:21.10-21.12"
+          }
+        },
+        "Q0": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v:24.10-24.12"
+          }
+        },
+        "Q1": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v:25.10-25.12"
+          }
+        },
+        "SR": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v:22.10-22.12"
+          }
+        }
+      }
+    },
+    "IOBUF": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "keep": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v:16.1-45.10"
+      },
+      "parameter_default_values": {
+        "EN_REG": "0",
+        "IN_REG": "0",
+        "OUT_REG": "0"
+      },
+      "ports": {
+        "CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "EN": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "IN": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "OUT": {
+          "direction": "output",
+          "bits": [ 5 ]
+        },
+        "PAD": {
+          "direction": "inout",
+          "bits": [ 6 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$294": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 5 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$295": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 6 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v:21.28-21.31"
+          }
+        },
+        "EN": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v:22.10-22.12"
+          }
+        },
+        "IN": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v:23.10-23.12"
+          }
+        },
+        "OUT": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v:24.10-24.13"
+          }
+        },
+        "PAD": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "iopad_external_pin": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v:25.34-25.37"
+          }
+        }
+      }
+    },
+    "LUT1": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:1.1-4.10"
+      },
+      "parameter_default_values": {
+        "INIT": "00"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "I0": {
+          "direction": "input",
+          "bits": [ 3 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$366": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "I0": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:1.29-1.31"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:1.20-1.21"
+          }
+        }
+      }
+    },
+    "LUT2": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:6.1-10.10"
+      },
+      "parameter_default_values": {
+        "INIT": "0000"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "I0": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "I1": {
+          "direction": "input",
+          "bits": [ 4 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$364": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "I0": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:6.29-6.31"
+          }
+        },
+        "I1": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:6.33-6.35"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:6.20-6.21"
+          }
+        }
+      }
+    },
+    "LUT3": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:12.1-17.10"
+      },
+      "parameter_default_values": {
+        "INIT": "00000000"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "I0": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "I1": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "I2": {
+          "direction": "input",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$361": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "I0": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:12.29-12.31"
+          }
+        },
+        "I1": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:12.33-12.35"
+          }
+        },
+        "I2": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:12.37-12.39"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:12.20-12.21"
+          }
+        }
+      }
+    },
+    "LUT4": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:19.1-25.10"
+      },
+      "parameter_default_values": {
+        "INIT": "0000000000000000"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "I0": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "I1": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "I2": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "I3": {
+          "direction": "input",
+          "bits": [ 6 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$357": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "I0": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:19.29-19.31"
+          }
+        },
+        "I1": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:19.33-19.35"
+          }
+        },
+        "I2": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:19.37-19.39"
+          }
+        },
+        "I3": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:19.41-19.43"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:19.20-19.21"
+          }
+        }
+      }
+    },
+    "LUT4_HA": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.1-39.10"
+      },
+      "parameter_default_values": {
+        "I0MUX": "1",
+        "INIT": "0000000000000000"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "Co": {
+          "direction": "output",
+          "bits": [ 3 ]
+        },
+        "I0": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "I1": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "I2": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "I3": {
+          "direction": "input",
+          "bits": [ 7 ]
+        },
+        "Ci": {
+          "direction": "input",
+          "bits": [ 8 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$351": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$352": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "Ci": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.52-27.54"
+          }
+        },
+        "Co": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.26-27.28"
+          }
+        },
+        "I0": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.36-27.38"
+          }
+        },
+        "I1": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.40-27.42"
+          }
+        },
+        "I2": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.44-27.46"
+          }
+        },
+        "I3": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.48-27.50"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:27.23-27.24"
+          }
+        }
+      }
+    },
+    "LUT5": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:41.1-48.10"
+      },
+      "parameter_default_values": {
+        "INIT": "00000000000000000000000000000000"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "I0": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "I1": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "I2": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "I3": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "I4": {
+          "direction": "input",
+          "bits": [ 7 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$345": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "I0": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:41.29-41.31"
+          }
+        },
+        "I1": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:41.33-41.35"
+          }
+        },
+        "I2": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:41.37-41.39"
+          }
+        },
+        "I3": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:41.41-41.43"
+          }
+        },
+        "I4": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:41.45-41.47"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:41.20-41.21"
+          }
+        }
+      }
+    },
+    "LUT55_FCY": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:60.1-70.10"
+      },
+      "parameter_default_values": {
+        "INIT": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "Co": {
+          "direction": "output",
+          "bits": [ 3 ]
+        },
+        "I0": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "I1": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "I2": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "I3": {
+          "direction": "input",
+          "bits": [ 7 ]
+        },
+        "I4": {
+          "direction": "input",
+          "bits": [ 8 ]
+        },
+        "Ci": {
+          "direction": "input",
+          "bits": [ 9 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$331": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$332": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "Ci": {
+          "hide_name": 0,
+          "bits": [ 9 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:60.59-60.61"
+          }
+        },
+        "Co": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:60.29-60.31"
+          }
+        },
+        "I0": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:60.39-60.41"
+          }
+        },
+        "I1": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:60.43-60.45"
+          }
+        },
+        "I2": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:60.47-60.49"
+          }
+        },
+        "I3": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:60.51-60.53"
+          }
+        },
+        "I4": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:60.55-60.57"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:60.26-60.27"
+          }
+        }
+      }
+    },
+    "LUT6": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:50.1-58.10"
+      },
+      "parameter_default_values": {
+        "INIT": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "I0": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "I1": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "I2": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "I3": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "I4": {
+          "direction": "input",
+          "bits": [ 7 ]
+        },
+        "I5": {
+          "direction": "input",
+          "bits": [ 8 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$339": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "I0": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:50.29-50.31"
+          }
+        },
+        "I1": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:50.33-50.35"
+          }
+        },
+        "I2": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:50.37-50.39"
+          }
+        },
+        "I3": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:50.41-50.43"
+          }
+        },
+        "I4": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:50.45-50.47"
+          }
+        },
+        "I5": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:50.49-50.51"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:50.20-50.21"
+          }
+        }
+      }
+    },
+    "LUTFF": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:72.1-77.10"
+      },
+      "ports": {
+        "CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "D": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "O": {
+          "direction": "output",
+          "bits": [ 4 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$324": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 4 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:72.38-72.41"
+          }
+        },
+        "D": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:72.49-72.50"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:72.63-72.64"
+          }
+        }
+      }
+    },
+    "LUTFF_E": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:112.1-121.10"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "CLK": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "E": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "D": {
+          "direction": "input",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$317": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:114.27-114.30"
+          }
+        },
+        "D": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:115.12-115.13"
+          }
+        },
+        "E": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:115.9-115.10"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:113.14-113.15"
+          }
+        }
+      }
+    },
+    "LUTFF_SR": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:123.1-134.10"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "CLK": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "R": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "D": {
+          "direction": "input",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$313": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:125.27-125.30"
+          }
+        },
+        "D": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:126.12-126.13"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:124.14-124.15"
+          }
+        },
+        "R": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:126.9-126.10"
+          }
+        }
+      }
+    },
+    "LUTFF_SRE": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:149.1-164.10"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "CLK": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "E": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "R": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "D": {
+          "direction": "input",
+          "bits": [ 6 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$305": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:151.27-151.30"
+          }
+        },
+        "D": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:152.15-152.16"
+          }
+        },
+        "E": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:152.9-152.10"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:150.14-150.15"
+          }
+        },
+        "R": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:152.12-152.13"
+          }
+        }
+      }
+    },
+    "LUTFF_SS": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:136.1-147.10"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "CLK": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "S": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "D": {
+          "direction": "input",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$309": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:138.27-138.30"
+          }
+        },
+        "D": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:139.12-139.13"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:137.14-137.15"
+          }
+        },
+        "S": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:139.9-139.10"
+          }
+        }
+      }
+    },
+    "LUTFF_SSE": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:166.1-181.10"
+      },
+      "ports": {
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "CLK": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "E": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "S": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "D": {
+          "direction": "input",
+          "bits": [ 6 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$300": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:168.27-168.30"
+          }
+        },
+        "D": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:169.15-169.16"
+          }
+        },
+        "E": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:169.9-169.10"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:167.14-167.15"
+          }
+        },
+        "S": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v:169.12-169.13"
+          }
+        }
+      }
+    },
+    "MACC_8x8_20": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:5.1-146.10"
+      },
+      "parameter_default_values": {
+        "ACC_OUT": "0",
+        "ACC_SEL": "0",
+        "A_REG": "0",
+        "B_REG": "0",
+        "CLK_INV": "0",
+        "C_REG": "0",
+        "SIGN_EXT": "0"
+      },
+      "ports": {
+        "CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "EN": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "ACC_RST": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "ACC_CI": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "ACC_CO": {
+          "direction": "output",
+          "bits": [ 6 ]
+        },
+        "A0": {
+          "direction": "input",
+          "bits": [ 7 ]
+        },
+        "A1": {
+          "direction": "input",
+          "bits": [ 8 ]
+        },
+        "A2": {
+          "direction": "input",
+          "bits": [ 9 ]
+        },
+        "A3": {
+          "direction": "input",
+          "bits": [ 10 ]
+        },
+        "A4": {
+          "direction": "input",
+          "bits": [ 11 ]
+        },
+        "A5": {
+          "direction": "input",
+          "bits": [ 12 ]
+        },
+        "A6": {
+          "direction": "input",
+          "bits": [ 13 ]
+        },
+        "A7": {
+          "direction": "input",
+          "bits": [ 14 ]
+        },
+        "B0": {
+          "direction": "input",
+          "bits": [ 15 ]
+        },
+        "B1": {
+          "direction": "input",
+          "bits": [ 16 ]
+        },
+        "B2": {
+          "direction": "input",
+          "bits": [ 17 ]
+        },
+        "B3": {
+          "direction": "input",
+          "bits": [ 18 ]
+        },
+        "B4": {
+          "direction": "input",
+          "bits": [ 19 ]
+        },
+        "B5": {
+          "direction": "input",
+          "bits": [ 20 ]
+        },
+        "B6": {
+          "direction": "input",
+          "bits": [ 21 ]
+        },
+        "B7": {
+          "direction": "input",
+          "bits": [ 22 ]
+        },
+        "C0": {
+          "direction": "input",
+          "bits": [ 23 ]
+        },
+        "C1": {
+          "direction": "input",
+          "bits": [ 24 ]
+        },
+        "C2": {
+          "direction": "input",
+          "bits": [ 25 ]
+        },
+        "C3": {
+          "direction": "input",
+          "bits": [ 26 ]
+        },
+        "C4": {
+          "direction": "input",
+          "bits": [ 27 ]
+        },
+        "C5": {
+          "direction": "input",
+          "bits": [ 28 ]
+        },
+        "C6": {
+          "direction": "input",
+          "bits": [ 29 ]
+        },
+        "C7": {
+          "direction": "input",
+          "bits": [ 30 ]
+        },
+        "C8": {
+          "direction": "input",
+          "bits": [ 31 ]
+        },
+        "C9": {
+          "direction": "input",
+          "bits": [ 32 ]
+        },
+        "C10": {
+          "direction": "input",
+          "bits": [ 33 ]
+        },
+        "C11": {
+          "direction": "input",
+          "bits": [ 34 ]
+        },
+        "C12": {
+          "direction": "input",
+          "bits": [ 35 ]
+        },
+        "C13": {
+          "direction": "input",
+          "bits": [ 36 ]
+        },
+        "C14": {
+          "direction": "input",
+          "bits": [ 37 ]
+        },
+        "C15": {
+          "direction": "input",
+          "bits": [ 38 ]
+        },
+        "C16": {
+          "direction": "input",
+          "bits": [ 39 ]
+        },
+        "C17": {
+          "direction": "input",
+          "bits": [ 40 ]
+        },
+        "C18": {
+          "direction": "input",
+          "bits": [ 41 ]
+        },
+        "C19": {
+          "direction": "input",
+          "bits": [ 42 ]
+        },
+        "Q0": {
+          "direction": "output",
+          "bits": [ 43 ]
+        },
+        "Q1": {
+          "direction": "output",
+          "bits": [ 44 ]
+        },
+        "Q2": {
+          "direction": "output",
+          "bits": [ 45 ]
+        },
+        "Q3": {
+          "direction": "output",
+          "bits": [ 46 ]
+        },
+        "Q4": {
+          "direction": "output",
+          "bits": [ 47 ]
+        },
+        "Q5": {
+          "direction": "output",
+          "bits": [ 48 ]
+        },
+        "Q6": {
+          "direction": "output",
+          "bits": [ 49 ]
+        },
+        "Q7": {
+          "direction": "output",
+          "bits": [ 50 ]
+        },
+        "Q8": {
+          "direction": "output",
+          "bits": [ 51 ]
+        },
+        "Q9": {
+          "direction": "output",
+          "bits": [ 52 ]
+        },
+        "Q10": {
+          "direction": "output",
+          "bits": [ 53 ]
+        },
+        "Q11": {
+          "direction": "output",
+          "bits": [ 54 ]
+        },
+        "Q12": {
+          "direction": "output",
+          "bits": [ 55 ]
+        },
+        "Q13": {
+          "direction": "output",
+          "bits": [ 56 ]
+        },
+        "Q14": {
+          "direction": "output",
+          "bits": [ 57 ]
+        },
+        "Q15": {
+          "direction": "output",
+          "bits": [ 58 ]
+        },
+        "Q16": {
+          "direction": "output",
+          "bits": [ 59 ]
+        },
+        "Q17": {
+          "direction": "output",
+          "bits": [ 60 ]
+        },
+        "Q18": {
+          "direction": "output",
+          "bits": [ 61 ]
+        },
+        "Q19": {
+          "direction": "output",
+          "bits": [ 62 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$211": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 6 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$212": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 43 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$213": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 44 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$214": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 45 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$215": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 46 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$216": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 47 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$217": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 48 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$218": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 49 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$219": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 50 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$220": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 51 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$221": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 52 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$222": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 53 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$223": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 54 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$224": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 55 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$225": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 56 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$226": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 57 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$227": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 58 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$228": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 59 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$229": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 60 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$230": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 61 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$231": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 62 ]
+          }
+        }
+      },
+      "netnames": {
+        "A0": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:21.12-21.14"
+          }
+        },
+        "A1": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:22.12-22.14"
+          }
+        },
+        "A2": {
+          "hide_name": 0,
+          "bits": [ 9 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:23.12-23.14"
+          }
+        },
+        "A3": {
+          "hide_name": 0,
+          "bits": [ 10 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:24.12-24.14"
+          }
+        },
+        "A4": {
+          "hide_name": 0,
+          "bits": [ 11 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:25.12-25.14"
+          }
+        },
+        "A5": {
+          "hide_name": 0,
+          "bits": [ 12 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:26.12-26.14"
+          }
+        },
+        "A6": {
+          "hide_name": 0,
+          "bits": [ 13 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:27.12-27.14"
+          }
+        },
+        "A7": {
+          "hide_name": 0,
+          "bits": [ 14 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:28.12-28.14"
+          }
+        },
+        "ACC_CI": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:18.12-18.18"
+          }
+        },
+        "ACC_CO": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:19.12-19.18"
+          }
+        },
+        "ACC_RST": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:17.12-17.19"
+          }
+        },
+        "B0": {
+          "hide_name": 0,
+          "bits": [ 15 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:30.12-30.14"
+          }
+        },
+        "B1": {
+          "hide_name": 0,
+          "bits": [ 16 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:31.12-31.14"
+          }
+        },
+        "B2": {
+          "hide_name": 0,
+          "bits": [ 17 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:32.12-32.14"
+          }
+        },
+        "B3": {
+          "hide_name": 0,
+          "bits": [ 18 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:33.12-33.14"
+          }
+        },
+        "B4": {
+          "hide_name": 0,
+          "bits": [ 19 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:34.12-34.14"
+          }
+        },
+        "B5": {
+          "hide_name": 0,
+          "bits": [ 20 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:35.12-35.14"
+          }
+        },
+        "B6": {
+          "hide_name": 0,
+          "bits": [ 21 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:36.12-36.14"
+          }
+        },
+        "B7": {
+          "hide_name": 0,
+          "bits": [ 22 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:37.12-37.14"
+          }
+        },
+        "C0": {
+          "hide_name": 0,
+          "bits": [ 23 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:39.12-39.14"
+          }
+        },
+        "C1": {
+          "hide_name": 0,
+          "bits": [ 24 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:40.12-40.14"
+          }
+        },
+        "C10": {
+          "hide_name": 0,
+          "bits": [ 33 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:49.12-49.15"
+          }
+        },
+        "C11": {
+          "hide_name": 0,
+          "bits": [ 34 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:50.12-50.15"
+          }
+        },
+        "C12": {
+          "hide_name": 0,
+          "bits": [ 35 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:51.12-51.15"
+          }
+        },
+        "C13": {
+          "hide_name": 0,
+          "bits": [ 36 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:52.12-52.15"
+          }
+        },
+        "C14": {
+          "hide_name": 0,
+          "bits": [ 37 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:53.12-53.15"
+          }
+        },
+        "C15": {
+          "hide_name": 0,
+          "bits": [ 38 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:54.12-54.15"
+          }
+        },
+        "C16": {
+          "hide_name": 0,
+          "bits": [ 39 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:55.12-55.15"
+          }
+        },
+        "C17": {
+          "hide_name": 0,
+          "bits": [ 40 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:56.12-56.15"
+          }
+        },
+        "C18": {
+          "hide_name": 0,
+          "bits": [ 41 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:57.12-57.15"
+          }
+        },
+        "C19": {
+          "hide_name": 0,
+          "bits": [ 42 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:58.12-58.15"
+          }
+        },
+        "C2": {
+          "hide_name": 0,
+          "bits": [ 25 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:41.12-41.14"
+          }
+        },
+        "C3": {
+          "hide_name": 0,
+          "bits": [ 26 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:42.12-42.14"
+          }
+        },
+        "C4": {
+          "hide_name": 0,
+          "bits": [ 27 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:43.12-43.14"
+          }
+        },
+        "C5": {
+          "hide_name": 0,
+          "bits": [ 28 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:44.12-44.14"
+          }
+        },
+        "C6": {
+          "hide_name": 0,
+          "bits": [ 29 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:45.12-45.14"
+          }
+        },
+        "C7": {
+          "hide_name": 0,
+          "bits": [ 30 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:46.12-46.14"
+          }
+        },
+        "C8": {
+          "hide_name": 0,
+          "bits": [ 31 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:47.12-47.14"
+          }
+        },
+        "C9": {
+          "hide_name": 0,
+          "bits": [ 32 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:48.12-48.14"
+          }
+        },
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:14.30-14.33"
+          }
+        },
+        "EN": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:15.12-15.14"
+          }
+        },
+        "Q0": {
+          "hide_name": 0,
+          "bits": [ 43 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:60.12-60.14"
+          }
+        },
+        "Q1": {
+          "hide_name": 0,
+          "bits": [ 44 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:61.12-61.14"
+          }
+        },
+        "Q10": {
+          "hide_name": 0,
+          "bits": [ 53 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:70.12-70.15"
+          }
+        },
+        "Q11": {
+          "hide_name": 0,
+          "bits": [ 54 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:71.12-71.15"
+          }
+        },
+        "Q12": {
+          "hide_name": 0,
+          "bits": [ 55 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:72.12-72.15"
+          }
+        },
+        "Q13": {
+          "hide_name": 0,
+          "bits": [ 56 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:73.12-73.15"
+          }
+        },
+        "Q14": {
+          "hide_name": 0,
+          "bits": [ 57 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:74.12-74.15"
+          }
+        },
+        "Q15": {
+          "hide_name": 0,
+          "bits": [ 58 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:75.12-75.15"
+          }
+        },
+        "Q16": {
+          "hide_name": 0,
+          "bits": [ 59 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:76.12-76.15"
+          }
+        },
+        "Q17": {
+          "hide_name": 0,
+          "bits": [ 60 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:77.12-77.15"
+          }
+        },
+        "Q18": {
+          "hide_name": 0,
+          "bits": [ 61 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:78.12-78.15"
+          }
+        },
+        "Q19": {
+          "hide_name": 0,
+          "bits": [ 62 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:79.12-79.15"
+          }
+        },
+        "Q2": {
+          "hide_name": 0,
+          "bits": [ 45 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:62.12-62.14"
+          }
+        },
+        "Q3": {
+          "hide_name": 0,
+          "bits": [ 46 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:63.12-63.14"
+          }
+        },
+        "Q4": {
+          "hide_name": 0,
+          "bits": [ 47 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:64.12-64.14"
+          }
+        },
+        "Q5": {
+          "hide_name": 0,
+          "bits": [ 48 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:65.12-65.14"
+          }
+        },
+        "Q6": {
+          "hide_name": 0,
+          "bits": [ 49 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:66.12-66.14"
+          }
+        },
+        "Q7": {
+          "hide_name": 0,
+          "bits": [ 50 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:67.12-67.14"
+          }
+        },
+        "Q8": {
+          "hide_name": 0,
+          "bits": [ 51 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:68.12-68.14"
+          }
+        },
+        "Q9": {
+          "hide_name": 0,
+          "bits": [ 52 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v:69.12-69.14"
+          }
+        }
+      }
+    },
+    "OBUF": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v:16.1-40.10"
+      },
+      "parameter_default_values": {
+        "EN_REG": "0",
+        "IN_REG": "0"
+      },
+      "ports": {
+        "CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "EN": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "IN": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "PAD": {
+          "direction": "output",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$287": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 5 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v:20.28-20.31"
+          }
+        },
+        "EN": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v:21.10-21.12"
+          }
+        },
+        "IN": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v:22.10-22.12"
+          }
+        },
+        "PAD": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "iopad_external_pin": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v:23.35-23.38"
+          }
+        }
+      }
+    },
+    "ODDR": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v:16.1-52.10"
+      },
+      "parameter_default_values": {
+        "INIT_Q0": "0",
+        "INIT_Q1": "0"
+      },
+      "ports": {
+        "CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "D0": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "D1": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "EN": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "SR": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "Q": {
+          "direction": "output",
+          "bits": [ 7 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$277": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 7 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v:20.28-20.31"
+          }
+        },
+        "D0": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v:21.10-21.12"
+          }
+        },
+        "D1": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v:22.10-22.12"
+          }
+        },
+        "EN": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v:23.10-23.12"
+          }
+        },
+        "Q": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v:25.10-25.11"
+          }
+        },
+        "SR": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v:24.10-24.12"
+          }
+        }
+      }
+    },
+    "RAM_32x4_2R_1W": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "dynports": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:16.1-134.10"
+      },
+      "parameter_default_values": {
+        "A_CLK_INV": "0",
+        "B_CLK_INV": "0",
+        "B_REG": "0",
+        "C_CLK_INV": "0",
+        "C_REG": "0"
+      },
+      "ports": {
+        "A_CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "A_ADDR0": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "A_ADDR1": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "A_ADDR2": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "A_ADDR3": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "A_ADDR4": {
+          "direction": "input",
+          "bits": [ 7 ]
+        },
+        "A_WEN": {
+          "direction": "input",
+          "bits": [ 8 ]
+        },
+        "A_DIN0": {
+          "direction": "input",
+          "bits": [ 9 ]
+        },
+        "A_DIN1": {
+          "direction": "input",
+          "bits": [ 10 ]
+        },
+        "A_DIN2": {
+          "direction": "input",
+          "bits": [ 11 ]
+        },
+        "A_DIN3": {
+          "direction": "input",
+          "bits": [ 12 ]
+        },
+        "B_CLK": {
+          "direction": "input",
+          "bits": [ 13 ]
+        },
+        "B_ADDR0": {
+          "direction": "input",
+          "bits": [ 14 ]
+        },
+        "B_ADDR1": {
+          "direction": "input",
+          "bits": [ 15 ]
+        },
+        "B_ADDR2": {
+          "direction": "input",
+          "bits": [ 16 ]
+        },
+        "B_ADDR3": {
+          "direction": "input",
+          "bits": [ 17 ]
+        },
+        "B_ADDR4": {
+          "direction": "input",
+          "bits": [ 18 ]
+        },
+        "B_REN": {
+          "direction": "input",
+          "bits": [ 19 ]
+        },
+        "B_DOUT0": {
+          "direction": "output",
+          "bits": [ 20 ]
+        },
+        "B_DOUT1": {
+          "direction": "output",
+          "bits": [ 21 ]
+        },
+        "B_DOUT2": {
+          "direction": "output",
+          "bits": [ 22 ]
+        },
+        "B_DOUT3": {
+          "direction": "output",
+          "bits": [ 23 ]
+        },
+        "C_CLK": {
+          "direction": "input",
+          "bits": [ 24 ]
+        },
+        "C_ADDR0": {
+          "direction": "input",
+          "bits": [ 25 ]
+        },
+        "C_ADDR1": {
+          "direction": "input",
+          "bits": [ 26 ]
+        },
+        "C_ADDR2": {
+          "direction": "input",
+          "bits": [ 27 ]
+        },
+        "C_ADDR3": {
+          "direction": "input",
+          "bits": [ 28 ]
+        },
+        "C_ADDR4": {
+          "direction": "input",
+          "bits": [ 29 ]
+        },
+        "C_REN": {
+          "direction": "input",
+          "bits": [ 30 ]
+        },
+        "C_DOUT0": {
+          "direction": "output",
+          "bits": [ 31 ]
+        },
+        "C_DOUT1": {
+          "direction": "output",
+          "bits": [ 32 ]
+        },
+        "C_DOUT2": {
+          "direction": "output",
+          "bits": [ 33 ]
+        },
+        "C_DOUT3": {
+          "direction": "output",
+          "bits": [ 34 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$257": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 20 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$258": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 21 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$259": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 22 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$260": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 23 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$261": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 31 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$262": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 32 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$263": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 33 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$264": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 34 ]
+          }
+        }
+      },
+      "netnames": {
+        "A_ADDR0": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:25.18-25.25"
+          }
+        },
+        "A_ADDR1": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:26.18-26.25"
+          }
+        },
+        "A_ADDR2": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:27.18-27.25"
+          }
+        },
+        "A_ADDR3": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:28.18-28.25"
+          }
+        },
+        "A_ADDR4": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:29.18-29.25"
+          }
+        },
+        "A_CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:24.36-24.41"
+          }
+        },
+        "A_DIN0": {
+          "hide_name": 0,
+          "bits": [ 9 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:31.18-31.24"
+          }
+        },
+        "A_DIN1": {
+          "hide_name": 0,
+          "bits": [ 10 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:32.18-32.24"
+          }
+        },
+        "A_DIN2": {
+          "hide_name": 0,
+          "bits": [ 11 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:33.18-33.24"
+          }
+        },
+        "A_DIN3": {
+          "hide_name": 0,
+          "bits": [ 12 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:34.18-34.24"
+          }
+        },
+        "A_WEN": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:30.18-30.23"
+          }
+        },
+        "B_ADDR0": {
+          "hide_name": 0,
+          "bits": [ 14 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:38.18-38.25"
+          }
+        },
+        "B_ADDR1": {
+          "hide_name": 0,
+          "bits": [ 15 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:39.18-39.25"
+          }
+        },
+        "B_ADDR2": {
+          "hide_name": 0,
+          "bits": [ 16 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:40.18-40.25"
+          }
+        },
+        "B_ADDR3": {
+          "hide_name": 0,
+          "bits": [ 17 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:41.18-41.25"
+          }
+        },
+        "B_ADDR4": {
+          "hide_name": 0,
+          "bits": [ 18 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:42.18-42.25"
+          }
+        },
+        "B_CLK": {
+          "hide_name": 0,
+          "bits": [ 13 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:37.36-37.41"
+          }
+        },
+        "B_DOUT0": {
+          "hide_name": 0,
+          "bits": [ 20 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:44.18-44.25"
+          }
+        },
+        "B_DOUT1": {
+          "hide_name": 0,
+          "bits": [ 21 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:45.18-45.25"
+          }
+        },
+        "B_DOUT2": {
+          "hide_name": 0,
+          "bits": [ 22 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:46.18-46.25"
+          }
+        },
+        "B_DOUT3": {
+          "hide_name": 0,
+          "bits": [ 23 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:47.18-47.25"
+          }
+        },
+        "B_REN": {
+          "hide_name": 0,
+          "bits": [ 19 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:43.18-43.23"
+          }
+        },
+        "C_ADDR0": {
+          "hide_name": 0,
+          "bits": [ 25 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:51.18-51.25"
+          }
+        },
+        "C_ADDR1": {
+          "hide_name": 0,
+          "bits": [ 26 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:52.18-52.25"
+          }
+        },
+        "C_ADDR2": {
+          "hide_name": 0,
+          "bits": [ 27 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:53.18-53.25"
+          }
+        },
+        "C_ADDR3": {
+          "hide_name": 0,
+          "bits": [ 28 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:54.18-54.25"
+          }
+        },
+        "C_ADDR4": {
+          "hide_name": 0,
+          "bits": [ 29 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:55.18-55.25"
+          }
+        },
+        "C_CLK": {
+          "hide_name": 0,
+          "bits": [ 24 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:50.36-50.41"
+          }
+        },
+        "C_DOUT0": {
+          "hide_name": 0,
+          "bits": [ 31 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:57.18-57.25"
+          }
+        },
+        "C_DOUT1": {
+          "hide_name": 0,
+          "bits": [ 32 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:58.18-58.25"
+          }
+        },
+        "C_DOUT2": {
+          "hide_name": 0,
+          "bits": [ 33 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:59.18-59.25"
+          }
+        },
+        "C_DOUT3": {
+          "hide_name": 0,
+          "bits": [ 34 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:60.18-60.25"
+          }
+        },
+        "C_REN": {
+          "hide_name": 0,
+          "bits": [ 30 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v:56.18-56.23"
+          }
+        }
+      }
+    },
+    "RERAM_CIM_32x32": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:16.1-93.10"
+      },
+      "parameter_default_values": {
+        "COUNTER_VALUE": "0000000000",
+        "NO_OF_CLK_CYCLES": "0000000000",
+        "TARGET_RESET1": "0000000000000000",
+        "TARGET_RESET2": "0000000000000000",
+        "TARGET_SET1": "0000000000000000",
+        "TARGET_SET2": "0000000000000000",
+        "TDC_DEAD_TIME": "00",
+        "TDC_TIME_OUT": "0000000"
+      },
+      "ports": {
+        "CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "RST": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "CMD_VALID": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "CMD_READY": {
+          "direction": "output",
+          "bits": [ 5 ]
+        },
+        "MODE0": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "MODE1": {
+          "direction": "input",
+          "bits": [ 7 ]
+        },
+        "ROW_INDEX0": {
+          "direction": "input",
+          "bits": [ 8 ]
+        },
+        "ROW_INDEX1": {
+          "direction": "input",
+          "bits": [ 9 ]
+        },
+        "ROW_INDEX2": {
+          "direction": "input",
+          "bits": [ 10 ]
+        },
+        "ROW_INDEX3": {
+          "direction": "input",
+          "bits": [ 11 ]
+        },
+        "ROW_INDEX4": {
+          "direction": "input",
+          "bits": [ 12 ]
+        },
+        "COL_INDEX0": {
+          "direction": "input",
+          "bits": [ 13 ]
+        },
+        "COL_INDEX1": {
+          "direction": "input",
+          "bits": [ 14 ]
+        },
+        "COL_INDEX2": {
+          "direction": "input",
+          "bits": [ 15 ]
+        },
+        "COL_INDEX3": {
+          "direction": "input",
+          "bits": [ 16 ]
+        },
+        "COL_INDEX4": {
+          "direction": "input",
+          "bits": [ 17 ]
+        },
+        "PWM_DATA0": {
+          "direction": "input",
+          "bits": [ 18 ]
+        },
+        "PWM_DATA1": {
+          "direction": "input",
+          "bits": [ 19 ]
+        },
+        "PWM_DATA2": {
+          "direction": "input",
+          "bits": [ 20 ]
+        },
+        "PWM_DATA3": {
+          "direction": "input",
+          "bits": [ 21 ]
+        },
+        "PWM_DATA4": {
+          "direction": "input",
+          "bits": [ 22 ]
+        },
+        "PWM_DATA5": {
+          "direction": "input",
+          "bits": [ 23 ]
+        },
+        "PWM_DATA6": {
+          "direction": "input",
+          "bits": [ 24 ]
+        },
+        "PWM_DATA7": {
+          "direction": "input",
+          "bits": [ 25 ]
+        },
+        "COMPUTE_LAST": {
+          "direction": "input",
+          "bits": [ 26 ]
+        },
+        "COMPUTE_ALL_COLUMNS": {
+          "direction": "input",
+          "bits": [ 27 ]
+        },
+        "BUSY": {
+          "direction": "output",
+          "bits": [ 28 ]
+        },
+        "COMMAND_ACCEPTED": {
+          "direction": "output",
+          "bits": [ 29 ]
+        },
+        "COMPUTE_PENDING": {
+          "direction": "output",
+          "bits": [ 30 ]
+        },
+        "ERROR0": {
+          "direction": "output",
+          "bits": [ 31 ]
+        },
+        "ERROR1": {
+          "direction": "output",
+          "bits": [ 32 ]
+        },
+        "ERROR_VALID": {
+          "direction": "output",
+          "bits": [ 33 ]
+        },
+        "OPERATION_DONE": {
+          "direction": "output",
+          "bits": [ 34 ]
+        },
+        "PROGRAM_READBACK_ACTIVE": {
+          "direction": "output",
+          "bits": [ 35 ]
+        },
+        "RESULT_VALID": {
+          "direction": "output",
+          "bits": [ 36 ]
+        },
+        "RESULT_READY": {
+          "direction": "input",
+          "bits": [ 37 ]
+        },
+        "RESULT_DATA0": {
+          "direction": "output",
+          "bits": [ 38 ]
+        },
+        "RESULT_DATA1": {
+          "direction": "output",
+          "bits": [ 39 ]
+        },
+        "RESULT_DATA2": {
+          "direction": "output",
+          "bits": [ 40 ]
+        },
+        "RESULT_DATA3": {
+          "direction": "output",
+          "bits": [ 41 ]
+        },
+        "RESULT_DATA4": {
+          "direction": "output",
+          "bits": [ 42 ]
+        },
+        "RESULT_DATA5": {
+          "direction": "output",
+          "bits": [ 43 ]
+        },
+        "RESULT_DATA6": {
+          "direction": "output",
+          "bits": [ 44 ]
+        },
+        "RESULT_DATA7": {
+          "direction": "output",
+          "bits": [ 45 ]
+        },
+        "RESULT_DATA8": {
+          "direction": "output",
+          "bits": [ 46 ]
+        },
+        "RESULT_DATA9": {
+          "direction": "output",
+          "bits": [ 47 ]
+        },
+        "RESULT_DATA10": {
+          "direction": "output",
+          "bits": [ 48 ]
+        },
+        "RESULT_DATA11": {
+          "direction": "output",
+          "bits": [ 49 ]
+        },
+        "RESULT_DATA12": {
+          "direction": "output",
+          "bits": [ 50 ]
+        },
+        "RESULT_DATA13": {
+          "direction": "output",
+          "bits": [ 51 ]
+        },
+        "RESULT_DATA14": {
+          "direction": "output",
+          "bits": [ 52 ]
+        },
+        "RESULT_DATA15": {
+          "direction": "output",
+          "bits": [ 53 ]
+        },
+        "RESULT_DATA16": {
+          "direction": "output",
+          "bits": [ 54 ]
+        },
+        "RESULT_DATA17": {
+          "direction": "output",
+          "bits": [ 55 ]
+        },
+        "RESULT_DATA18": {
+          "direction": "output",
+          "bits": [ 56 ]
+        },
+        "RESULT_DATA19": {
+          "direction": "output",
+          "bits": [ 57 ]
+        },
+        "RESULT_DATA20": {
+          "direction": "output",
+          "bits": [ 58 ]
+        },
+        "RESULT_LAST": {
+          "direction": "output",
+          "bits": [ 59 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$139": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 5 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$140": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 28 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$141": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 29 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$142": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 30 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$143": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 31 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$144": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 32 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$145": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 33 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$146": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 34 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$147": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 35 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$148": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 36 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$149": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 38 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$150": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 39 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$151": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 40 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$152": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 41 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$153": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 42 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$154": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 43 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$155": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 44 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$156": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 45 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$157": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 46 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$158": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 47 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$159": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 48 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$160": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 49 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$161": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 50 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$162": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 51 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$163": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 52 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$164": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 53 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$165": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 54 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$166": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 55 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$167": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 56 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$168": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 57 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$169": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 58 ]
+          }
+        },
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$170": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 59 ]
+          }
+        }
+      },
+      "netnames": {
+        "BUSY": {
+          "hide_name": 0,
+          "bits": [ 28 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:57.25-57.29"
+          }
+        },
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:27.34-27.37"
+          }
+        },
+        "CMD_READY": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:32.25-32.34"
+          }
+        },
+        "CMD_VALID": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:31.25-31.34"
+          }
+        },
+        "COL_INDEX0": {
+          "hide_name": 0,
+          "bits": [ 13 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:40.25-40.35"
+          }
+        },
+        "COL_INDEX1": {
+          "hide_name": 0,
+          "bits": [ 14 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:41.25-41.35"
+          }
+        },
+        "COL_INDEX2": {
+          "hide_name": 0,
+          "bits": [ 15 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:42.25-42.35"
+          }
+        },
+        "COL_INDEX3": {
+          "hide_name": 0,
+          "bits": [ 16 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:43.25-43.35"
+          }
+        },
+        "COL_INDEX4": {
+          "hide_name": 0,
+          "bits": [ 17 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:44.25-44.35"
+          }
+        },
+        "COMMAND_ACCEPTED": {
+          "hide_name": 0,
+          "bits": [ 29 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:58.25-58.41"
+          }
+        },
+        "COMPUTE_ALL_COLUMNS": {
+          "hide_name": 0,
+          "bits": [ 27 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:54.25-54.44"
+          }
+        },
+        "COMPUTE_LAST": {
+          "hide_name": 0,
+          "bits": [ 26 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:53.25-53.37"
+          }
+        },
+        "COMPUTE_PENDING": {
+          "hide_name": 0,
+          "bits": [ 30 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:59.25-59.40"
+          }
+        },
+        "ERROR0": {
+          "hide_name": 0,
+          "bits": [ 31 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:60.25-60.31"
+          }
+        },
+        "ERROR1": {
+          "hide_name": 0,
+          "bits": [ 32 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:61.25-61.31"
+          }
+        },
+        "ERROR_VALID": {
+          "hide_name": 0,
+          "bits": [ 33 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:62.25-62.36"
+          }
+        },
+        "MODE0": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:33.25-33.30"
+          }
+        },
+        "MODE1": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:34.25-34.30"
+          }
+        },
+        "OPERATION_DONE": {
+          "hide_name": 0,
+          "bits": [ 34 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:63.25-63.39"
+          }
+        },
+        "PROGRAM_READBACK_ACTIVE": {
+          "hide_name": 0,
+          "bits": [ 35 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:64.25-64.48"
+          }
+        },
+        "PWM_DATA0": {
+          "hide_name": 0,
+          "bits": [ 18 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:45.25-45.34"
+          }
+        },
+        "PWM_DATA1": {
+          "hide_name": 0,
+          "bits": [ 19 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:46.25-46.34"
+          }
+        },
+        "PWM_DATA2": {
+          "hide_name": 0,
+          "bits": [ 20 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:47.25-47.34"
+          }
+        },
+        "PWM_DATA3": {
+          "hide_name": 0,
+          "bits": [ 21 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:48.25-48.34"
+          }
+        },
+        "PWM_DATA4": {
+          "hide_name": 0,
+          "bits": [ 22 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:49.25-49.34"
+          }
+        },
+        "PWM_DATA5": {
+          "hide_name": 0,
+          "bits": [ 23 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:50.25-50.34"
+          }
+        },
+        "PWM_DATA6": {
+          "hide_name": 0,
+          "bits": [ 24 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:51.25-51.34"
+          }
+        },
+        "PWM_DATA7": {
+          "hide_name": 0,
+          "bits": [ 25 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:52.25-52.34"
+          }
+        },
+        "RESULT_DATA0": {
+          "hide_name": 0,
+          "bits": [ 38 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:69.25-69.37"
+          }
+        },
+        "RESULT_DATA1": {
+          "hide_name": 0,
+          "bits": [ 39 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:70.25-70.37"
+          }
+        },
+        "RESULT_DATA10": {
+          "hide_name": 0,
+          "bits": [ 48 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:79.25-79.38"
+          }
+        },
+        "RESULT_DATA11": {
+          "hide_name": 0,
+          "bits": [ 49 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:80.25-80.38"
+          }
+        },
+        "RESULT_DATA12": {
+          "hide_name": 0,
+          "bits": [ 50 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:81.25-81.38"
+          }
+        },
+        "RESULT_DATA13": {
+          "hide_name": 0,
+          "bits": [ 51 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:82.25-82.38"
+          }
+        },
+        "RESULT_DATA14": {
+          "hide_name": 0,
+          "bits": [ 52 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:83.25-83.38"
+          }
+        },
+        "RESULT_DATA15": {
+          "hide_name": 0,
+          "bits": [ 53 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:84.25-84.38"
+          }
+        },
+        "RESULT_DATA16": {
+          "hide_name": 0,
+          "bits": [ 54 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:85.25-85.38"
+          }
+        },
+        "RESULT_DATA17": {
+          "hide_name": 0,
+          "bits": [ 55 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:86.25-86.38"
+          }
+        },
+        "RESULT_DATA18": {
+          "hide_name": 0,
+          "bits": [ 56 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:87.25-87.38"
+          }
+        },
+        "RESULT_DATA19": {
+          "hide_name": 0,
+          "bits": [ 57 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:88.25-88.38"
+          }
+        },
+        "RESULT_DATA2": {
+          "hide_name": 0,
+          "bits": [ 40 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:71.25-71.37"
+          }
+        },
+        "RESULT_DATA20": {
+          "hide_name": 0,
+          "bits": [ 58 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:89.25-89.38"
+          }
+        },
+        "RESULT_DATA3": {
+          "hide_name": 0,
+          "bits": [ 41 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:72.25-72.37"
+          }
+        },
+        "RESULT_DATA4": {
+          "hide_name": 0,
+          "bits": [ 42 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:73.25-73.37"
+          }
+        },
+        "RESULT_DATA5": {
+          "hide_name": 0,
+          "bits": [ 43 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:74.25-74.37"
+          }
+        },
+        "RESULT_DATA6": {
+          "hide_name": 0,
+          "bits": [ 44 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:75.25-75.37"
+          }
+        },
+        "RESULT_DATA7": {
+          "hide_name": 0,
+          "bits": [ 45 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:76.25-76.37"
+          }
+        },
+        "RESULT_DATA8": {
+          "hide_name": 0,
+          "bits": [ 46 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:77.25-77.37"
+          }
+        },
+        "RESULT_DATA9": {
+          "hide_name": 0,
+          "bits": [ 47 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:78.25-78.37"
+          }
+        },
+        "RESULT_LAST": {
+          "hide_name": 0,
+          "bits": [ 59 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:90.25-90.36"
+          }
+        },
+        "RESULT_READY": {
+          "hide_name": 0,
+          "bits": [ 37 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:68.25-68.37"
+          }
+        },
+        "RESULT_VALID": {
+          "hide_name": 0,
+          "bits": [ 36 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:67.25-67.37"
+          }
+        },
+        "ROW_INDEX0": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:35.25-35.35"
+          }
+        },
+        "ROW_INDEX1": {
+          "hide_name": 0,
+          "bits": [ 9 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:36.25-36.35"
+          }
+        },
+        "ROW_INDEX2": {
+          "hide_name": 0,
+          "bits": [ 10 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:37.25-37.35"
+          }
+        },
+        "ROW_INDEX3": {
+          "hide_name": 0,
+          "bits": [ 11 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:38.25-38.35"
+          }
+        },
+        "ROW_INDEX4": {
+          "hide_name": 0,
+          "bits": [ 12 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:39.25-39.35"
+          }
+        },
+        "RST": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v:28.16-28.19"
+          }
+        }
+      }
+    },
+    "SYS_RESET": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/SYS_RESET/yosys/primitives/SYS_RESET.v:16.1-19.10"
+      },
+      "ports": {
+        "RESET": {
+          "direction": "output",
+          "bits": [ 2 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$265": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "RESET": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/SYS_RESET/yosys/primitives/SYS_RESET.v:17.10-17.15"
+          }
+        }
+      }
+    },
+    "TBUF": {
+      "attributes": {
+        "keep": "00000000000000000000000000000001",
+        "blackbox": "00000000000000000000000000000001",
+        "cells_not_processed": "00000000000000000000000000000001",
+        "src": "REPO/ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v:16.1-41.10"
+      },
+      "parameter_default_values": {
+        "EN_REG": "0",
+        "IN_REG": "0",
+        "OUT_REG": "0"
+      },
+      "ports": {
+        "CLK": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "EN": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "IN": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "PAD": {
+          "direction": "output",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$rtlil_bufnorm.cc:460:bufNormalize$283": {
+          "hide_name": 1,
+          "type": "$buf",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "z" ],
+            "Y": [ 5 ]
+          }
+        }
+      },
+      "netnames": {
+        "CLK": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "clkbuf_sink": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v:21.28-21.31"
+          }
+        },
+        "EN": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v:22.10-22.12"
+          }
+        },
+        "IN": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "REPO/ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v:23.10-23.12"
+          }
+        },
+        "PAD": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "iopad_external_pin": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v:24.35-24.38"
+          }
+        }
+      }
+    },
+    "counter": {
+      "attributes": {
+        "hdlname": "counter",
+        "top": "00000000000000000000000000000001",
+        "src": "rtl/counter.v:6.1-47.10"
+      },
+      "ports": {
+        "clk1": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "rst": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "ena": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "c": {
+          "direction": "output",
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ]
+        }
+      },
+      "cells": {
+        "$auto$alumacc.cc:578:replace_alu$12.carry_start": {
+          "hide_name": 1,
+          "type": "LUT4_HA",
+          "parameters": {
+            "I0MUX": "1",
+            "INIT": "0000000000000000"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:29.25-29.36|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v:39.3-43.2"
+          },
+          "port_directions": {
+            "Ci": "input",
+            "Co": "output",
+            "I0": "input",
+            "I1": "input",
+            "I2": "input",
+            "I3": "input"
+          },
+          "connections": {
+            "Ci": [ ],
+            "Co": [ 13 ],
+            "I0": [ ],
+            "I1": [ "0" ],
+            "I2": [ "0" ],
+            "I3": [ ]
+          }
+        },
+        "$auto$alumacc.cc:578:replace_alu$12.slice[0].lut_i": {
+          "hide_name": 1,
+          "type": "LUT4_HA",
+          "parameters": {
+            "I0MUX": "1",
+            "INIT": "1001011010010110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:29.25-29.36|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v:51.4-56.3"
+          },
+          "port_directions": {
+            "Ci": "input",
+            "Co": "output",
+            "I0": "input",
+            "I1": "input",
+            "I2": "input",
+            "I3": "input",
+            "O": "output"
+          },
+          "connections": {
+            "Ci": [ 13 ],
+            "Co": [ 14 ],
+            "I0": [ ],
+            "I1": [ "1" ],
+            "I2": [ 15 ],
+            "I3": [ ],
+            "O": [ 16 ]
+          }
+        },
+        "$auto$alumacc.cc:578:replace_alu$12.slice[1].lut_i": {
+          "hide_name": 1,
+          "type": "LUT4_HA",
+          "parameters": {
+            "I0MUX": "1",
+            "INIT": "1001011010010110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:29.25-29.36|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v:51.4-56.3"
+          },
+          "port_directions": {
+            "Ci": "input",
+            "Co": "output",
+            "I0": "input",
+            "I1": "input",
+            "I2": "input",
+            "I3": "input",
+            "O": "output"
+          },
+          "connections": {
+            "Ci": [ 14 ],
+            "Co": [ 17 ],
+            "I0": [ ],
+            "I1": [ "0" ],
+            "I2": [ 18 ],
+            "I3": [ ],
+            "O": [ 19 ]
+          }
+        },
+        "$auto$alumacc.cc:578:replace_alu$12.slice[2].lut_i": {
+          "hide_name": 1,
+          "type": "LUT4_HA",
+          "parameters": {
+            "I0MUX": "1",
+            "INIT": "1001011010010110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:29.25-29.36|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v:51.4-56.3"
+          },
+          "port_directions": {
+            "Ci": "input",
+            "Co": "output",
+            "I0": "input",
+            "I1": "input",
+            "I2": "input",
+            "I3": "input",
+            "O": "output"
+          },
+          "connections": {
+            "Ci": [ 17 ],
+            "Co": [ 20 ],
+            "I0": [ ],
+            "I1": [ "0" ],
+            "I2": [ 21 ],
+            "I3": [ ],
+            "O": [ 22 ]
+          }
+        },
+        "$auto$alumacc.cc:578:replace_alu$12.slice[3].lut_i": {
+          "hide_name": 1,
+          "type": "LUT4_HA",
+          "parameters": {
+            "I0MUX": "1",
+            "INIT": "1001011010010110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:29.25-29.36|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v:51.4-56.3"
+          },
+          "port_directions": {
+            "Ci": "input",
+            "Co": "output",
+            "I0": "input",
+            "I1": "input",
+            "I2": "input",
+            "I3": "input",
+            "O": "output"
+          },
+          "connections": {
+            "Ci": [ 20 ],
+            "Co": [ 23 ],
+            "I0": [ ],
+            "I1": [ "0" ],
+            "I2": [ 24 ],
+            "I3": [ ],
+            "O": [ 25 ]
+          }
+        },
+        "$auto$alumacc.cc:578:replace_alu$12.slice[4].lut_i": {
+          "hide_name": 1,
+          "type": "LUT4_HA",
+          "parameters": {
+            "I0MUX": "1",
+            "INIT": "1001011010010110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:29.25-29.36|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v:51.4-56.3"
+          },
+          "port_directions": {
+            "Ci": "input",
+            "Co": "output",
+            "I0": "input",
+            "I1": "input",
+            "I2": "input",
+            "I3": "input",
+            "O": "output"
+          },
+          "connections": {
+            "Ci": [ 23 ],
+            "Co": [ 26 ],
+            "I0": [ ],
+            "I1": [ "0" ],
+            "I2": [ 27 ],
+            "I3": [ ],
+            "O": [ 28 ]
+          }
+        },
+        "$auto$alumacc.cc:578:replace_alu$12.slice[5].lut_i": {
+          "hide_name": 1,
+          "type": "LUT4_HA",
+          "parameters": {
+            "I0MUX": "1",
+            "INIT": "1001011010010110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:29.25-29.36|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v:51.4-56.3"
+          },
+          "port_directions": {
+            "Ci": "input",
+            "Co": "output",
+            "I0": "input",
+            "I1": "input",
+            "I2": "input",
+            "I3": "input",
+            "O": "output"
+          },
+          "connections": {
+            "Ci": [ 26 ],
+            "Co": [ 29 ],
+            "I0": [ ],
+            "I1": [ "0" ],
+            "I2": [ 30 ],
+            "I3": [ ],
+            "O": [ 31 ]
+          }
+        },
+        "$auto$alumacc.cc:578:replace_alu$12.slice[6].lut_i": {
+          "hide_name": 1,
+          "type": "LUT4_HA",
+          "parameters": {
+            "I0MUX": "1",
+            "INIT": "1001011010010110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:29.25-29.36|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v:51.4-56.3"
+          },
+          "port_directions": {
+            "Ci": "input",
+            "Co": "output",
+            "I0": "input",
+            "I1": "input",
+            "I2": "input",
+            "I3": "input",
+            "O": "output"
+          },
+          "connections": {
+            "Ci": [ 29 ],
+            "Co": [ 32 ],
+            "I0": [ ],
+            "I1": [ "0" ],
+            "I2": [ 33 ],
+            "I3": [ ],
+            "O": [ 34 ]
+          }
+        },
+        "$auto$alumacc.cc:578:replace_alu$12.slice[7].lut_i": {
+          "hide_name": 1,
+          "type": "LUT4_HA",
+          "parameters": {
+            "I0MUX": "1",
+            "INIT": "1001011010010110"
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:29.25-29.36|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v:51.4-56.3"
+          },
+          "port_directions": {
+            "Ci": "input",
+            "Co": "output",
+            "I0": "input",
+            "I1": "input",
+            "I2": "input",
+            "I3": "input",
+            "O": "output"
+          },
+          "connections": {
+            "Ci": [ 32 ],
+            "Co": [ 35 ],
+            "I0": [ ],
+            "I1": [ "0" ],
+            "I2": [ 36 ],
+            "I3": [ ],
+            "O": [ 37 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$66": {
+          "hide_name": 1,
+          "type": "LUTFF_SRE",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:24.5-32.8|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v:8.65-8.120"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "E": "input",
+            "O": "output",
+            "R": "input"
+          },
+          "connections": {
+            "CLK": [ 38 ],
+            "D": [ 16 ],
+            "E": [ 39 ],
+            "O": [ 15 ],
+            "R": [ 40 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$67": {
+          "hide_name": 1,
+          "type": "LUTFF_SRE",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:24.5-32.8|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v:8.65-8.120"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "E": "input",
+            "O": "output",
+            "R": "input"
+          },
+          "connections": {
+            "CLK": [ 38 ],
+            "D": [ 19 ],
+            "E": [ 39 ],
+            "O": [ 18 ],
+            "R": [ 40 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$68": {
+          "hide_name": 1,
+          "type": "LUTFF_SRE",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:24.5-32.8|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v:8.65-8.120"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "E": "input",
+            "O": "output",
+            "R": "input"
+          },
+          "connections": {
+            "CLK": [ 38 ],
+            "D": [ 22 ],
+            "E": [ 39 ],
+            "O": [ 21 ],
+            "R": [ 40 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$69": {
+          "hide_name": 1,
+          "type": "LUTFF_SRE",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:24.5-32.8|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v:8.65-8.120"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "E": "input",
+            "O": "output",
+            "R": "input"
+          },
+          "connections": {
+            "CLK": [ 38 ],
+            "D": [ 25 ],
+            "E": [ 39 ],
+            "O": [ 24 ],
+            "R": [ 40 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$70": {
+          "hide_name": 1,
+          "type": "LUTFF_SRE",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:24.5-32.8|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v:8.65-8.120"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "E": "input",
+            "O": "output",
+            "R": "input"
+          },
+          "connections": {
+            "CLK": [ 38 ],
+            "D": [ 28 ],
+            "E": [ 39 ],
+            "O": [ 27 ],
+            "R": [ 40 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$71": {
+          "hide_name": 1,
+          "type": "LUTFF_SRE",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:24.5-32.8|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v:8.65-8.120"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "E": "input",
+            "O": "output",
+            "R": "input"
+          },
+          "connections": {
+            "CLK": [ 38 ],
+            "D": [ 31 ],
+            "E": [ 39 ],
+            "O": [ 30 ],
+            "R": [ 40 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$72": {
+          "hide_name": 1,
+          "type": "LUTFF_SRE",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:24.5-32.8|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v:8.65-8.120"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "E": "input",
+            "O": "output",
+            "R": "input"
+          },
+          "connections": {
+            "CLK": [ 38 ],
+            "D": [ 34 ],
+            "E": [ 39 ],
+            "O": [ 33 ],
+            "R": [ 40 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$73": {
+          "hide_name": 1,
+          "type": "LUTFF_SRE",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:24.5-32.8|REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v:8.65-8.120"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "E": "input",
+            "O": "output",
+            "R": "input"
+          },
+          "connections": {
+            "CLK": [ 38 ],
+            "D": [ 37 ],
+            "E": [ 39 ],
+            "O": [ 36 ],
+            "R": [ 40 ]
+          }
+        },
+        "$iopadmap$counter.c": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:6.8-6.57"
+          },
+          "port_directions": {
+            "EN": "input",
+            "IN": "input",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "1" ],
+            "IN": [ 15 ],
+            "PAD": [ 5 ]
+          }
+        },
+        "$iopadmap$counter.c_1": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:6.8-6.57"
+          },
+          "port_directions": {
+            "EN": "input",
+            "IN": "input",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "1" ],
+            "IN": [ 18 ],
+            "PAD": [ 6 ]
+          }
+        },
+        "$iopadmap$counter.c_2": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:6.8-6.57"
+          },
+          "port_directions": {
+            "EN": "input",
+            "IN": "input",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "1" ],
+            "IN": [ 21 ],
+            "PAD": [ 7 ]
+          }
+        },
+        "$iopadmap$counter.c_3": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:6.8-6.57"
+          },
+          "port_directions": {
+            "EN": "input",
+            "IN": "input",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "1" ],
+            "IN": [ 24 ],
+            "PAD": [ 8 ]
+          }
+        },
+        "$iopadmap$counter.c_4": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:6.8-6.57"
+          },
+          "port_directions": {
+            "EN": "input",
+            "IN": "input",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "1" ],
+            "IN": [ 27 ],
+            "PAD": [ 9 ]
+          }
+        },
+        "$iopadmap$counter.c_5": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:6.8-6.57"
+          },
+          "port_directions": {
+            "EN": "input",
+            "IN": "input",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "1" ],
+            "IN": [ 30 ],
+            "PAD": [ 10 ]
+          }
+        },
+        "$iopadmap$counter.c_6": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:6.8-6.57"
+          },
+          "port_directions": {
+            "EN": "input",
+            "IN": "input",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "1" ],
+            "IN": [ 33 ],
+            "PAD": [ 11 ]
+          }
+        },
+        "$iopadmap$counter.c_7": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:6.8-6.57"
+          },
+          "port_directions": {
+            "EN": "input",
+            "IN": "input",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "1" ],
+            "IN": [ 36 ],
+            "PAD": [ 12 ]
+          }
+        },
+        "$iopadmap$counter.clk1": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:2.8-2.59"
+          },
+          "port_directions": {
+            "EN": "input",
+            "OUT": "output",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "0" ],
+            "OUT": [ 41 ],
+            "PAD": [ 2 ]
+          }
+        },
+        "$iopadmap$counter.ena": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:2.8-2.59"
+          },
+          "port_directions": {
+            "EN": "input",
+            "OUT": "output",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "0" ],
+            "OUT": [ 39 ],
+            "PAD": [ 4 ]
+          }
+        },
+        "$iopadmap$counter.rst": {
+          "hide_name": 1,
+          "type": "IOBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "keep": "00000000000000000000000000000001",
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v:2.8-2.59"
+          },
+          "port_directions": {
+            "EN": "input",
+            "OUT": "output",
+            "PAD": "inout"
+          },
+          "connections": {
+            "EN": [ "0" ],
+            "OUT": [ 40 ],
+            "PAD": [ 3 ]
+          }
+        },
+        "clock_buf": {
+          "hide_name": 0,
+          "type": "GBUF",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "rtl/counter.v:16.10-19.6"
+          },
+          "port_directions": {
+            "IN": "input",
+            "OUT": "output"
+          },
+          "connections": {
+            "IN": [ 41 ],
+            "OUT": [ 38 ]
+          }
+        }
+      },
+      "netnames": {
+        "$abc$440$aiger$o0": {
+          "hide_name": 1,
+          "bits": [ 41 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o1": {
+          "hide_name": 1,
+          "bits": [ 20 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o11": {
+          "hide_name": 1,
+          "bits": [ 23 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o13": {
+          "hide_name": 1,
+          "bits": [ 32 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o15": {
+          "hide_name": 1,
+          "bits": [ 29 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o21": {
+          "hide_name": 1,
+          "bits": [ 40 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o22": {
+          "hide_name": 1,
+          "bits": [ 39 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o24": {
+          "hide_name": 1,
+          "bits": [ 28 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o28": {
+          "hide_name": 1,
+          "bits": [ 31 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o3": {
+          "hide_name": 1,
+          "bits": [ 17 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o33": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o37": {
+          "hide_name": 1,
+          "bits": [ 19 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o41": {
+          "hide_name": 1,
+          "bits": [ 22 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o45": {
+          "hide_name": 1,
+          "bits": [ 25 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o49": {
+          "hide_name": 1,
+          "bits": [ 37 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o5": {
+          "hide_name": 1,
+          "bits": [ 26 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o56": {
+          "hide_name": 1,
+          "bits": [ 34 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o7": {
+          "hide_name": 1,
+          "bits": [ 13 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$aiger$o9": {
+          "hide_name": 1,
+          "bits": [ 14 ],
+          "attributes": {
+          }
+        },
+        "$abc$440$auto$rtlil_bufnorm.cc:318:bufNormalize$401": {
+          "hide_name": 1,
+          "bits": [ 35 ],
+          "attributes": {
+          }
+        },
+        "c": {
+          "hide_name": 0,
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ],
+          "attributes": {
+            "src": "rtl/counter.v:11.23-11.24"
+          }
+        },
+        "clk1": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "rtl/counter.v:7.23-7.27"
+          }
+        },
+        "clk1_buf": {
+          "hide_name": 0,
+          "bits": [ 38 ],
+          "attributes": {
+            "src": "rtl/counter.v:14.10-14.18"
+          }
+        },
+        "ctr1": {
+          "hide_name": 0,
+          "bits": [ 15, 18, 21, 24, 27, 30, 33, 36 ],
+          "attributes": {
+            "src": "rtl/counter.v:21.15-21.19"
+          }
+        },
+        "ena": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "rtl/counter.v:9.23-9.26"
+          }
+        },
+        "rst": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "rtl/counter.v:8.23-8.26"
+          }
+        }
+      }
+    }
+  }
+}

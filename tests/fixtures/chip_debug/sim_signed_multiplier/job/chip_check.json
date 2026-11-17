@@ -1,0 +1,133 @@
+{
+  "op": "requant_i32_i8",
+  "status": "fail",
+  "detail": "flow ok | V0 audit 3597/3597 | netlist sim FAIL",
+  "facts": {
+    "utilisation": {
+      "FABULOUS_LC": {
+        "used": 134,
+        "available": 2160
+      },
+      "IOBUF": {
+        "used": 26,
+        "available": 36
+      },
+      "RAM_32x4_2R_1W": {
+        "used": 0,
+        "available": 36
+      },
+      "MACC_8x8_20": {
+        "used": 4,
+        "available": 18
+      },
+      "RERAM_CIM_32x32": {
+        "used": 0,
+        "available": 2
+      },
+      "GBUF": {
+        "used": 1,
+        "available": 4
+      },
+      "SYS_RESET": {
+        "used": 0,
+        "available": 1
+      }
+    },
+    "pins": {
+      "needed": 26,
+      "available": 36,
+      "fits": true,
+      "by_port": {
+        "clk": 1,
+        "d": 16,
+        "sel": 1,
+        "y": 8
+      },
+      "assignment": {
+        "clk": "X0Y1/A",
+        "d[0]": "X0Y1/B",
+        "d[1]": "X0Y2/A",
+        "d[2]": "X0Y2/B",
+        "d[3]": "X0Y3/A",
+        "d[4]": "X0Y3/B",
+        "d[5]": "X0Y4/A",
+        "d[6]": "X0Y4/B",
+        "d[7]": "X0Y5/A",
+        "d[8]": "X0Y5/B",
+        "d[9]": "X0Y6/A",
+        "d[10]": "X0Y6/B",
+        "d[11]": "X0Y7/A",
+        "d[12]": "X0Y7/B",
+        "d[13]": "X0Y8/A",
+        "d[14]": "X0Y8/B",
+        "d[15]": "X0Y9/A",
+        "sel": "X0Y9/B",
+        "y[0]": "X0Y10/A",
+        "y[1]": "X0Y10/B",
+        "y[2]": "X0Y11/A",
+        "y[3]": "X0Y11/B",
+        "y[4]": "X0Y12/A",
+        "y[5]": "X0Y12/B",
+        "y[6]": "X0Y13/A",
+        "y[7]": "X0Y13/B"
+      }
+    },
+    "bitstream_audit": {
+      "structural_ok": true,
+      "failed_checks": [],
+      "required_bits": 3597,
+      "set_bits": 3597,
+      "missing": 0,
+      "unexplained": 0,
+      "unparsed_fasm_lines": 0
+    },
+    "bitstream_bytes": 35304,
+    "fasm_features": 5781,
+    "fmax": {},
+    "netlist_simulation": {
+      "status": "fail",
+      "reason": "219/485 vectors differ from NumPy (0 undefined)",
+      "vectors": 485,
+      "mismatches": [
+        {
+          "index": 0,
+          "inputs": {
+            "acc": -2147483648
+          },
+          "expected": -128,
+          "got": 127
+        },
+        {
+          "index": 1,
+          "inputs": {
+            "acc": -2147483647
+          },
+          "expected": -128,
+          "got": 127
+        },
+        {
+          "index": 2,
+          "inputs": {
+            "acc": -100000
+          },
+          "expected": -128,
+          "got": 127
+        },
+        {
+          "index": 3,
+          "inputs": {
+            "acc": -1000
+          },
+          "expected": -19,
+          "got": 127
+        }
+      ]
+    },
+    "not_checked": [
+      "the configured fabric (tile RTL + bitstream) in simulation",
+      "timing-annotated simulation",
+      "silicon"
+    ]
+  },
+  "evidence_level": "yosys_rtl_evaluation + real_chip_flow(repo techmaps, nextpnr, bitstream, V0 audit) + synthesized_netlist_simulation_vs_numpy (NOT configured fabric, NOT timing-annotated, NOT silicon)"
+}

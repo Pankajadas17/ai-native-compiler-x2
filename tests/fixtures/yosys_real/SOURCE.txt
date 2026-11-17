@@ -1,0 +1,4 @@
+Real Yosys logs captured 2026-11-09 with YoWASP Yosys 0.70 (pip yowasp-yosys), command:
+  yowasp-yosys -p "read_verilog X.v; hierarchy -check -top top; synth -top top"
+Plain `synth`, not `synth_fabulous`: front-end (read_verilog / hierarchy) messages are the same, back-end ones may differ.
+These are NOT nextpnr logs; nextpnr wording remains unverified.

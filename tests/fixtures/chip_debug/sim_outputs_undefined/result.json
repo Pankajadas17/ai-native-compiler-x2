@@ -1,0 +1,197 @@
+{
+ "op": "add8_sat",
+ "verdict": "FAIL",
+ "stages": [
+  {
+   "stage": "rtl",
+   "status": "pass",
+   "detail": "reports/rtl/add8_sat.v re-checked in Yosys vs NumPy: 500 vectors",
+   "seconds": 0.5
+  },
+  {
+   "stage": "prep",
+   "status": "pass",
+   "detail": "wrapper check (chip pins, direct): 500 vectors through 25/36 pins == NumPy, 24 flip-flop bits",
+   "seconds": 0.4
+  },
+  {
+   "stage": "env",
+   "status": "pass",
+   "detail": "Ubuntu has the chip toolchain (Yosys 0.70+368, nextpnr 0.11.1-89, Icarus 14.0), chipenv, the chip repo and profile",
+   "seconds": 0.3
+  },
+  {
+   "stage": "flow",
+   "status": "pass",
+   "detail": "chip flow ok: 35304-byte bitstream, FABULOUS_LC 35/2160, pins 25/36, 4.0 s",
+   "seconds": 4.0
+  },
+  {
+   "stage": "sim",
+   "status": "fail",
+   "detail": "500/500 vectors differ from NumPy (500 undefined)",
+   "seconds": 0.3
+  },
+  {
+   "stage": "check",
+   "status": "fail",
+   "detail": "flow ok | V0 audit 744/744 | netlist sim FAIL",
+   "seconds": 0.0
+  }
+ ],
+ "facts": {
+  "wrapper_check": {
+   "status": "pass",
+   "stage": "function",
+   "errors": [],
+   "vectors": 500,
+   "flop_bits": 24,
+   "pins": 25
+  },
+  "tool_versions": {
+   "yosys": "Yosys 0.70+368 (git sha1 7cf88aca6, Release, Clang /usr/bin/clang++ 21.1.8)",
+   "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-89-g445e2a65)",
+   "iverilog": "Icarus Verilog version 14.0 (devel) (s20260301-948-gbd5af2914-dirty)"
+  },
+  "netlist_simulation": {
+   "status": "fail",
+   "reason": "500/500 vectors differ from NumPy (500 undefined)",
+   "vectors": 500,
+   "mismatches": [
+    {
+     "index": 0,
+     "inputs": {
+      "a": -128,
+      "b": -128
+     },
+     "expected": -128,
+     "got": null
+    },
+    {
+     "index": 1,
+     "inputs": {
+      "a": -127,
+      "b": -128
+     },
+     "expected": -128,
+     "got": null
+    },
+    {
+     "index": 2,
+     "inputs": {
+      "a": -64,
+      "b": -128
+     },
+     "expected": -128,
+     "got": null
+    },
+    {
+     "index": 3,
+     "inputs": {
+      "a": -1,
+      "b": -128
+     },
+     "expected": -128,
+     "got": null
+    }
+   ]
+  },
+  "utilisation": {
+   "FABULOUS_LC": {
+    "used": 35,
+    "available": 2160
+   },
+   "IOBUF": {
+    "used": 25,
+    "available": 36
+   },
+   "RAM_32x4_2R_1W": {
+    "used": 0,
+    "available": 36
+   },
+   "MACC_8x8_20": {
+    "used": 0,
+    "available": 18
+   },
+   "RERAM_CIM_32x32": {
+    "used": 0,
+    "available": 2
+   },
+   "GBUF": {
+    "used": 1,
+    "available": 4
+   },
+   "SYS_RESET": {
+    "used": 0,
+    "available": 1
+   }
+  },
+  "pins": {
+   "needed": 25,
+   "available": 36,
+   "fits": true,
+   "by_port": {
+    "clk": 1,
+    "a": 8,
+    "b": 8,
+    "y": 8
+   },
+   "assignment": {
+    "clk": "X0Y1/A",
+    "a[0]": "X0Y1/B",
+    "a[1]": "X0Y2/A",
+    "a[2]": "X0Y2/B",
+    "a[3]": "X0Y3/A",
+    "a[4]": "X0Y3/B",
+    "a[5]": "X0Y4/A",
+    "a[6]": "X0Y4/B",
+    "a[7]": "X0Y5/A",
+    "b[0]": "X0Y5/B",
+    "b[1]": "X0Y6/A",
+    "b[2]": "X0Y6/B",
+    "b[3]": "X0Y7/A",
+    "b[4]": "X0Y7/B",
+    "b[5]": "X0Y8/A",
+    "b[6]": "X0Y8/B",
+    "b[7]": "X0Y9/A",
+    "y[0]": "X0Y9/B",
+    "y[1]": "X0Y10/A",
+    "y[2]": "X0Y10/B",
+    "y[3]": "X0Y11/A",
+    "y[4]": "X0Y11/B",
+    "y[5]": "X0Y12/A",
+    "y[6]": "X0Y12/B",
+    "y[7]": "X0Y13/A"
+   }
+  },
+  "bitstream_audit": {
+   "structural_ok": true,
+   "failed_checks": [],
+   "required_bits": 744,
+   "set_bits": 744,
+   "missing": 0,
+   "unexplained": 0,
+   "unparsed_fasm_lines": 0
+  },
+  "bitstream_bytes": 35304,
+  "fasm_features": 1002,
+  "fmax": {
+   "$abc$858$aiger$o35": {
+    "fmax_mhz": 42.19,
+    "target_mhz": 12.0,
+    "ok": true
+   }
+  },
+  "not_checked": [
+   "the configured fabric (tile RTL + bitstream) in simulation",
+   "timing-annotated simulation",
+   "silicon"
+  ]
+ },
+ "diagnosis": {
+  "rule_based_candidates": [
+   "chip_netlist_outputs_undefined"
+  ],
+  "source": "rules (no LLM)"
+ }
+}

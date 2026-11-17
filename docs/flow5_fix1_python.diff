@@ -1,0 +1,80 @@
+--- a/verification/chip_chain.py
++++ b/verification/chip_chain.py
+@@ -60,12 +60,14 @@
+ # Checks that Ubuntu has what the chip chain needs. Changes nothing. Written by run_fab_chain.py --target chip.
+ CAD="${CHIP_CAD:-$HOME/tools/chip/oss-cad-suite}"
+ PY="${CHIP_PY:-$HOME/chipenv/bin/python}"
+-export PATH="$CAD/bin:$PATH"
++# chipenv first: the repo Makefile runs bit_gen.py with the first python3 on PATH, and OSS CAD Suite ships its own (no fasm)
++export PATH="$(dirname "$PY"):$CAD/bin:$PATH"
+ for t in yosys nextpnr-generic iverilog vvp make; do
+   if command -v "$t" >/dev/null 2>&1; then echo "FOUND $t"; else echo "MISSING $t"; fi
+ done
+ if [ -x "$PY" ]; then echo "FOUND chipenv"; else echo "MISSING chipenv python ($PY)"; fi
+ if "$PY" -c "import fasm, numpy" 2>/dev/null; then echo "FOUND fasm+numpy"; else echo "MISSING fasm or numpy in $PY (pip install fasm numpy)"; fi
++if python3 -c "import fasm, numpy" 2>/dev/null; then echo "FOUND make python3"; else echo "MISSING fasm or numpy in the Makefile's python3 ($(command -v python3))"; fi
+ cd "$1" 2>/dev/null || { echo "MISSING project folder $1"; echo "PREFLIGHT DONE"; exit 0; }
+ if [ -f sky130-reram-fpga/user_designs/makefile.include ]; then echo "FOUND chip repo"; else echo "MISSING chip repo (sky130-reram-fpga with its submodules)"; fi
+ if [ -f specifications/chip_profile.json ]; then echo "FOUND chip profile"; else echo "MISSING specifications/chip_profile.json (run_chip_profile.py)"; fi
+@@ -79,7 +81,7 @@
+ # One chip-chain stage in Ubuntu: flow or sim. Written by run_fab_chain.py --target chip; reads/writes only bm_verif.
+ CAD="${{CHIP_CAD:-$HOME/tools/chip/oss-cad-suite}}"
+ PY="${{CHIP_PY:-$HOME/chipenv/bin/python}}"
+-export PATH="$CAD/bin:$PATH" PYTHONDONTWRITEBYTECODE=1
++export PATH="$(dirname "$PY"):$CAD/bin:$PATH" PYTHONDONTWRITEBYTECODE=1     # chipenv first: the Makefile's python3 needs fasm
+ cd "{root}" || exit 2
+ JOB="{job}"
+ if [ "$1" = flow ]; then
+@@ -551,7 +553,14 @@
+             return "fail", f"the chip flow did not finish this run (report status {rep.get('status')}); see flow_console.log"
+         if rep["status"] != "ok":
+             f = rep.get("failure") or {}
+-            return "fail", f"chip flow failed at {f.get('stage')}: {f.get('cause')}"
++            log = CHIP_BUILD / f"chain_{op}" / f"{f.get('stage')}.log"
++            tail = ""
++            if log.is_file():
++                lines = [l.strip() for l in log.read_text(errors="replace").splitlines() if l.strip()]
++                errs = [l for l in lines if re.search(r"error|no module named", l, re.I)]
++                tail = (errs or lines)[-1][:200] if lines else ""
++            return "fail", (f"chip flow failed at {f.get('stage')}: {f.get('cause')}" + (f" | {tail}" if tail else "") +
++                            f" | log {log.as_posix()}")
+         u = (rep.get("utilisation") or {}).get("FABULOUS_LC", {})
+         return "pass", (f"chip flow ok: {rep.get('bitstream_bytes')}-byte bitstream, FABULOUS_LC {u.get('used')}/{u.get('available')}, "
+                         f"pins {(rep.get('pins') or {}).get('needed')}/{(rep.get('pins') or {}).get('available')}, {run['seconds']} s")
+--- a/chip/chip_flow.py
++++ b/chip/chip_flow.py
+@@ -137,6 +137,7 @@
+         ("check", "empty_fasm", lambda: (extra or {}).get("fasm_features") == 0),
+         ("check", "bitstream_size_mismatch", lambda: "size" in (extra or {}).get("why", "")),
+         ("check", "bitstream_audit_failed", lambda: "audit" in (extra or {})),
++        ("bitstream", "python_module_missing", lambda: "no module named" in t),
+     ]
+     for st, cause, test in rules:  # see RULE_EVIDENCE for which rules were seen on real logs
+         if st == stage and test():
+@@ -157,6 +158,7 @@
+     "empty_fasm": "real (earlier FABulous demo finding: exit 0 with nothing placed)",
+     "bitstream_size_mismatch": "NOT yet seen on a real log",
+     "bitstream_audit_failed": "real bitstreams with planted bit flips (tests/test_chip_bitstream_audit.py)",
++    "python_module_missing": "real make log: the Makefile's python3 was OSS CAD Suite's, without fasm (2026-11-13)",
+ }
+ 
+ _AUDIT_CACHE = {}
+--- a/tests/test_chip_flow.py
++++ b/tests/test_chip_flow.py
+@@ -102,6 +102,7 @@
+     ("check", "", {"fasm_features": 0}, "empty_fasm"),
+     ("check", "", {"unconstrained": ["c[3]"]}, "unconstrained_io"),
+     ("check", "", {"audit": {"missing": 1}}, "bitstream_audit_failed"),
++    ("bitstream", "python_missing.bitstream.log", None, "python_module_missing"),
+ ])
+ def test_classify_real_failures(stage, log, extra, cause):
+     tail = "\n".join(text(log).splitlines()[-25:]) if log else ""
+@@ -116,7 +117,7 @@
+ def test_every_rule_has_recorded_evidence():
+     causes = {"pin_budget_exceeded", "syntax_error", "unknown_module", "ff_type_unsupported", "over_capacity",
+               "unconstrained_io", "routing_failed", "empty_fasm", "bitstream_size_mismatch",
+-              "bitstream_audit_failed"}
++              "bitstream_audit_failed", "python_module_missing"}
+     assert set(cf.RULE_EVIDENCE) == causes
+ 
+ 

@@ -1,0 +1,2 @@
+Info: Max frequency for clock 'engine.clk': 6.25 MHz (FAIL at 12.00 MHz)
+Warning: Max frequency for clock 'engine.clk': 11.20 MHz (FAIL at 12.00 MHz)

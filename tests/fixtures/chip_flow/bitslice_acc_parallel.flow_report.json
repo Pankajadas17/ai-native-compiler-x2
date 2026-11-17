@@ -1,0 +1,43 @@
+{
+  "design": "bitslice_acc_parallel",
+  "top": "bitslice_acc_parallel",
+  "rtl": [
+    "bitslice_acc_parallel.v"
+  ],
+  "stages": {
+    "synth": {
+      "exit": 0,
+      "seconds": 0.26
+    }
+  },
+  "status": "failed",
+  "failure": {
+    "stage": "pins",
+    "cause": "pin_budget_exceeded",
+    "evidence": "design needs 42 I/O pins, fabric has 36 IOBUF sites",
+    "details": {
+      "by_port": {
+        "clk": 1,
+        "rst": 1,
+        "en": 1,
+        "count": 14,
+        "k": 3,
+        "acc": 22
+      }
+    }
+  },
+  "pins": {
+    "needed": 42,
+    "available": 36,
+    "fits": false,
+    "by_port": {
+      "clk": 1,
+      "rst": 1,
+      "en": 1,
+      "count": 14,
+      "k": 3,
+      "acc": 22
+    }
+  },
+  "chip_repo_read_only": true
+}

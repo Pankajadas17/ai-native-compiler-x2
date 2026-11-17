@@ -1,0 +1,461 @@
+{
+  "generated": "2026-11-16 05:49:08",
+  "target": "chip",
+  "runner": "native",
+  "distro": "Ubuntu",
+  "tool_versions": {
+    "yosys": "Yosys 0.70+368 (git sha1 7cf88aca6, Release, Clang /usr/bin/clang++ 21.1.8)",
+    "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-89-g445e2a65)",
+    "iverilog": "Icarus Verilog version 14.0 (devel) (s20260301-948-gbd5af2914-dirty)"
+  },
+  "clock_target_mhz": 12.0,
+  "results": [
+    {
+      "op": "relu8",
+      "verdict": "PASS",
+      "stages": [
+        {
+          "stage": "rtl",
+          "status": "pass",
+          "detail": "reports/rtl/relu8.v re-checked in Yosys vs NumPy: 256 vectors",
+          "seconds": 0.7
+        },
+        {
+          "stage": "prep",
+          "status": "pass",
+          "detail": "wrapper check (chip pins, direct): 256 vectors through 17/36 pins == NumPy, 16 flip-flop bits",
+          "seconds": 0.4
+        },
+        {
+          "stage": "env",
+          "status": "pass",
+          "detail": "Ubuntu has the chip toolchain (Yosys 0.70+368, nextpnr 0.11.1-89, Icarus 14.0), chipenv, the chip repo and profile",
+          "seconds": 0.4
+        },
+        {
+          "stage": "flow",
+          "status": "pass",
+          "detail": "chip flow ok: 35304-byte bitstream, FABULOUS_LC 15/2160, pins 17/36, 3.9 s",
+          "seconds": 3.9
+        },
+        {
+          "stage": "sim",
+          "status": "pass",
+          "detail": "synthesized netlist == NumPy on all 256 vectors",
+          "seconds": 0.3
+        },
+        {
+          "stage": "check",
+          "status": "pass",
+          "detail": "flow ok | V0 audit 345/345 | netlist sim PASS | timing met (151.52 MHz, nextpnr model)",
+          "seconds": 0.0
+        }
+      ],
+      "facts": {
+        "wrapper_check": {
+          "status": "pass",
+          "stage": "function",
+          "errors": [],
+          "vectors": 256,
+          "flop_bits": 16,
+          "pins": 17
+        },
+        "tool_versions": {
+          "yosys": "Yosys 0.70+368 (git sha1 7cf88aca6, Release, Clang /usr/bin/clang++ 21.1.8)",
+          "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-89-g445e2a65)",
+          "iverilog": "Icarus Verilog version 14.0 (devel) (s20260301-948-gbd5af2914-dirty)"
+        },
+        "netlist_simulation": {
+          "status": "pass",
+          "reason": "synthesized netlist == NumPy on all 256 vectors",
+          "vectors": 256
+        },
+        "utilisation": {
+          "FABULOUS_LC": {
+            "used": 15,
+            "available": 2160
+          },
+          "IOBUF": {
+            "used": 17,
+            "available": 36
+          },
+          "RAM_32x4_2R_1W": {
+            "used": 0,
+            "available": 36
+          },
+          "MACC_8x8_20": {
+            "used": 0,
+            "available": 18
+          },
+          "RERAM_CIM_32x32": {
+            "used": 0,
+            "available": 2
+          },
+          "GBUF": {
+            "used": 1,
+            "available": 4
+          },
+          "SYS_RESET": {
+            "used": 0,
+            "available": 1
+          }
+        },
+        "pins": {
+          "needed": 17,
+          "available": 36,
+          "fits": true,
+          "by_port": {
+            "clk": 1,
+            "x": 8,
+            "y": 8
+          },
+          "assignment": {
+            "clk": "X0Y1/A",
+            "x[0]": "X0Y1/B",
+            "x[1]": "X0Y2/A",
+            "x[2]": "X0Y2/B",
+            "x[3]": "X0Y3/A",
+            "x[4]": "X0Y3/B",
+            "x[5]": "X0Y4/A",
+            "x[6]": "X0Y4/B",
+            "x[7]": "X0Y5/A",
+            "y[0]": "X0Y5/B",
+            "y[1]": "X0Y6/A",
+            "y[2]": "X0Y6/B",
+            "y[3]": "X0Y7/A",
+            "y[4]": "X0Y7/B",
+            "y[5]": "X0Y8/A",
+            "y[6]": "X0Y8/B",
+            "y[7]": "X0Y9/A"
+          }
+        },
+        "bitstream_audit": {
+          "structural_ok": true,
+          "failed_checks": [],
+          "required_bits": 345,
+          "set_bits": 345,
+          "missing": 0,
+          "unexplained": 0,
+          "unparsed_fasm_lines": 0
+        },
+        "bitstream_bytes": 35304,
+        "fasm_features": 413,
+        "fmax": {
+          "$abc$406$aiger$o0": {
+            "fmax_mhz": 151.52,
+            "target_mhz": 14.0,
+            "ok": true
+          }
+        },
+        "not_checked": [
+          "the configured fabric (tile RTL + bitstream) in simulation",
+          "timing-annotated simulation",
+          "silicon"
+        ]
+      }
+    },
+    {
+      "op": "add8_sat",
+      "verdict": "PASS",
+      "stages": [
+        {
+          "stage": "rtl",
+          "status": "pass",
+          "detail": "reports/rtl/add8_sat.v re-checked in Yosys vs NumPy: 500 vectors",
+          "seconds": 0.4
+        },
+        {
+          "stage": "prep",
+          "status": "pass",
+          "detail": "wrapper check (chip pins, direct): 500 vectors through 25/36 pins == NumPy, 24 flip-flop bits",
+          "seconds": 0.4
+        },
+        {
+          "stage": "env",
+          "status": "pass",
+          "detail": "Ubuntu has the chip toolchain (Yosys 0.70+368, nextpnr 0.11.1-89, Icarus 14.0), chipenv, the chip repo and profile",
+          "seconds": 0.0
+        },
+        {
+          "stage": "flow",
+          "status": "pass",
+          "detail": "chip flow ok: 35304-byte bitstream, FABULOUS_LC 35/2160, pins 25/36, 3.7 s",
+          "seconds": 3.7
+        },
+        {
+          "stage": "sim",
+          "status": "pass",
+          "detail": "synthesized netlist == NumPy on all 500 vectors",
+          "seconds": 0.3
+        },
+        {
+          "stage": "check",
+          "status": "pass",
+          "detail": "flow ok | V0 audit 744/744 | netlist sim PASS | timing met (42.19 MHz, nextpnr model)",
+          "seconds": 0.0
+        }
+      ],
+      "facts": {
+        "wrapper_check": {
+          "status": "pass",
+          "stage": "function",
+          "errors": [],
+          "vectors": 500,
+          "flop_bits": 24,
+          "pins": 25
+        },
+        "tool_versions": {
+          "yosys": "Yosys 0.70+368 (git sha1 7cf88aca6, Release, Clang /usr/bin/clang++ 21.1.8)",
+          "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-89-g445e2a65)",
+          "iverilog": "Icarus Verilog version 14.0 (devel) (s20260301-948-gbd5af2914-dirty)"
+        },
+        "netlist_simulation": {
+          "status": "pass",
+          "reason": "synthesized netlist == NumPy on all 500 vectors",
+          "vectors": 500
+        },
+        "utilisation": {
+          "FABULOUS_LC": {
+            "used": 35,
+            "available": 2160
+          },
+          "IOBUF": {
+            "used": 25,
+            "available": 36
+          },
+          "RAM_32x4_2R_1W": {
+            "used": 0,
+            "available": 36
+          },
+          "MACC_8x8_20": {
+            "used": 0,
+            "available": 18
+          },
+          "RERAM_CIM_32x32": {
+            "used": 0,
+            "available": 2
+          },
+          "GBUF": {
+            "used": 1,
+            "available": 4
+          },
+          "SYS_RESET": {
+            "used": 0,
+            "available": 1
+          }
+        },
+        "pins": {
+          "needed": 25,
+          "available": 36,
+          "fits": true,
+          "by_port": {
+            "clk": 1,
+            "a": 8,
+            "b": 8,
+            "y": 8
+          },
+          "assignment": {
+            "clk": "X0Y1/A",
+            "a[0]": "X0Y1/B",
+            "a[1]": "X0Y2/A",
+            "a[2]": "X0Y2/B",
+            "a[3]": "X0Y3/A",
+            "a[4]": "X0Y3/B",
+            "a[5]": "X0Y4/A",
+            "a[6]": "X0Y4/B",
+            "a[7]": "X0Y5/A",
+            "b[0]": "X0Y5/B",
+            "b[1]": "X0Y6/A",
+            "b[2]": "X0Y6/B",
+            "b[3]": "X0Y7/A",
+            "b[4]": "X0Y7/B",
+            "b[5]": "X0Y8/A",
+            "b[6]": "X0Y8/B",
+            "b[7]": "X0Y9/A",
+            "y[0]": "X0Y9/B",
+            "y[1]": "X0Y10/A",
+            "y[2]": "X0Y10/B",
+            "y[3]": "X0Y11/A",
+            "y[4]": "X0Y11/B",
+            "y[5]": "X0Y12/A",
+            "y[6]": "X0Y12/B",
+            "y[7]": "X0Y13/A"
+          }
+        },
+        "bitstream_audit": {
+          "structural_ok": true,
+          "failed_checks": [],
+          "required_bits": 744,
+          "set_bits": 744,
+          "missing": 0,
+          "unexplained": 0,
+          "unparsed_fasm_lines": 0
+        },
+        "bitstream_bytes": 35304,
+        "fasm_features": 1002,
+        "fmax": {
+          "$abc$858$aiger$o35": {
+            "fmax_mhz": 42.19,
+            "target_mhz": 14.0,
+            "ok": true
+          }
+        },
+        "not_checked": [
+          "the configured fabric (tile RTL + bitstream) in simulation",
+          "timing-annotated simulation",
+          "silicon"
+        ]
+      }
+    },
+    {
+      "op": "requant_i32_i8",
+      "verdict": "PASS",
+      "stages": [
+        {
+          "stage": "rtl",
+          "status": "pass",
+          "detail": "reports/rtl/requant_i32_i8.v re-checked in Yosys vs NumPy: 485 vectors",
+          "seconds": 0.4
+        },
+        {
+          "stage": "prep",
+          "status": "pass",
+          "detail": "wrapper check (chip pins, two_step): 485 vectors through 26/36 pins == NumPy, 40 flip-flop bits",
+          "seconds": 0.5
+        },
+        {
+          "stage": "env",
+          "status": "pass",
+          "detail": "Ubuntu has the chip toolchain (Yosys 0.70+368, nextpnr 0.11.1-89, Icarus 14.0), chipenv, the chip repo and profile",
+          "seconds": 0.0
+        },
+        {
+          "stage": "flow",
+          "status": "pass",
+          "detail": "chip flow ok: 35304-byte bitstream, FABULOUS_LC 134/2160, pins 26/36, 5.9 s",
+          "seconds": 5.9
+        },
+        {
+          "stage": "sim",
+          "status": "pass",
+          "detail": "synthesized netlist == NumPy on all 485 vectors",
+          "seconds": 0.5
+        },
+        {
+          "stage": "check",
+          "status": "pass",
+          "detail": "flow ok | V0 audit 3549/3549 | netlist sim PASS | timing: nextpnr found no register-to-register path",
+          "seconds": 0.0
+        }
+      ],
+      "facts": {
+        "wrapper_check": {
+          "status": "pass",
+          "stage": "function",
+          "errors": [],
+          "vectors": 485,
+          "flop_bits": 40,
+          "pins": 26
+        },
+        "tool_versions": {
+          "yosys": "Yosys 0.70+368 (git sha1 7cf88aca6, Release, Clang /usr/bin/clang++ 21.1.8)",
+          "nextpnr-generic": "\"nextpnr-generic\" -- Next Generation Place and Route (Version nextpnr-0.11.1-89-g445e2a65)",
+          "iverilog": "Icarus Verilog version 14.0 (devel) (s20260301-948-gbd5af2914-dirty)"
+        },
+        "netlist_simulation": {
+          "status": "pass",
+          "reason": "synthesized netlist == NumPy on all 485 vectors",
+          "vectors": 485
+        },
+        "utilisation": {
+          "FABULOUS_LC": {
+            "used": 134,
+            "available": 2160
+          },
+          "IOBUF": {
+            "used": 26,
+            "available": 36
+          },
+          "RAM_32x4_2R_1W": {
+            "used": 0,
+            "available": 36
+          },
+          "MACC_8x8_20": {
+            "used": 4,
+            "available": 18
+          },
+          "RERAM_CIM_32x32": {
+            "used": 0,
+            "available": 2
+          },
+          "GBUF": {
+            "used": 1,
+            "available": 4
+          },
+          "SYS_RESET": {
+            "used": 0,
+            "available": 1
+          }
+        },
+        "pins": {
+          "needed": 26,
+          "available": 36,
+          "fits": true,
+          "by_port": {
+            "clk": 1,
+            "d": 16,
+            "sel": 1,
+            "y": 8
+          },
+          "assignment": {
+            "clk": "X0Y1/A",
+            "d[0]": "X0Y1/B",
+            "d[1]": "X0Y2/A",
+            "d[2]": "X0Y2/B",
+            "d[3]": "X0Y3/A",
+            "d[4]": "X0Y3/B",
+            "d[5]": "X0Y4/A",
+            "d[6]": "X0Y4/B",
+            "d[7]": "X0Y5/A",
+            "d[8]": "X0Y5/B",
+            "d[9]": "X0Y6/A",
+            "d[10]": "X0Y6/B",
+            "d[11]": "X0Y7/A",
+            "d[12]": "X0Y7/B",
+            "d[13]": "X0Y8/A",
+            "d[14]": "X0Y8/B",
+            "d[15]": "X0Y9/A",
+            "sel": "X0Y9/B",
+            "y[0]": "X0Y10/A",
+            "y[1]": "X0Y10/B",
+            "y[2]": "X0Y11/A",
+            "y[3]": "X0Y11/B",
+            "y[4]": "X0Y12/A",
+            "y[5]": "X0Y12/B",
+            "y[6]": "X0Y13/A",
+            "y[7]": "X0Y13/B"
+          }
+        },
+        "bitstream_audit": {
+          "structural_ok": true,
+          "failed_checks": [],
+          "required_bits": 3549,
+          "set_bits": 3549,
+          "missing": 0,
+          "unexplained": 0,
+          "unparsed_fasm_lines": 0
+        },
+        "bitstream_bytes": 35304,
+        "fasm_features": 5460,
+        "fmax": {},
+        "not_checked": [
+          "timing (nextpnr found no register-to-register path to time)",
+          "the configured fabric (tile RTL + bitstream) in simulation",
+          "timing-annotated simulation",
+          "silicon"
+        ]
+      }
+    }
+  ],
+  "evidence_level": "yosys_rtl_evaluation + real_chip_flow(repo techmaps, nextpnr, bitstream, V0 audit) + synthesized_netlist_simulation_vs_numpy (NOT configured fabric, NOT timing-annotated, NOT silicon)"
+}

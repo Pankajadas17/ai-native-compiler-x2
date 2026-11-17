@@ -1,0 +1,114 @@
+{
+  "design": "chain_add8_sat",
+  "top": "add8_sat_chip",
+  "rtl": [
+    "add8_sat_chip.v"
+  ],
+  "stages": {
+    "synth": {
+      "exit": 0,
+      "seconds": 0.21
+    },
+    "pnr": {
+      "exit": 0,
+      "seconds": 1.22
+    },
+    "bitstream": {
+      "exit": 0,
+      "seconds": 1.25
+    },
+    "hex": {
+      "exit": 0,
+      "seconds": 0.04
+    }
+  },
+  "status": "ok",
+  "failure": null,
+  "multiplier_map": {
+    "file": "chip/techmap/MACC_8x8_20_map_signed.v",
+    "args": "8 8 2 2 12",
+    "replaces": "ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/techmap/MACC_8x8_20_map.v",
+    "why": "the repo map is unsigned-only (signed multiplies wider than 8 bits were wrong)"
+  },
+  "pins": {
+    "needed": 25,
+    "available": 36,
+    "fits": true,
+    "by_port": {
+      "clk": 1,
+      "a": 8,
+      "b": 8,
+      "y": 8
+    },
+    "assignment": {
+      "clk": "X0Y1/A",
+      "a[0]": "X0Y1/B",
+      "a[1]": "X0Y2/A",
+      "a[2]": "X0Y2/B",
+      "a[3]": "X0Y3/A",
+      "a[4]": "X0Y3/B",
+      "a[5]": "X0Y4/A",
+      "a[6]": "X0Y4/B",
+      "a[7]": "X0Y5/A",
+      "b[0]": "X0Y5/B",
+      "b[1]": "X0Y6/A",
+      "b[2]": "X0Y6/B",
+      "b[3]": "X0Y7/A",
+      "b[4]": "X0Y7/B",
+      "b[5]": "X0Y8/A",
+      "b[6]": "X0Y8/B",
+      "b[7]": "X0Y9/A",
+      "y[0]": "X0Y9/B",
+      "y[1]": "X0Y10/A",
+      "y[2]": "X0Y10/B",
+      "y[3]": "X0Y11/A",
+      "y[4]": "X0Y11/B",
+      "y[5]": "X0Y12/A",
+      "y[6]": "X0Y12/B",
+      "y[7]": "X0Y13/A"
+    }
+  },
+  "utilisation": {
+    "FABULOUS_LC": {
+      "used": 35,
+      "available": 2160
+    },
+    "IOBUF": {
+      "used": 25,
+      "available": 36
+    },
+    "RAM_32x4_2R_1W": {
+      "used": 0,
+      "available": 36
+    },
+    "MACC_8x8_20": {
+      "used": 0,
+      "available": 18
+    },
+    "RERAM_CIM_32x32": {
+      "used": 0,
+      "available": 2
+    },
+    "GBUF": {
+      "used": 1,
+      "available": 4
+    },
+    "SYS_RESET": {
+      "used": 0,
+      "available": 1
+    }
+  },
+  "fasm_features": 1002,
+  "bitstream_bytes": 35304,
+  "bitstream_expected_bytes": 35304,
+  "bitstream_audit": {
+    "structural_ok": true,
+    "failed_checks": [],
+    "required_bits": 744,
+    "set_bits": 744,
+    "missing": 0,
+    "unexplained": 0,
+    "unparsed_fasm_lines": 0
+  },
+  "chip_repo_read_only": true
+}

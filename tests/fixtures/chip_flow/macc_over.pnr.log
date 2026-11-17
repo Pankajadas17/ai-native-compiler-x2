@@ -1,0 +1,49 @@
+sky130A
+classic_fabric_reram
+classic
+FAB_ROOT=REPO/user_designs/fabrics/classic_fabric_reram/macro/sky130A/fabulous \
+nextpnr-generic \
+--uarch fabulous \
+--json macc_over.json \
+--write macc_over_out.json \
+-o fasm=macc_over.fasm \
+-o corner= \
+-o pcf=BM_VERIF/chip_build/macc_over/design.pcf \
+--verbose \
+--log macc_over_log.txt \
+--timing-allow-fail
+Info: placement_estimate.txt: no value for 'delayScale', using default 3
+Info: placement_estimate.txt: no value for 'delayOffset', using default 3
+Info: placement_estimate.txt: no value for 'carryPredictDelay', using default 0.5
+Info: placement_estimate.txt: no value for 'delayEpsilon', using default 0.25
+Info: placement_estimate.txt: no value for 'ripupPenalty', using default 0.5
+Info: placement_estimate.txt: no value for 'pipDelayScale', using default 0.05
+Info: Reading BELs file: /.FABulous/bel.v2.txt
+Info: Reading PIPs file: /.FABulous/pips.txt
+
+Info: constrained 'clk' to bel 'X0Y1/A'
+Info: constrained 'a[0]' to bel 'X0Y1/B'
+Info: constrained 'a[1]' to bel 'X0Y2/A'
+Info: constrained 'a[2]' to bel 'X0Y2/B'
+Info: constrained 'a[3]' to bel 'X0Y3/A'
+Info: constrained 'a[4]' to bel 'X0Y3/B'
+Info: constrained 'a[5]' to bel 'X0Y4/A'
+Info: constrained 'a[6]' to bel 'X0Y4/B'
+Info: constrained 'a[7]' to bel 'X0Y5/A'
+Info: constrained 'q' to bel 'X0Y5/B'
+Info: Finished applying constraints from 'BM_VERIF/chip_build/macc_over/design.pcf'
+Info: Checksum: 0x891ae5f6
+
+Info: Device utilisation:
+Info: 	         FABULOUS_LC:     589/   2160    27%
+Info: 	               IOBUF:      10/     36    27%
+Info: 	      RAM_32x4_2R_1W:       0/     36     0%
+Info: 	         MACC_8x8_20:      20/     18   111%
+Info: 	     RERAM_CIM_32x32:       0/      2     0%
+Info: 	                GBUF:       1/      4    25%
+Info: 	           SYS_RESET:       0/      1     0%
+
+Info: Placed 10 cells based on constraints.
+ERROR: Unable to place cell '$rtl/macc_over.v:10$mul$37', no BELs remaining to implement cell type 'MACC_8x8_20'
+0 warnings, 1 error
+make: *** [REPO/user_designs/makefile.include:76: pnr] Error 125

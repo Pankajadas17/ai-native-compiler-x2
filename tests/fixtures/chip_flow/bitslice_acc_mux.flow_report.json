@@ -1,0 +1,107 @@
+{
+  "design": "bitslice_acc_mux",
+  "top": "bitslice_acc_mux",
+  "rtl": [
+    "bitslice_acc_mux.v"
+  ],
+  "stages": {
+    "synth": {
+      "exit": 0,
+      "seconds": 0.21
+    },
+    "pnr": {
+      "exit": 0,
+      "seconds": 1.72
+    },
+    "bitstream": {
+      "exit": 0,
+      "seconds": 1.73
+    },
+    "hex": {
+      "exit": 0,
+      "seconds": 0.05
+    }
+  },
+  "status": "ok",
+  "failure": null,
+  "pins": {
+    "needed": 30,
+    "available": 36,
+    "fits": true,
+    "by_port": {
+      "clk": 1,
+      "rst": 1,
+      "en": 1,
+      "count": 14,
+      "k": 3,
+      "sel": 2,
+      "acc_byte": 8
+    },
+    "assignment": {
+      "clk": "X0Y1/A",
+      "rst": "X0Y1/B",
+      "en": "X0Y2/A",
+      "count[0]": "X0Y2/B",
+      "count[1]": "X0Y3/A",
+      "count[2]": "X0Y3/B",
+      "count[3]": "X0Y4/A",
+      "count[4]": "X0Y4/B",
+      "count[5]": "X0Y5/A",
+      "count[6]": "X0Y5/B",
+      "count[7]": "X0Y6/A",
+      "count[8]": "X0Y6/B",
+      "count[9]": "X0Y7/A",
+      "count[10]": "X0Y7/B",
+      "count[11]": "X0Y8/A",
+      "count[12]": "X0Y8/B",
+      "count[13]": "X0Y9/A",
+      "k[0]": "X0Y9/B",
+      "k[1]": "X0Y10/A",
+      "k[2]": "X0Y10/B",
+      "sel[0]": "X0Y11/A",
+      "sel[1]": "X0Y11/B",
+      "acc_byte[0]": "X0Y12/A",
+      "acc_byte[1]": "X0Y12/B",
+      "acc_byte[2]": "X0Y13/A",
+      "acc_byte[3]": "X0Y13/B",
+      "acc_byte[4]": "X0Y14/A",
+      "acc_byte[5]": "X0Y14/B",
+      "acc_byte[6]": "X0Y15/A",
+      "acc_byte[7]": "X0Y15/B"
+    }
+  },
+  "utilisation": {
+    "FABULOUS_LC": {
+      "used": 88,
+      "available": 2160
+    },
+    "IOBUF": {
+      "used": 30,
+      "available": 36
+    },
+    "RAM_32x4_2R_1W": {
+      "used": 0,
+      "available": 36
+    },
+    "MACC_8x8_20": {
+      "used": 0,
+      "available": 18
+    },
+    "RERAM_CIM_32x32": {
+      "used": 0,
+      "available": 2
+    },
+    "GBUF": {
+      "used": 1,
+      "available": 4
+    },
+    "SYS_RESET": {
+      "used": 0,
+      "available": 1
+    }
+  },
+  "fasm_features": 2668,
+  "bitstream_bytes": 35304,
+  "bitstream_expected_bytes": 35304,
+  "chip_repo_read_only": true
+}

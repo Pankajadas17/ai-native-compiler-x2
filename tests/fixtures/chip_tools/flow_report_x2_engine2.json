@@ -1,0 +1,131 @@
+{
+  "design": "x2_engine2",
+  "top": "x2_engine2",
+  "rtl": [
+    "x2_engine2.v"
+  ],
+  "stages": {
+    "synth": {
+      "exit": 0,
+      "seconds": 0.58
+    },
+    "pnr": {
+      "exit": 0,
+      "seconds": 18.06
+    },
+    "bitstream": {
+      "exit": 0,
+      "seconds": 12.45
+    },
+    "hex": {
+      "exit": 0,
+      "seconds": 0.04
+    }
+  },
+  "status": "ok",
+  "failure": null,
+  "multiplier_map": {
+    "file": "chip/techmap/MACC_8x8_20_map_signed.v",
+    "args": "8 8 2 2 12",
+    "replaces": "ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/techmap/MACC_8x8_20_map.v",
+    "why": "the repo map is unsigned-only (signed multiplies wider than 8 bits were wrong)"
+  },
+  "pins": {
+    "needed": 35,
+    "available": 36,
+    "fits": true,
+    "by_port": {
+      "clk": 1,
+      "rst": 1,
+      "cmd_data": 12,
+      "cmd_hi": 1,
+      "cmd_strobe": 1,
+      "cmd_ready": 2,
+      "acc_clear": 1,
+      "idle": 2,
+      "acc_sel": 4,
+      "byte_sel": 2,
+      "acc_byte": 8
+    },
+    "assignment": {
+      "clk": "X0Y1/A",
+      "rst": "X0Y1/B",
+      "cmd_data[0]": "X0Y2/A",
+      "cmd_data[1]": "X0Y2/B",
+      "cmd_data[2]": "X0Y3/A",
+      "cmd_data[3]": "X0Y3/B",
+      "cmd_data[4]": "X0Y4/A",
+      "cmd_data[5]": "X0Y4/B",
+      "cmd_data[6]": "X0Y5/A",
+      "cmd_data[7]": "X0Y5/B",
+      "cmd_data[8]": "X0Y6/A",
+      "cmd_data[9]": "X0Y6/B",
+      "cmd_data[10]": "X0Y7/A",
+      "cmd_data[11]": "X0Y7/B",
+      "cmd_hi": "X0Y8/A",
+      "cmd_strobe": "X0Y8/B",
+      "cmd_ready[0]": "X0Y9/A",
+      "cmd_ready[1]": "X0Y9/B",
+      "acc_clear": "X0Y10/A",
+      "idle[0]": "X0Y10/B",
+      "idle[1]": "X0Y11/A",
+      "acc_sel[0]": "X0Y11/B",
+      "acc_sel[1]": "X0Y12/A",
+      "acc_sel[2]": "X0Y12/B",
+      "acc_sel[3]": "X0Y13/A",
+      "byte_sel[0]": "X0Y13/B",
+      "byte_sel[1]": "X0Y14/A",
+      "acc_byte[0]": "X0Y14/B",
+      "acc_byte[1]": "X0Y15/A",
+      "acc_byte[2]": "X0Y15/B",
+      "acc_byte[3]": "X0Y16/A",
+      "acc_byte[4]": "X0Y16/B",
+      "acc_byte[5]": "X0Y17/A",
+      "acc_byte[6]": "X0Y17/B",
+      "acc_byte[7]": "X0Y18/A"
+    }
+  },
+  "utilisation": {
+    "FABULOUS_LC": {
+      "used": 710,
+      "available": 2160
+    },
+    "IOBUF": {
+      "used": 35,
+      "available": 36
+    },
+    "RAM_32x4_2R_1W": {
+      "used": 0,
+      "available": 36
+    },
+    "MACC_8x8_20": {
+      "used": 0,
+      "available": 18
+    },
+    "RERAM_CIM_32x32": {
+      "used": 2,
+      "available": 2
+    },
+    "GBUF": {
+      "used": 1,
+      "available": 4
+    },
+    "SYS_RESET": {
+      "used": 0,
+      "available": 1
+    }
+  },
+  "fasm_features": 30521,
+  "bitstream_bytes": 35304,
+  "bitstream_expected_bytes": 35304,
+  "bitstream_audit": {
+    "structural_ok": true,
+    "failed_checks": [],
+    "required_bits": 18177,
+    "set_bits": 18177,
+    "missing": 0,
+    "unexplained": 0,
+    "unparsed_fasm_lines": 0
+  },
+  "chip_repo_read_only": true
+}

@@ -1,0 +1,534 @@
+{
+ "name": "public_invres_net",
+ "meta": {
+  "source": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository",
+  "assumptions": [
+   "seeded INT8 weights; shapes chosen here"
+  ]
+ },
+ "nodes": [
+  {
+   "name": "x",
+   "op": "input",
+   "inputs": [],
+   "shape": [
+    1,
+    3,
+    8,
+    8
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "stem",
+   "op": "conv2d",
+   "inputs": [
+    "x"
+   ],
+   "shape": [
+    1,
+    8,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 8,
+    "C": 3,
+    "R": 3,
+    "S": 3,
+    "stride": 2,
+    "padding": 1,
+    "groups": 1,
+    "weight_dtype": "int8",
+    "tile_width": 8
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "stem_bn",
+   "op": "shape_preserving",
+   "inputs": [
+    "stem"
+   ],
+   "shape": [
+    1,
+    8,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "stem_act",
+   "op": "shape_preserving",
+   "inputs": [
+    "stem_bn"
+   ],
+   "shape": [
+    1,
+    8,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b1_expand",
+   "op": "pointwise_conv2d",
+   "inputs": [
+    "stem_act"
+   ],
+   "shape": [
+    1,
+    16,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 16,
+    "C": 8,
+    "R": 1,
+    "S": 1,
+    "stride": 1,
+    "padding": 0,
+    "groups": 1,
+    "weight_dtype": "int8",
+    "tile_width": 16
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b1_expand_bn",
+   "op": "shape_preserving",
+   "inputs": [
+    "b1_expand"
+   ],
+   "shape": [
+    1,
+    16,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b1_expand_act",
+   "op": "shape_preserving",
+   "inputs": [
+    "b1_expand_bn"
+   ],
+   "shape": [
+    1,
+    16,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b1_dw",
+   "op": "depthwise_conv2d",
+   "inputs": [
+    "b1_expand_act"
+   ],
+   "shape": [
+    1,
+    16,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 16,
+    "C": 16,
+    "R": 3,
+    "S": 3,
+    "stride": 1,
+    "padding": 1,
+    "groups": 16,
+    "weight_dtype": "int8",
+    "tile_width": 16
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b1_dw_bn",
+   "op": "shape_preserving",
+   "inputs": [
+    "b1_dw"
+   ],
+   "shape": [
+    1,
+    16,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b1_dw_act",
+   "op": "shape_preserving",
+   "inputs": [
+    "b1_dw_bn"
+   ],
+   "shape": [
+    1,
+    16,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b1_project",
+   "op": "pointwise_conv2d",
+   "inputs": [
+    "b1_dw_act"
+   ],
+   "shape": [
+    1,
+    8,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 8,
+    "C": 16,
+    "R": 1,
+    "S": 1,
+    "stride": 1,
+    "padding": 0,
+    "groups": 1,
+    "weight_dtype": "int8",
+    "tile_width": 8
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b1_project_bn",
+   "op": "shape_preserving",
+   "inputs": [
+    "b1_project"
+   ],
+   "shape": [
+    1,
+    8,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b1_add",
+   "op": "add",
+   "inputs": [
+    "stem_act",
+    "b1_project_bn"
+   ],
+   "shape": [
+    1,
+    8,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b2_expand",
+   "op": "pointwise_conv2d",
+   "inputs": [
+    "b1_add"
+   ],
+   "shape": [
+    1,
+    24,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 24,
+    "C": 8,
+    "R": 1,
+    "S": 1,
+    "stride": 1,
+    "padding": 0,
+    "groups": 1,
+    "weight_dtype": "int8",
+    "tile_width": 16
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b2_expand_bn",
+   "op": "shape_preserving",
+   "inputs": [
+    "b2_expand"
+   ],
+   "shape": [
+    1,
+    24,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b2_expand_act",
+   "op": "shape_preserving",
+   "inputs": [
+    "b2_expand_bn"
+   ],
+   "shape": [
+    1,
+    24,
+    4,
+    4
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b2_dw",
+   "op": "depthwise_conv2d",
+   "inputs": [
+    "b2_expand_act"
+   ],
+   "shape": [
+    1,
+    24,
+    2,
+    2
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 24,
+    "C": 24,
+    "R": 3,
+    "S": 3,
+    "stride": 2,
+    "padding": 1,
+    "groups": 24,
+    "weight_dtype": "int8",
+    "tile_width": 16
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b2_dw_bn",
+   "op": "shape_preserving",
+   "inputs": [
+    "b2_dw"
+   ],
+   "shape": [
+    1,
+    24,
+    2,
+    2
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b2_dw_act",
+   "op": "shape_preserving",
+   "inputs": [
+    "b2_dw_bn"
+   ],
+   "shape": [
+    1,
+    24,
+    2,
+    2
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b2_project",
+   "op": "pointwise_conv2d",
+   "inputs": [
+    "b2_dw_act"
+   ],
+   "shape": [
+    1,
+    12,
+    2,
+    2
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 12,
+    "C": 24,
+    "R": 1,
+    "S": 1,
+    "stride": 1,
+    "padding": 0,
+    "groups": 1,
+    "weight_dtype": "int8",
+    "tile_width": 12
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "b2_project_bn",
+   "op": "shape_preserving",
+   "inputs": [
+    "b2_project"
+   ],
+   "shape": [
+    1,
+    12,
+    2,
+    2
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "pool",
+   "op": "pool",
+   "inputs": [
+    "b2_project_bn"
+   ],
+   "shape": [
+    1,
+    12,
+    1,
+    1
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "flat",
+   "op": "flatten",
+   "inputs": [
+    "pool"
+   ],
+   "shape": [
+    1,
+    12
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "classifier",
+   "op": "linear",
+   "inputs": [
+    "flat"
+   ],
+   "shape": [
+    1,
+    10
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 10,
+    "C": 12,
+    "R": 1,
+    "S": 1,
+    "stride": 1,
+    "padding": 0,
+    "groups": 1,
+    "weight_dtype": "int8",
+    "tile_width": 10
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "output",
+   "op": "output",
+   "inputs": [
+    "classifier"
+   ],
+   "shape": [
+    1,
+    10
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  }
+ ]
+}

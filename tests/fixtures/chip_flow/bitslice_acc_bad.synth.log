@@ -1,0 +1,37 @@
+sky130A
+classic_fabric_reram
+classic
+yosys \
+-p \
+"synth_fabulous \
+-top bitslice_acc_bad \
+-lut 4 \
+-carry ha \
+-ff "\$_DFF_P_" x -ff "\$_DFFE_PP_" x -ff "\$_SDFF_PP?_" x -ff "\$_SDFFE_PP?P_" x -ff "\$_DLATCH_?_" x \
+-cells-map REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/cells_map.v \
+-arith-map REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v \
+-multiplier-map REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/techmap/MACC_8x8_20_map.v 8 8 2 2 12 \
+-extra-plib REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v -extra-plib REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/IBUF/yosys/primitives/IBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/GBUF/yosys/primitives/GBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v -extra-plib REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v -extra-plib REPO/ip/fabulous-tiles/primitives/SYS_RESET/yosys/primitives/SYS_RESET.v -extra-plib REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v -extra-plib REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v -extra-plib REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v \
+-extra-map REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v -extra-map REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v -extra-map REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/techmap/RAM_32x4_2R_1W_map.v \
+-extra-mlibmap REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/memlib/RAM_32x4_2R_1W_lib.txt \
+-clkbuf-map REPO/ip/fabulous-tiles/primitives/GBUF/yosys/techmap/GBUF_map.v ; \
+show -format dot -prefix bitslice_acc_bad; \
+write_json -noscopeinfo bitslice_acc_bad.json; \
+" \
+--define CLASSIC_FABRIC_RERAM rtl/bitslice_acc_bad.v
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.70+368 (git sha1 7cf88aca6, Release, Clang /usr/bin/clang++ 21.1.8)
+
+-- Running command `read -define CLASSIC_FABRIC_RERAM' --
+
+-- Parsing `rtl/bitslice_acc_bad.v' using frontend ` -vlog2k' --
+
+1. Executing Verilog-2005 frontend: rtl/bitslice_acc_bad.v
+Parsing Verilog input from `rtl/bitslice_acc_bad.v' to AST representation.
+rtl/bitslice_acc_bad.v:3: ERROR: syntax error, unexpected TOK_ALWAYS, expecting ';'
+make: *** [REPO/user_designs/makefile.include:55: synth] Error 1

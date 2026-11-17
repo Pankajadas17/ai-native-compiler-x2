@@ -1,0 +1,79 @@
+{
+ "source": "chip_build/<design>/flow_report.json + pnr.log (nextpnr's model of the chip, not silicon)",
+ "generated": "2026-11-16T15:05:12+0530",
+ "budget": {
+  "logic_cells": 2160,
+  "pins": 36,
+  "ram32x4": 36,
+  "macc": 18,
+  "x2_blocks": 2,
+  "gbuf": 4,
+  "sys_reset": 1
+ },
+ "blocks": {
+  "x2_engine": {
+   "design": "x2_engine2_4bit",
+   "status": "measured",
+   "used": {
+    "logic_cells": 1792,
+    "pins": 35,
+    "ram32x4": 0,
+    "macc": 0,
+    "x2_blocks": 2,
+    "gbuf": 1,
+    "sys_reset": 0
+   },
+   "fmax_mhz": 14.45,
+   "timing": null,
+   "built": "2026-11-16"
+  },
+  "relu": {
+   "design": "chain_relu8",
+   "status": "measured",
+   "used": {
+    "logic_cells": 15,
+    "pins": 17,
+    "ram32x4": 0,
+    "macc": 0,
+    "x2_blocks": 0,
+    "gbuf": 1,
+    "sys_reset": 0
+   },
+   "fmax_mhz": 151.52,
+   "timing": null,
+   "built": "2026-11-16"
+  },
+  "add": {
+   "design": "chain_add8_sat",
+   "status": "measured",
+   "used": {
+    "logic_cells": 35,
+    "pins": 25,
+    "ram32x4": 0,
+    "macc": 0,
+    "x2_blocks": 0,
+    "gbuf": 1,
+    "sys_reset": 0
+   },
+   "fmax_mhz": 42.19,
+   "timing": null,
+   "built": "2026-11-16"
+  },
+  "requant": {
+   "design": "chain_requant_i32_i8",
+   "status": "measured",
+   "used": {
+    "logic_cells": 134,
+    "pins": 26,
+    "ram32x4": 0,
+    "macc": 4,
+    "x2_blocks": 0,
+    "gbuf": 1,
+    "sys_reset": 0
+   },
+   "fmax_mhz": null,
+   "timing": "combinational block (no clocked path in nextpnr's report)",
+   "built": "2026-11-16"
+  }
+ }
+}

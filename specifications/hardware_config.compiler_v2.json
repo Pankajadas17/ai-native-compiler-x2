@@ -1,0 +1,15 @@
+{
+  "version": "0.1-ASSUMED",
+  "status": "ASSUMED - values come from BMsemi_Model sources, NOT from a frozen BM hardware contract. Replace when the team provides the X2 ABI and the fabric profile.",
+  "x2": {
+    "pe_rows": 64,
+    "default_tile_cols": 32,
+    "basis": "core.mapping PEGeometry default (64x32); compiler V2 uses per-layer tile_width <= 16 on 64 rows"
+  },
+  "efpga": {
+    "luts": null, "flip_flops": null, "macc_blocks": null,
+    "basis": "no frozen fabric profile: budgets unknown, so no eFPGA resource estimate is claimed"
+  },
+  "activation_bytes": 1,
+  "activation_bytes_basis": "assumed INT8 activations (not recorded in compiler_graph.json)"
+}

@@ -1,0 +1,85 @@
+{
+  "design": "counter",
+  "top": "counter",
+  "rtl": [
+    "counter.v"
+  ],
+  "stages": {
+    "synth": {
+      "exit": 0,
+      "seconds": 0.16
+    },
+    "pnr": {
+      "exit": 0,
+      "seconds": 1.19
+    },
+    "bitstream": {
+      "exit": 0,
+      "seconds": 1.1
+    },
+    "hex": {
+      "exit": 0,
+      "seconds": 0.06
+    }
+  },
+  "status": "ok",
+  "failure": null,
+  "pins": {
+    "needed": 11,
+    "available": 36,
+    "fits": true,
+    "by_port": {
+      "clk1": 1,
+      "rst": 1,
+      "ena": 1,
+      "c": 8
+    },
+    "assignment": {
+      "clk1": "X0Y1/A",
+      "rst": "X0Y1/B",
+      "ena": "X0Y2/A",
+      "c[0]": "X0Y2/B",
+      "c[1]": "X0Y3/A",
+      "c[2]": "X0Y3/B",
+      "c[3]": "X0Y4/A",
+      "c[4]": "X0Y4/B",
+      "c[5]": "X0Y5/A",
+      "c[6]": "X0Y5/B",
+      "c[7]": "X0Y6/A"
+    }
+  },
+  "utilisation": {
+    "FABULOUS_LC": {
+      "used": 9,
+      "available": 2160
+    },
+    "IOBUF": {
+      "used": 11,
+      "available": 36
+    },
+    "RAM_32x4_2R_1W": {
+      "used": 0,
+      "available": 36
+    },
+    "MACC_8x8_20": {
+      "used": 0,
+      "available": 18
+    },
+    "RERAM_CIM_32x32": {
+      "used": 0,
+      "available": 2
+    },
+    "GBUF": {
+      "used": 1,
+      "available": 4
+    },
+    "SYS_RESET": {
+      "used": 0,
+      "available": 1
+    }
+  },
+  "fasm_features": 361,
+  "bitstream_bytes": 35304,
+  "bitstream_expected_bytes": 35304,
+  "chip_repo_read_only": true
+}

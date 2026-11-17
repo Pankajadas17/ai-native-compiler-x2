@@ -1,0 +1,133 @@
+sky130A
+classic_fabric_reram
+classic
+yosys \
+-p \
+"synth_fabulous \
+-top missing_mod \
+-lut 4 \
+-carry ha \
+-ff "\$_DFF_P_" x -ff "\$_DFFE_PP_" x -ff "\$_SDFF_PP?_" x -ff "\$_SDFFE_PP?P_" x -ff "\$_DLATCH_?_" x \
+-cells-map REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/cells_map.v \
+-arith-map REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v \
+-multiplier-map REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/techmap/MACC_8x8_20_map.v 8 8 2 2 12 \
+-extra-plib REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v -extra-plib REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/IBUF/yosys/primitives/IBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/GBUF/yosys/primitives/GBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v -extra-plib REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v -extra-plib REPO/ip/fabulous-tiles/primitives/SYS_RESET/yosys/primitives/SYS_RESET.v -extra-plib REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v -extra-plib REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v -extra-plib REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v \
+-extra-map REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v -extra-map REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v -extra-map REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/techmap/RAM_32x4_2R_1W_map.v \
+-extra-mlibmap REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/memlib/RAM_32x4_2R_1W_lib.txt \
+-clkbuf-map REPO/ip/fabulous-tiles/primitives/GBUF/yosys/techmap/GBUF_map.v ; \
+show -format dot -prefix missing_mod; \
+write_json -noscopeinfo missing_mod.json; \
+" \
+--define CLASSIC_FABRIC_RERAM rtl/missing_mod.v
+
+ /----------------------------------------------------------------------------\
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |  Copyright (C) 2012 - 2026  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |  Distributed under an ISC-like license, type "license" to see terms        |
+ \----------------------------------------------------------------------------/
+ Yosys 0.70+368 (git sha1 7cf88aca6, Release, Clang /usr/bin/clang++ 21.1.8)
+
+-- Running command `read -define CLASSIC_FABRIC_RERAM' --
+
+-- Parsing `rtl/missing_mod.v' using frontend ` -vlog2k' --
+
+1. Executing Verilog-2005 frontend: rtl/missing_mod.v
+Parsing Verilog input from `rtl/missing_mod.v' to AST representation.
+Storing AST representation for module `$abstract\missing_mod'.
+Successfully finished Verilog frontend.
+
+-- Running command `synth_fabulous -top missing_mod -lut 4 -carry ha -ff $_DFF_P_ x -ff $_DFFE_PP_ x -ff $_SDFF_PP?_ x -ff $_SDFFE_PP?P_ x -ff $_DLATCH_?_ x -cells-map REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/cells_map.v -arith-map REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/arith_map.v -multiplier-map REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/techmap/MACC_8x8_20_map.v 8 8 2 2 12 -extra-plib REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v -extra-plib REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/IBUF/yosys/primitives/IBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/GBUF/yosys/primitives/GBUF.v -extra-plib REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v -extra-plib REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v -extra-plib REPO/ip/fabulous-tiles/primitives/SYS_RESET/yosys/primitives/SYS_RESET.v -extra-plib REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v -extra-plib REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v -extra-plib REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v -extra-map REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/techmap/ff_map.v -extra-map REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/techmap/IOBUF_map.v -extra-map REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/techmap/RAM_32x4_2R_1W_map.v -extra-mlibmap REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/memlib/RAM_32x4_2R_1W_lib.txt -clkbuf-map REPO/ip/fabulous-tiles/primitives/GBUF/yosys/techmap/GBUF_map.v ; show -format dot -prefix missing_mod; write_json -noscopeinfo missing_mod.json; ' --
+
+2. Executing SYNTH_FABULOUS pass.
+
+2.1. Executing Verilog-2005 frontend: /tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v
+Parsing Verilog input from `/tmp/oss2/oss-cad-suite/lib/../share/yosys/fabulous/cells_bb.v' to AST representation.
+Generating RTLIL representation for module `$__FABULOUS_IBUF'.
+Generating RTLIL representation for module `$__FABULOUS_OBUF'.
+Generating RTLIL representation for module `$__FABULOUS_TBUF'.
+Generating RTLIL representation for module `$__FABULOUS_IOBUF'.
+Successfully finished Verilog frontend.
+
+2.2. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/FABULOUS_LC/yosys/primitives/prims.v' to AST representation.
+Generating RTLIL representation for module `\LUT1'.
+Generating RTLIL representation for module `\LUT2'.
+Generating RTLIL representation for module `\LUT3'.
+Generating RTLIL representation for module `\LUT4'.
+Generating RTLIL representation for module `\LUT4_HA'.
+Generating RTLIL representation for module `\LUT5'.
+Generating RTLIL representation for module `\LUT6'.
+Generating RTLIL representation for module `\LUT55_FCY'.
+Generating RTLIL representation for module `\LUTFF'.
+Generating RTLIL representation for module `\FABULOUS_LC'.
+Generating RTLIL representation for module `\LUTFF_E'.
+Generating RTLIL representation for module `\LUTFF_SR'.
+Generating RTLIL representation for module `\LUTFF_SS'.
+Generating RTLIL representation for module `\LUTFF_SRE'.
+Generating RTLIL representation for module `\LUTFF_SSE'.
+Successfully finished Verilog frontend.
+
+2.3. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/IOBUF/yosys/primitives/IOBUF.v' to AST representation.
+Generating RTLIL representation for module `\IOBUF'.
+Successfully finished Verilog frontend.
+
+2.4. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/IBUF/yosys/primitives/IBUF.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/IBUF/yosys/primitives/IBUF.v' to AST representation.
+Generating RTLIL representation for module `\IBUF'.
+Successfully finished Verilog frontend.
+
+2.5. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v' to AST representation.
+Generating RTLIL representation for module `\OBUF'.
+Successfully finished Verilog frontend.
+
+2.6. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v' to AST representation.
+Generating RTLIL representation for module `\TBUF'.
+Successfully finished Verilog frontend.
+
+2.7. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/GBUF/yosys/primitives/GBUF.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/GBUF/yosys/primitives/GBUF.v' to AST representation.
+Generating RTLIL representation for module `\GBUF'.
+Successfully finished Verilog frontend.
+
+2.8. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v' to AST representation.
+Generating RTLIL representation for module `\ODDR'.
+Successfully finished Verilog frontend.
+
+2.9. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v' to AST representation.
+Generating RTLIL representation for module `\IDDR'.
+Successfully finished Verilog frontend.
+
+2.10. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/SYS_RESET/yosys/primitives/SYS_RESET.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/SYS_RESET/yosys/primitives/SYS_RESET.v' to AST representation.
+Generating RTLIL representation for module `\SYS_RESET'.
+Successfully finished Verilog frontend.
+
+2.11. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/RAM_32x4_2R_1W/yosys/primitives/RAM_32x4_2R_1W.v' to AST representation.
+Generating RTLIL representation for module `\RAM_32x4_2R_1W'.
+Successfully finished Verilog frontend.
+
+2.12. Executing Verilog-2005 frontend: REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v
+Parsing Verilog input from `REPO/ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/primitives/MACC_8x8_20.v' to AST representation.
+Generating RTLIL representation for module `\MACC_8x8_20'.
+Successfully finished Verilog frontend.
+
+2.13. Executing Verilog-2005 frontend: REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v
+Parsing Verilog input from `REPO/ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v' to AST representation.
+Generating RTLIL representation for module `\RERAM_CIM_32x32'.
+Successfully finished Verilog frontend.
+
+2.14. Executing HIERARCHY pass (managing design hierarchy).
+
+2.15. Executing AST frontend in derive mode using pre-parsed AST for module `\missing_mod'.
+Generating RTLIL representation for module `\missing_mod'.
+
+2.15.1. Analyzing design hierarchy..
+Top module:  \missing_mod
+ERROR: Module `\not_a_real_cell' referenced in module `\missing_mod' in cell `\u0' is not part of the design.
+make: *** [REPO/user_designs/makefile.include:55: synth] Error 1

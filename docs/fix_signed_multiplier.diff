@@ -1,0 +1,82 @@
+--- a/chip/chip_flow.py
++++ b/chip/chip_flow.py
+@@ -50,8 +50,29 @@
+ EXTRA_MAPS_PATH     := $(call fix,$(EXTRA_MAPS_PATH))
+ EXTRA_MLIBMAPS_PATH := $(call fix,$(EXTRA_MLIBMAPS_PATH))
+ CLKBUF_MAP_PATH     := $(call fix,$(CLKBUF_MAP_PATH))
++# bm_verif: corrected multiplier map (signed pieces); the repo's map is unsigned-only. See chip/techmap/MACC_8x8_20_map_signed.v
++MULTIPLIER_MAP_PATH := -multiplier-map {multiplier_map} {multiplier_args}
+ """
+ 
++# The repo map (fabulous-tiles 0651993f) ignores A_SIGNED/B_SIGNED, so signed multiplies wider than 8 bits were wrong for
++# negative operands. bm_verif's corrected copy replaces it, only after checking the repo still sets exactly this line.
++REPO_MULTIPLIER_LINE = re.compile(r"^MULTIPLIER_MAP_PATH\s*=\s*-multiplier-map\s+(\S*/ip/fabulous-tiles/primitives/MACC_8x8_20/"
++                                  r"yosys/techmap/MACC_8x8_20_map\.v)\s+(8 8 2 2 12)\s*$", re.M)
++SIGNED_MAP = PROJECT_ROOT / "chip" / "techmap" / "MACC_8x8_20_map_signed.v"
++
++
++def multiplier_override(repo):
++    """(map path, args) for the generated Makefile. Raises if the repo's multiplier setting is not the one the corrected
++    map was verified against (then a person must look again; nothing is overridden silently)."""
++    text = repo.path("user_designs/makefile.include").read_text(errors="replace").replace("\r", "")
++    m = REPO_MULTIPLIER_LINE.search(text)
++    if not m:
++        raise RuntimeError("the repo's MULTIPLIER_MAP_PATH line in user_designs/makefile.include changed; "
++                           "re-check chip/techmap/MACC_8x8_20_map_signed.v against it before building")
++    if not SIGNED_MAP.is_file():
++        raise RuntimeError(f"missing {SIGNED_MAP}")
++    return SIGNED_MAP.resolve().as_posix(), m.group(2)
++
+ _UTIL = re.compile(r"^Info:\s+(\w+):\s+(\d+)/\s*(\d+)\s+\d+%\s*$")
+ 
+ 
+@@ -207,7 +228,9 @@
+         dst = work / "rtl" / Path(f).name
+         shutil.copyfile(f, dst)
+         rtl_local.append("rtl/" + dst.name)
+-    (work / "Makefile").write_text(MAKEFILE.format(name=name, top=top, rtl=" ".join(rtl_local)),
++    mul_map, mul_args = multiplier_override(repo)
++    (work / "Makefile").write_text(MAKEFILE.format(name=name, top=top, rtl=" ".join(rtl_local),
++                                                   multiplier_map=mul_map, multiplier_args=mul_args),
+                                    encoding="ascii", newline="\n")
+     env = dict(env or os.environ)
+     env["REPO"] = str(repo.root)
+@@ -215,7 +238,10 @@
+ 
+     before = repo.tree_fingerprint()
+     report = {"design": name, "top": top, "rtl": [Path(f).name for f in rtl_files], "stages": {},
+-              "status": None, "failure": None}
++              "status": None, "failure": None,
++              "multiplier_map": {"file": "chip/techmap/MACC_8x8_20_map_signed.v", "args": mul_args,
++                                 "replaces": "ip/fabulous-tiles/primitives/MACC_8x8_20/yosys/techmap/MACC_8x8_20_map.v",
++                                 "why": "the repo map is unsigned-only (signed multiplies wider than 8 bits were wrong)"}}
+ 
+     def fail(stage, text, extra=None):
+         tail = "\n".join(text.splitlines()[-25:])
+--- a/verification/chip_chain.py
++++ b/verification/chip_chain.py
+@@ -380,10 +380,9 @@
+     return {"status": "pass", "reason": f"synthesized netlist == NumPy on all {n} vectors", "vectors": n}
+ 
+ 
+-MACC_SIGNED_NOTE = ("known chip-flow issue: the repo's multiplier map (MACC_8x8_20_map.v, used by synth_fabulous -multiplier-map) "
+-                    "configures every 8x8 block unsigned (SIGN_EXT=0, no A_SIGNED/B_SIGNED branch), so a SIGNED multiply wider than "
+-                    "8 bits that Yosys splits over several blocks is wrong whenever an operand is negative (bm_verif test: 16x8 "
+-                    "unsigned 0 wrong, 16x8 signed wrong on every negative case; 8x8 fits one block and is right)")
++MACC_SIGNED_NOTE = ("signed multiply on the hard multipliers: the repo's MACC_8x8_20_map.v is unsigned-only, so signed multiplies "
++                    "wider than 8 bits are wrong for negative operands. chip_flow normally replaces it with "
++                    "chip/techmap/MACC_8x8_20_map_signed.v; check the build's Makefile and flow_report.json multiplier_map")
+ 
+ 
+ def explain_mismatch(op, res, netlist_text):
+--- a/tests/test_chip_chain.py
++++ b/tests/test_chip_chain.py
+@@ -106,7 +106,7 @@
+     assert r["status"] == "fail" and r["reason"].startswith("219/485")
+     assert all(v < 0 for b in r["all_mismatches"] for v in b["inputs"].values())
+     why = cc.explain_mismatch("requant_i32_i8", r, "  MACC_8x8_20 #(\n" * 4)
+-    assert why and "4 MACC_8x8_20" in why and "SIGNED multiply" in why
++    assert why and "4 MACC_8x8_20" in why and "MACC_8x8_20_map_signed.v" in why
+     assert cc.explain_mismatch("requant_i32_i8", r, "no multipliers here") is None
+ 
+ 

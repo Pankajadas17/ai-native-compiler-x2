@@ -1,0 +1,166 @@
+{
+ "name": "public_mlp_chain",
+ "meta": {
+  "source": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository",
+  "assumptions": [
+   "chain of matrix ops only"
+  ]
+ },
+ "nodes": [
+  {
+   "name": "input",
+   "op": "input",
+   "inputs": [],
+   "shape": [
+    1,
+    96
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "fc0",
+   "op": "linear",
+   "inputs": [
+    "input"
+   ],
+   "shape": [
+    1,
+    48
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 48,
+    "C": 96,
+    "R": 1,
+    "S": 1,
+    "stride": 1,
+    "padding": 0,
+    "groups": 1,
+    "weight_dtype": "int8"
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "fc1",
+   "op": "linear",
+   "inputs": [
+    "fc0"
+   ],
+   "shape": [
+    1,
+    16
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 16,
+    "C": 48,
+    "R": 1,
+    "S": 1,
+    "stride": 1,
+    "padding": 0,
+    "groups": 1,
+    "weight_dtype": "int8"
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "fc2",
+   "op": "linear",
+   "inputs": [
+    "fc1"
+   ],
+   "shape": [
+    1,
+    48
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 48,
+    "C": 16,
+    "R": 1,
+    "S": 1,
+    "stride": 1,
+    "padding": 0,
+    "groups": 1,
+    "weight_dtype": "int8"
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "fc3",
+   "op": "linear",
+   "inputs": [
+    "fc2"
+   ],
+   "shape": [
+    1,
+    96
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 96,
+    "C": 48,
+    "R": 1,
+    "S": 1,
+    "stride": 1,
+    "padding": 0,
+    "groups": 1,
+    "weight_dtype": "int8"
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "fc4",
+   "op": "linear",
+   "inputs": [
+    "fc3"
+   ],
+   "shape": [
+    1,
+    96
+   ],
+   "dtype": "unspecified",
+   "attrs": {
+    "K": 96,
+    "C": 96,
+    "R": 1,
+    "S": 1,
+    "stride": 1,
+    "padding": 0,
+    "groups": 1,
+    "weight_dtype": "int8"
+   },
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  },
+  {
+   "name": "output",
+   "op": "output",
+   "inputs": [
+    "fc4"
+   ],
+   "shape": [
+    1,
+    96
+   ],
+   "dtype": "unspecified",
+   "attrs": {},
+   "origin": {
+    "note": "PUBLIC stand-in written by tools/make_public_fixtures.py; shapes chosen by hand, no data from any team repository"
+   }
+  }
+ ]
+}

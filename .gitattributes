@@ -1,0 +1,14 @@
+# Same line endings on Windows and Ubuntu (the benchmark digest and the test fixtures depend on it)
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+# binary files: never touch their bytes
+*.bit binary
+*.bin binary
+*.npz binary
+*.npy binary
+*.png binary
+*.jpg binary
+*.pdf binary
+*.docx binary
+*.zip binary

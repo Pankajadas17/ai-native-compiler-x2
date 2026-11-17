@@ -1,0 +1,216 @@
+--- a/run_hardware_config.py
++++ b/run_hardware_config.py
+@@ -22,10 +22,13 @@
+ OLD = SPEC / "hardware_config.compiler_v2.json"
+ 
+ BEHAV = "ip/sky130_bmlabs_reram/verilog/behavioral/sky130_bmlabs_reram__cim32x32.sv"
++# Bits stored per X2 cell. DECISION (user, 2026-11-13): 4, following BMsemi DeepGate's 4-bit banks.
++# The chip repo's behavioral model computes with 1-bit cells; pass --cell-bits 1 to model that instead.
++CELL_BITS = 4
+ DEEPGATE = "BMsemi_Model/projects/1_foundation/PE/variants/deep_gate/Crossbar_array.py"
+ 
+ 
+-def build(profile):
++def build(profile, cell_bits=CELL_BITS):
+     x2, fab, io = profile["x2"], profile["fabric"]["resources"], profile["io"]
+     bm = x2["behavioral_model"]["parameters"]
+     return {
+@@ -35,13 +38,18 @@
+                    "weights.sign_factor follow BMsemi_Model DeepGate and are not stated by the chip repo"),
+         "x2": {
+             "rows": x2["rows"], "cols": x2["cols"], "blocks": x2["count"], "sites": x2["sites"],
+-            "cell_bits": 1, "input_bits": x2["pwm_bits"],
++            "cell_bits": cell_bits, "input_bits": x2["pwm_bits"],
+             "result_count_bits": next(f["width"] for f in x2["behavioral_model"]["result_format_msb_first"] if f["field"] == "count"),
+             "timing_cycles": {"read": bm["READ_DELAY"], "program": bm["PROGRAM_DELAY"], "compute": bm["COMPUTE_DELAY"]},
+             "basis": {
+                 "rows/cols": "2**width(ROW_INDEX/COL_INDEX) in RERAM_CIM_32x32.v; array_state[0:31] in " + BEHAV,
+                 "blocks": "two RERAM_CIM_32x32 BELs in .FABulous/bel.txt (X20Y6, X20Y14)",
+-                "cell_bits": f"1: COMPUTE adds pwm only where array_state is 1 ({BEHAV} l.847-848); SET/RESET store 1/0 (l.802)",
++                "cell_bits": (f"{cell_bits}: DECISION (user, 2026-11-13) to follow BMsemi DeepGate 4-bit banks "
++                              f"({DEEPGATE} l.127, 165). NOT what the chip repo models: its behavioral X2 computes with "
++                              f"1-bit cells ({BEHAV} l.802, l.847-848), so 4-bit plans cannot be checked in that "
++                              "simulation. Pending team confirmation of the silicon cell precision.")
++                             if cell_bits == 4 else
++                             f"1: COMPUTE adds pwm only where array_state is 1 ({BEHAV} l.847-848); SET/RESET store 1/0 (l.802)",
+                 "input_bits": f"i_pwm_data[7:0] ({BEHAV} l.38), unsigned",
+                 "timing_cycles": f"READ/PROGRAM/COMPUTE_DELAY parameters ({BEHAV} l.14-16): behavioral model, not silicon",
+             },
+@@ -51,10 +59,9 @@
+             "cells_per_weight_formula": "sign_factor * ceil(magnitude_bits / x2.cell_bits)",
+             "basis": (f"{DEEPGATE} l.29-30: signed INT8 weights split into positive/negative banks (w = w_pos - w_neg); "
+                       "l.127/165 store each magnitude as two 4-bit banks, i.e. 8 magnitude bits. "
+-                      "On the chip's 1-bit cells that is 2 x 8 = 16 cells per weight."),
+-            "open_question": ("deep_gate/Crossbar_array.py assumes 4-bit cells (4 cells per weight); the X2 behavioral "
+-                              "model computes with 1-bit cells (16 cells per weight). If the team says 4-bit, set "
+-                              "x2.cell_bits = 4."),
++                      f"With x2.cell_bits = {cell_bits}: 2 x ceil(8 / {cell_bits}) = {2 * -(-8 // cell_bits)} cells per weight."),
++            "open_question": ("silicon cell precision: deep_gate/Crossbar_array.py uses 4-bit banks (4 cells per weight); "
++                              "the X2 behavioral model computes with 1-bit cells (16 cells per weight)."),
+         },
+         "efpga": {
+             "luts": fab["FABULOUS_LC"], "flip_flops": fab["FABULOUS_LC"], "macc_blocks": fab["MACC_8x8_20"],
+@@ -78,9 +85,11 @@
+ def main(argv=None):
+     ap = argparse.ArgumentParser()
+     ap.add_argument("--check", action="store_true")
++    ap.add_argument("--cell-bits", type=int, choices=(1, 4), default=CELL_BITS,
++                    help="bits per X2 cell: 4 = decision following BMsemi DeepGate (default), 1 = chip behavioral model")
+     a = ap.parse_args(argv)
+     profile = json.loads(PROFILE.read_text(encoding="utf-8"))
+-    text = json.dumps(build(profile), indent=2) + "\n"
++    text = json.dumps(build(profile, a.cell_bits), indent=2) + "\n"
+     if a.check:
+         same = OUT.is_file() and OUT.read_text(encoding="utf-8") == text
+         print(f"hardware_config.json up to date: {same}")
+@@ -94,7 +103,7 @@
+         f.write(text)
+     hw = json.loads(text)
+     print(f"wrote {OUT}: X2 {hw['x2']['rows']}x{hw['x2']['cols']} x {hw['x2']['blocks']} blocks, "
+-          f"{hw['weights']['sign_factor']}x{hw['weights']['magnitude_bits']} cells per weight, "
++          f"{hw['x2']['cell_bits']}-bit cells, {hw['weights']['sign_factor'] * -(-hw['weights']['magnitude_bits'] // hw['x2']['cell_bits'])} cells per weight, "
+           f"eFPGA {hw['efpga']['luts']} LC / {hw['efpga']['macc_blocks']} MACC / {hw['efpga']['io_pins']} pins")
+     return 0
+ 
+--- a/tests/test_chip_partition.py
++++ b/tests/test_chip_partition.py
+@@ -24,13 +24,29 @@
+ 
+ 
+ @pytest.fixture(scope="module")
+-def hw():
++def hw_file():
+     hw = load_hardware()
+     if not has_chip(hw):
+         pytest.skip("hardware_config.json is the old 0.1 file: run run_hardware_config.py")
+     return hw
+ 
+ 
++def with_cells(hw, bits):
++    h = copy.deepcopy(hw); h["x2"]["cell_bits"] = bits
++    return h
++
++
++@pytest.fixture(scope="module", params=[4, 1], ids=["4bit_cells", "1bit_cells"])
++def hw(request, hw_file):
++    """Every chip test runs with the configured 4-bit cells AND the chip model's 1-bit cells."""
++    return with_cells(hw_file, request.param)
++
++
++# expected numbers on the synthetic graph for each cell size
++EXP = {4: {"cpw": 4, "tiles": [1, 3, 2, 2], "total": 8, "resident": ["conv"], "conv_cols_tiles": 1},
++       1: {"cpw": 16, "tiles": [4, 4, 8, 5], "total": 21, "resident": [], "conv_cols_tiles": 4}}
++
++
+ def _m(name, op, inp, shape, K, C, R=1, S=1, groups=1, tile_width=16):
+     patch = (C // groups) * R * S
+     exp = -(-K // tile_width) * -(-patch // 64)                     # compiler view: 64-row geometry
+@@ -52,10 +68,12 @@
+ 
+ 
+ # ---------------------------------------------------------------- generated hardware config
+-def test_hardware_config_comes_from_the_chip_profile(hw):
++def test_hardware_config_comes_from_the_chip_profile(hw_file):
++    hw = hw_file
+     prof = json.loads((SPEC / "chip_profile.json").read_text())
+     assert (hw["x2"]["rows"], hw["x2"]["cols"], hw["x2"]["blocks"]) == (prof["x2"]["rows"], prof["x2"]["cols"], prof["x2"]["count"]) == (32, 32, 2)
+-    assert hw["x2"]["cell_bits"] == 1 and hw["x2"]["input_bits"] == 8 and hw["x2"]["result_count_bits"] == 14
++    assert hw["x2"]["cell_bits"] == 4 and "DECISION" in hw["x2"]["basis"]["cell_bits"] and "1-bit" in hw["x2"]["basis"]["cell_bits"]
++    assert hw["x2"]["input_bits"] == 8 and hw["x2"]["result_count_bits"] == 14
+     assert hw["x2"]["timing_cycles"] == {"read": 160, "program": 360, "compute": 450}
+     assert (hw["efpga"]["luts"], hw["efpga"]["macc_blocks"], hw["efpga"]["io_pins"]) == (2160, 18, 36)
+     assert hw["compiler_v2"] == {**hw["compiler_v2"], "pe_rows": 64, "default_tile_cols": 32}
+@@ -67,11 +85,18 @@
+     assert run_hardware_config.main(["--check"]) == 0
+ 
+ 
++def test_generator_can_model_the_chips_1bit_cells():
++    import run_hardware_config
++    prof = json.loads((SPEC / "chip_profile.json").read_text())
++    one = run_hardware_config.build(prof, cell_bits=1)
++    assert one["x2"]["cell_bits"] == 1 and "DECISION" not in one["x2"]["basis"]["cell_bits"]
++    assert "16 cells per weight" in one["weights"]["basis"]
++
++
+ # ---------------------------------------------------------------- chip maths
+ def test_cells_per_weight(hw):
+-    assert chip_x2.cells_per_weight(hw) == 16                         # 2 signs x 8 magnitude bits on 1-bit cells
+-    four = copy.deepcopy(hw); four["x2"]["cell_bits"] = 4
+-    assert chip_x2.cells_per_weight(four) == 4                        # DeepGate's 4-bit-bank assumption
++    # 4-bit cells: 2 signs x 2 banks (DeepGate) = 4.  1-bit cells: 2 signs x 8 bit planes = 16.
++    assert chip_x2.cells_per_weight(hw) == EXP[hw["x2"]["cell_bits"]]["cpw"]
+ 
+ 
+ def test_known_layer_tiles(hw):
+@@ -79,7 +104,8 @@
+     # conv: 27 taps -> 1 row fold; 8 outputs x 16 cells = 128 columns -> 4 tiles
+     # dw: 8 groups of 9 taps x 16 columns; block-diagonal 2 per tile (32 cols / 16) -> 4 tiles
+     # pw: 8 taps; 16 x 16 = 256 columns -> 8 tiles.  fc: 16 taps; 10 x 16 = 160 columns -> 5 tiles
+-    assert [chip_x2.layer_tiles(g[k].attrs, hw) for k in ("conv", "dw", "pw", "fc")] == [4, 4, 8, 5]
++    # 4-bit: conv 32 cols -> 1; dw 3 groups per tile -> 3; pw 64 cols -> 2; fc 40 cols -> 2
++    assert [chip_x2.layer_tiles(g[k].attrs, hw) for k in ("conv", "dw", "pw", "fc")] == EXP[hw["x2"]["cell_bits"]]["tiles"]
+ 
+ 
+ def test_placements_are_valid_on_random_layers(hw):
+@@ -93,7 +119,7 @@
+         assert len(p) >= chip_x2.area_lower_bound(a, hw)
+         if groups == 1:                                               # ungrouped: exactly folds x chunks
+             g, taps, outs = chip_x2.layer_shape(a)
+-            assert len(p) == -(-taps // 32) * -(-(outs * 16) // 32)
++            assert len(p) == -(-taps // 32) * -(-(outs * chip_x2.cells_per_weight(hw)) // 32)
+ 
+ 
+ @pytest.mark.parametrize("label,mutate,msg", [
+@@ -123,8 +149,10 @@
+     assert validate_partition(g, plan, hw) == []
+     assert plan["totals"]["x2_tiles"] == 4                            # compiler view (64 rows): 1+1+1+1
+     c = plan["chip"]
+-    assert c["totals"]["tiles"] == 21 and c["resident"] == [] and c["totals"]["streamed_tiles"] == 21
+-    assert c["geometry"] == {"rows": 32, "cols": 32, "blocks": 2, "cells_per_weight": 16}
++    e = EXP[hw["x2"]["cell_bits"]]
++    assert c["totals"]["tiles"] == e["total"] and c["resident"] == e["resident"]
++    assert c["totals"]["resident_tiles"] + c["totals"]["streamed_tiles"] == e["total"]
++    assert c["geometry"] == {"rows": 32, "cols": 32, "blocks": 2, "cells_per_weight": e["cpw"]}
+     assert any("64-row" in f for f in c["findings"]) and any("reprogrammed every inference" in f for f in c["findings"])
+     assert plan["hardware_profile"]["status"] == "chip_profile"
+ 
+@@ -133,8 +161,9 @@
+     plan = propose_partition_baseline(graph(), hw)
+     L = plan["chip"]["layers"]
+     assert L["conv"]["mvms_per_tile"] == 256 and L["fc"]["mvms_per_tile"] == 1
+-    assert L["conv"]["compute_cycles"] == 4 * 256 * (32 + 450 + 32)
+-    assert L["conv"]["program_upper"] == 8 * 27 * 16 * 360            # every weight cell SET once
++    e = EXP[hw["x2"]["cell_bits"]]
++    assert L["conv"]["compute_cycles"] == e["conv_cols_tiles"] * 256 * (32 + 450 + 32)
++    assert L["conv"]["program_upper"] == 8 * 27 * e["cpw"] * 360      # every weight cell SET once
+ 
+ 
+ def test_plan_from_targets_matches_baseline_and_accepts_a_resident_choice(hw):
+@@ -153,7 +182,7 @@
+ @pytest.mark.parametrize("label,fn,msg", [
+     ("wrong chip tiles", lambda p: p["chip"]["layers"]["pw"].update(tiles=1), "its placement has"),
+     ("placement removed", lambda p: p["chip"]["layers"]["pw"].pop("placement"), "placement must be a list"),
+-    ("too many resident", lambda p: p["chip"].update(resident=["pw"], streamed=["conv", "dw", "fc"]), "only 1 are free"),
++    ("too many resident", lambda p: p["chip"].update(resident=["dw", "pw"], streamed=["conv", "fc"]), "only 1 are free"),
+     ("resident not on X2", lambda p: p["chip"].update(resident=["pool"]), "resident layers not on X2"),
+     ("streamed list wrong", lambda p: p["chip"].update(streamed=[]), "plan.chip.streamed"),
+     ("program cycles hidden", lambda p: p["chip"]["totals"].update(program_cycles_per_inference_upper=0), "program_cycles_per_inference_upper"),
+@@ -194,5 +223,5 @@
+ 
+     out = run_mapping_agent(Scripted(), graph(), hw, log_path=str(tmp_path / "l.jsonl"))
+     assert out["final_source"] == "llm_validated" and out["matches_baseline"]
+-    assert out["chip"]["totals"]["tiles"] == 21 and out["hardware_profile"]["status"] == "chip_profile"
++    assert out["chip"]["totals"]["tiles"] == EXP[hw["x2"]["cell_bits"]]["total"] and out["hardware_profile"]["status"] == "chip_profile"
+     assert "NOT silicon" in out["evidence_level"]
+--- a/tests/test_ir_partition.py
++++ b/tests/test_ir_partition.py
+@@ -84,7 +84,8 @@
+ # ---------------------------------------------------------------- hardware config: chip numbers, compiler geometry kept apart
+ def test_hardware_config_is_derived_from_the_chip_and_keeps_the_compiler_geometry_apart(hw):
+     assert hw["version"] == "1.0-chip" and "sky130-reram-fpga" in hw["status"]
+-    assert (hw["x2"]["rows"], hw["x2"]["cols"], hw["x2"]["blocks"], hw["x2"]["cell_bits"]) == (32, 32, 2, 1)
++    assert (hw["x2"]["rows"], hw["x2"]["cols"], hw["x2"]["blocks"]) == (32, 32, 2)
++    assert hw["x2"]["cell_bits"] == 4          # decision following BMsemi DeepGate; the chip model computes 1-bit
+     assert (hw["efpga"]["luts"], hw["efpga"]["macc_blocks"], hw["efpga"]["io_pins"]) == (2160, 18, 36)
+     assert (hw["compiler_v2"]["pe_rows"], hw["compiler_v2"]["default_tile_cols"]) == (64, 32)   # compiler view only
+ 

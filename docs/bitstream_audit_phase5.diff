@@ -1,0 +1,57 @@
+--- bitstream_audit.orig.py	2026-11-12 11:03:17.858870654 +0000
++++ bitstream_audit.py	2026-11-12 11:03:49.345787327 +0000
+@@ -15,6 +15,10 @@
+ LAYOUT ASSUMPTION (verified on the FABulous 2.2.0 demo fabric: sequential_16bit_en 713/713 bits, add8_sat_fab 653/653 bits): tile (X, Y) configuration bit `idx` lives in
+ column X, frame idx // 32, row word (rows_per_frame - Y), bit idx % 32. It is stored in FabricProfile.layout and must be
+ re-verified for any other fabric before the decode check is trusted.
++
++BM Labs chip (classic_fabric_reram, sky130-reram-fpga): border rows are INCLUDED (spec ArchSpecs IncludeBorderRows),
++so the first row word is Y = rows_per_frame - 1 (FabricProfile.top_row_y). Verified 2026-11-12 on 7 designs, every
++required bit present and no other bit set; see chip/chip_bitstream.py.
+ """
+ import csv
+ import hashlib
+@@ -42,6 +46,9 @@
+     desync_bit: int = 20
+     column_shift: int = 27
+     layout: dict = field(default_factory=lambda: dict(DEFAULT_LAYOUT), compare=False)
++    # Y of the tile in the FIRST row word of a frame. None = rows_per_frame (FABulous 2.2.0 demo flow:
++    # border rows excluded). The BM Labs chip (classic_fabric_reram, border rows INCLUDED) uses rows_per_frame - 1.
++    top_row_y: int = None
+ 
+     @property
+     def expected_frames(self):
+@@ -180,7 +187,7 @@
+     return spec
+ 
+ 
+-_LIT = re.compile(r"(\d+)'([bhd])([0-9a-fA-F_]+)")
++_LIT = re.compile(r"(\d*)'([bhd])([0-9a-fA-F_]+)")   # width optional: nextpnr writes 'b0101 (unsized)
+ 
+ 
+ def parse_fasm(text):
+@@ -195,9 +202,10 @@
+             m, v = re.fullmatch(r"(X\d+Y\d+)\.(.+)\[(\d+):(\d+)\]", lhs), _LIT.fullmatch(rhs)
+             if not (m and v):
+                 bad.append(raw); continue
+-            width, kind, digits = int(v.group(1)), v.group(2), v.group(3).replace("_", "")
++            kind, digits = v.group(2), v.group(3).replace("_", "")
+             n = int(digits, {"b": 2, "h": 16, "d": 10}[kind])
+             hi, lo = int(m.group(3)), int(m.group(4))
++            width = int(v.group(1)) if v.group(1) else hi - lo + 1
+             feats.append((m.group(1), m.group(2), (hi, lo), format(n, f"0{width}b")[-(hi - lo + 1):]))
+         else:
+             m = re.fullmatch(r"(X\d+Y\d+)\.(\S+)", line)
+@@ -240,10 +248,11 @@
+ def decode_set_bits(data, p):
+     frames, _ = parse_frames(data, p)
+     out = set()
++    top = p.rows_per_frame if p.top_row_y is None else p.top_row_y
+     for col, strobe, rows, _h in frames:
+         f = strobe.bit_length() - 1
+         for r, word in enumerate(rows):
+-            y = p.rows_per_frame - r
++            y = top - r
+             for bit in range(p.frame_bits_per_row):
+                 if (word >> bit) & 1:
+                     out.add((f"X{col}Y{y}", f * 32 + bit))

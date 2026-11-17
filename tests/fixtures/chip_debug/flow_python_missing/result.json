@@ -1,0 +1,125 @@
+{
+ "op": "relu8",
+ "verdict": "FAIL",
+ "stages": [
+  {
+   "stage": "rtl",
+   "status": "skipped",
+   "detail": "not re-run (--from-stage); earlier results are read from the job folder",
+   "seconds": 0.0
+  },
+  {
+   "stage": "prep",
+   "status": "skipped",
+   "detail": "not re-run (--from-stage); earlier results are read from the job folder",
+   "seconds": 0.0
+  },
+  {
+   "stage": "env",
+   "status": "skipped",
+   "detail": "not re-run (--from-stage); earlier results are read from the job folder",
+   "seconds": 0.0
+  },
+  {
+   "stage": "flow",
+   "status": "fail",
+   "detail": "chip flow failed at bitstream: python_module_missing | make: *** [/tmp/crlf/repo/user_designs/makefile.include:90: bitstream] Error 1 | log chip_build/chain_relu8/bitstream.log",
+   "seconds": 1.4
+  },
+  {
+   "stage": "sim",
+   "status": "not_run",
+   "detail": "not run: flow did not pass",
+   "seconds": 0.0
+  },
+  {
+   "stage": "check",
+   "status": "fail",
+   "detail": "chip flow status failed (python_module_missing)",
+   "seconds": 0.0
+  }
+ ],
+ "facts": {
+  "utilisation": {
+   "FABULOUS_LC": {
+    "used": 15,
+    "available": 2160
+   },
+   "IOBUF": {
+    "used": 17,
+    "available": 36
+   },
+   "RAM_32x4_2R_1W": {
+    "used": 0,
+    "available": 36
+   },
+   "MACC_8x8_20": {
+    "used": 0,
+    "available": 18
+   },
+   "RERAM_CIM_32x32": {
+    "used": 0,
+    "available": 2
+   },
+   "GBUF": {
+    "used": 1,
+    "available": 4
+   },
+   "SYS_RESET": {
+    "used": 0,
+    "available": 1
+   }
+  },
+  "pins": {
+   "needed": 17,
+   "available": 36,
+   "fits": true,
+   "by_port": {
+    "clk": 1,
+    "x": 8,
+    "y": 8
+   },
+   "assignment": {
+    "clk": "X0Y1/A",
+    "x[0]": "X0Y1/B",
+    "x[1]": "X0Y2/A",
+    "x[2]": "X0Y2/B",
+    "x[3]": "X0Y3/A",
+    "x[4]": "X0Y3/B",
+    "x[5]": "X0Y4/A",
+    "x[6]": "X0Y4/B",
+    "x[7]": "X0Y5/A",
+    "y[0]": "X0Y5/B",
+    "y[1]": "X0Y6/A",
+    "y[2]": "X0Y6/B",
+    "y[3]": "X0Y7/A",
+    "y[4]": "X0Y7/B",
+    "y[5]": "X0Y8/A",
+    "y[6]": "X0Y8/B",
+    "y[7]": "X0Y9/A"
+   }
+  },
+  "bitstream_audit": null,
+  "bitstream_bytes": null,
+  "fasm_features": null,
+  "fmax": {
+   "$abc$406$aiger$o0": {
+    "fmax_mhz": 151.52,
+    "target_mhz": 12.0,
+    "ok": true
+   }
+  },
+  "netlist_simulation": null,
+  "not_checked": [
+   "the configured fabric (tile RTL + bitstream) in simulation",
+   "timing-annotated simulation",
+   "silicon"
+  ]
+ },
+ "diagnosis": {
+  "rule_based_candidates": [
+   "chip_python_module_missing"
+  ],
+  "source": "rules (no LLM)"
+ }
+}

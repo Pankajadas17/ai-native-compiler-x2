@@ -1,0 +1,399 @@
+--- a/verification/chain_debug.py
++++ b/verification/chain_debug.py
+@@ -23,6 +23,10 @@
+         "suspect": "the RTL agent (A2) could not run: the API key is not set in this terminal window",
+         "fix": "set the key in this window with Read-Host -AsSecureString (never paste it into chat or code), or run with --llm mock",
+         "seen": "message printed by the chain"},
++    "yosys_missing": {
++        "suspect": "Yosys was not found by this Python, so the operator's Verilog could not be checked at all (it was NOT judged wrong)",
++        "fix": "activate the project venv (it has yowasp-yosys), or pip install yowasp-yosys in it; then run the chain again",
++        "seen": "real run (bm_verif sandbox, 2026-11-13): the chain was started with a Python without yowasp-yosys"},
+     "rtl_not_verified": {
+         "suspect": "the operator's Verilog did not pass the Yosys-vs-NumPy check, so nothing later can be trusted",
+         "fix": "regenerate it: python run_fab_chain.py --op <op> --regen-rtl (with a real --llm), then read the mismatches it reports",
+@@ -130,7 +134,8 @@
+     if status == "blocked" and "too little for ubuntu" in low:
+         add("windows_memory_low")
+     if stage == "rtl":
+-        add("llm_key_missing" if status == "blocked" and "is not set" in low else "rtl_not_verified")
++        add("yosys_missing" if "yosys not found" in low else
++            "llm_key_missing" if status == "blocked" and "is not set" in low else "rtl_not_verified")
+     if stage == "env" and status == "blocked" and "too little for ubuntu" not in low:
+         add("ubuntu_not_answering")
+     if stage == "flow":
+@@ -173,3 +178,198 @@
+     if candidates:
+         return candidates[0], f"rules_fallback ({why})", checks
+     return "unknown", f"unknown_fallback ({why})", checks
++
++
++# ====================================================================== the chain on the BM Labs chip (run_fab_chain.py --target chip)
++# Same contract as above: plain facts from the report and the job/build folders, then rules; the LLM may only pick a supported cause.
++CHIP_REPORT = Path("reports/chip_chain_report.json")
++CHIP_JOBS = Path("reports/chip_jobs")
++CHIP_BUILD = Path("chip_build")
++CHIP_MULTIPLIER_MAP = "MACC_8x8_20_map_signed.v"
++
++CHIP_CAUSES = {
++    "chip_tools_missing": {
++        "suspect": "Ubuntu is missing part of the chip toolchain (OSS CAD Suite tools, ~/chipenv with fasm and numpy, the chip repo or profile)",
++        "fix": "install what the env stage lists as MISSING; tools elsewhere: set CHIP_CAD / CHIP_PY in Ubuntu; the profile: python3 run_chip_profile.py",
++        "seen": "real preflight output (bm_verif sandbox, 2026-11-13: chipenv without fasm)"},
++    "chip_python_module_missing": {
++        "suspect": "the repo Makefile ran bit_gen.py with a python3 that lacks fasm (the OSS CAD Suite one came first on PATH)",
++        "fix": "put ~/chipenv/bin first on PATH (the chain's stage scripts do since fix 1); by hand: activate ~/chipenv after the CAD suite export",
++        "seen": "real run (your machine, 2026-11-13): every operator failed at 'bitstream'; reproduced: ModuleNotFoundError: No module named 'fasm'"},
++    "chip_multiplier_setting_changed": {
++        "suspect": "the repo's MULTIPLIER_MAP_PATH line changed, so chip_flow refused to override it with the corrected signed-multiplier map",
++        "fix": "compare user_designs/makefile.include l.26 with chip/techmap/MACC_8x8_20_map_signed.v; re-verify (tests/test_macc_signed_map.py) "
++               "before updating REPO_MULTIPLIER_LINE in chip/chip_flow.py",
++        "seen": "follows from chip_flow's own check (tests/test_macc_signed_map.py); not seen on a real run"},
++    "chip_pins_exceeded": {
++        "suspect": "the design needs more pins than the chip's 36 IOBUF sites",
++        "fix": "fewer or narrower ports: load wide operands over several ticks (as the two-step wrapper does) or keep data on the fabric",
++        "seen": "real (chip example bitslice_acc_parallel, pin pre-check)"},
++    "chip_over_capacity": {
++        "suspect": "the design uses more of a resource than the chip has (logic cells, 18 MACC blocks, RAMs, 2 X2 blocks)",
++        "fix": "read the utilisation in the flow report; share or time-multiplex the resource, or split the design",
++        "seen": "real nextpnr log (chip example macc_over: 20 multipliers on 18 MACC blocks)"},
++    "chip_synth_error": {
++        "suspect": "Yosys stopped on the design (syntax error, missing module, or a flip-flop type the fabric does not have)",
++        "fix": "read the last lines of chip_build/chain_<op>/synth.log, fix the Verilog, run again from --from-stage rtl",
++        "seen": "real Yosys logs (chip examples bitslice_acc_bad, missing_mod)"},
++    "chip_bitstream_audit_failed": {
++        "suspect": "the bitstream is not what the FASM asks for (V0 audit) or has the wrong size",
++        "fix": "read bitstream_audit.json in chip_build/chain_<op>/; rebuild from --from-stage flow; if it repeats, report it with the audit file",
++        "seen": "real bitstreams with planted bit flips (tests/test_chip_bitstream_audit.py); not on a real run"},
++    "chip_flow_crashed": {
++        "suspect": "the chip flow did not finish (it crashed, Ubuntu stopped, or it timed out), so no result was written",
++        "fix": "read reports/chip_jobs/<op>/flow_console.log (the last lines say why); run again from --from-stage flow",
++        "seen": "message printed by the chain"},
++    "chip_flow_tool_error": {
++        "suspect": "a chip-flow tool (Yosys, nextpnr, bit_gen) stopped with an error that no rule recognises",
++        "fix": "read the log the stage detail names (chip_build/chain_<op>/<stage>.log); fix that error, then --from-stage flow",
++        "seen": "message printed by the chain"},
++    "chip_wrapper_check_failed": {
++        "suspect": "the chip-pin wrapper around the verified core does not compute the core's result (or does not fit the pins)",
++        "fix": "read the wrapper_check in the chain report; the wrapper is generated by verification/chip_chain.py, so this is a bm_verif bug to report",
++        "seen": "message printed by the chain; tests with planted wrapper faults (tests/test_chip_chain.py)"},
++    "chip_signed_multiplier": {
++        "suspect": "a signed multiply on the hard MACC blocks: the repo's MACC_8x8_20_map.v is unsigned-only, so every negative operand is wrong",
++        "fix": "check that chip_build/chain_<op>/Makefile sets MULTIPLIER_MAP_PATH to chip/techmap/MACC_8x8_20_map_signed.v (chip_flow does "
++               "this since the signed-multiplier fix); if it does, report the failing vectors",
++        "seen": "real run (your machine, 2026-11-13): requant_i32_i8 219/485 wrong, all with negative inputs, 4 MACC blocks"},
++    "chip_netlist_outputs_undefined": {
++        "suspect": "the synthesized netlist drove no defined value on the result pins (x/z): a pin is undriven or a simulation model is wrong",
++        "fix": "check the IOBUF model in use (sim/IOBUF_chip_sim.v, chip polarity: EN=1 drives) and that the result pins are outputs in the netlist",
++        "seen": "bm_verif sandbox: with the repo's IOBUF sim model every output floated"},
++    "chip_netlist_differs": {
++        "suspect": "the synthesized netlist computes defined but wrong values: synthesis did not preserve the design",
++        "fix": "simulate the RTL wrapper and the netlist on the first failing vector; compare the techmaps used (synth.log)",
++        "seen": "not seen on a real run yet; follows from the netlist simulation's comparison"},
++    "chip_sim_not_finished": {
++        "suspect": "the netlist simulation did not finish (no DONE line, no log, or a time-out): it hung or crashed",
++        "fix": "read reports/chip_jobs/<op>/sim_console.log; a hang usually means a signal never becomes defined (see the IOBUF note)",
++        "seen": "bm_verif sandbox: the netlist simulation hung with the repo's IOBUF model"},
++    "chip_timing_not_met": {
++        "suspect": "nextpnr's delay model gives the design a lower maximum frequency than the 12 MHz target (the repo Makefile still writes a bitstream)",
++        "fix": "add a pipeline register on the slowest path (as x2_engine does) or agree a lower clock with the team; timing is a nextpnr estimate",
++        "seen": "real build: x2_engine_4bit 11.2 MHz against 12 MHz (run_chip_flow.py)"},
++    "chip_repo_modified": {
++        "suspect": "the chip repo (sky130-reram-fpga or a submodule) changed while the flow ran",
++        "fix": "run git -C sky130-reram-fpga status --short --ignored in Ubuntu; restore the repo; build only through chip_flow (out of the repo)",
++        "seen": "message printed by the chain (tree fingerprint before/after)"},
++}
++CHIP_SHARED = ("yosys_missing", "llm_key_missing", "rtl_not_verified", "ubuntu_not_answering")       # demo causes that mean the same on the chip
++CAUSE_IDS = set(CAUSES) | set(CHIP_CAUSES) | {"unknown"}
++_SYNTH = {"syntax_error", "unknown_module", "ff_type_unsupported"}
++_AUDIT = {"bitstream_audit_failed", "bitstream_size_mismatch", "empty_fasm", "unconstrained_io"}
++
++
++def cause_info(cause_id):
++    """suspect / fix / seen for a demo or chip cause ({} for unknown)."""
++    return CAUSES.get(cause_id) or CHIP_CAUSES.get(cause_id) or {}
++
++
++def chip_menu_ids():
++    return list(CHIP_SHARED) + list(CHIP_CAUSES)
++
++
++def _json(path):
++    text = _read(path, 5_000_000)
++    try:
++        return json.loads(text) if text else None
++    except ValueError:
++        return None
++
++
++def collect_chip_evidence(op, result, jobs_dir=CHIP_JOBS, build_dir=CHIP_BUILD):
++    """Plain facts about one chip-chain result: stage results, the chip flow report, the console and simulation logs."""
++    from verification import chip_chain as cc                       # only needed for chip runs
++    job, build = Path(jobs_dir) / op, Path(build_dir) / f"chain_{op}"
++    stages = {r["stage"]: {"status": r["status"], "detail": str(r.get("detail", ""))[:900]} for r in (result or {}).get("stages", [])}
++    first_bad = next((s for s, r in stages.items() if r["status"] in ("fail", "blocked", "unverified")), None)
++    rep = _json(build / "flow_report.json") or {}
++    failure = rep.get("failure") or {}
++    console = _read(job / "flow_console.log") or ""
++    err_lines = [l.strip() for l in console.splitlines() if re.search(r"error|no module named|refused|changed", l, re.I)]
++    makefile = _read(build / "Makefile") or ""
++    sim_text = _read(job / "sim.log")
++    sim = None
++    if sim_text is not None and op in cc.OPS:
++        try:
++            sim = cc.parse_netlist_log(op, sim_text)
++        except ValueError:                                            # an operator the chip chain cannot wrap
++            sim = None
++    bad = (sim or {}).get("all_mismatches") or []
++    netlist = _read(job / "netlist.v") or ""
++    check = _json(job / "chip_check.json") or {}
++    return {
++        "op": op, "target": "chip", "verdict": (result or {}).get("verdict"), "stages": stages, "first_bad_stage": first_bad,
++        "first_bad_status": stages[first_bad]["status"] if first_bad else None,
++        "first_bad_detail": stages[first_bad]["detail"] if first_bad else "",
++        "flow_report_status": rep.get("status"), "flow_failure_stage": failure.get("stage"), "flow_failure_cause": failure.get("cause"),
++        "flow_utilisation": rep.get("utilisation"),
++        "flow_console_error_lines": err_lines[-3:],
++        "multiplier_line_changed": "MULTIPLIER_MAP_PATH line" in console,
++        "signed_multiplier_map_in_makefile": CHIP_MULTIPLIER_MAP in makefile if makefile else None,
++        "sim_status": (sim or {}).get("status"), "sim_reason": (sim or {}).get("reason"), "sim_vectors": (sim or {}).get("vectors"),
++        "sim_finished": bool(sim_text) and bool(re.search(r"^DONE \d+\s*$", sim_text, re.M)),
++        "sim_mismatches": len(bad), "sim_undefined_outputs": sum(1 for b in bad if b["got"] is None),
++        "sim_wrong_all_have_a_negative_input": bool(bad) and all(any(v < 0 for v in b["inputs"].values()) for b in bad),
++        "sim_first_mismatches": [f"inputs={b['inputs']} expected={b['expected']} got={b['got']}" for b in bad[:3]],
++        "netlist_macc_blocks": len(re.findall(r"^\s*MACC_8x8_20\s*#", netlist, re.M)),
++        "timing": (check.get("facts") or {}).get("fmax"),
++    }
++
++
++def chip_rule_candidates(ev):
++    """Cause ids the chip evidence supports, most specific first. An empty list means: the rules do not know."""
++    out, stage, status, d = [], ev.get("first_bad_stage"), ev.get("first_bad_status"), (ev.get("first_bad_detail") or "")
++    low = d.lower()
++
++    def add(c):
++        if c not in out:
++            out.append(c)
++    if stage is None:
++        return out
++    if stage == "rtl":
++        add("yosys_missing" if "yosys not found" in low else
++            "llm_key_missing" if status == "blocked" and "is not set" in low else "rtl_not_verified")
++    elif stage == "prep":
++        add("rtl_not_verified" if "no verified core" in low else "chip_wrapper_check_failed")
++    elif stage == "env":
++        add("chip_tools_missing" if "ubuntu is missing" in low else "ubuntu_not_answering")
++    elif stage == "flow":
++        cause = ev.get("flow_failure_cause")
++        if status == "blocked":
++            add("ubuntu_not_answering")
++        elif cause == "python_module_missing" or "no module named" in low or any("no module named" in l.lower() for l in ev.get("flow_console_error_lines") or []):
++            add("chip_python_module_missing")
++        elif ev.get("multiplier_line_changed"):
++            add("chip_multiplier_setting_changed")
++        elif cause == "pin_budget_exceeded":
++            add("chip_pins_exceeded")
++        elif cause == "over_capacity":
++            add("chip_over_capacity")
++        elif cause in _SYNTH:
++            add("chip_synth_error")
++        elif cause in _AUDIT:
++            add("chip_bitstream_audit_failed")
++        elif "timed out" in low or "did not finish" in low or "no flow report" in low:
++            add("chip_flow_crashed")
++        elif status == "fail":
++            add("chip_flow_tool_error")
++    elif stage == "sim":
++        if status == "blocked":
++            add("ubuntu_not_answering")
++        elif not ev.get("sim_finished") or "timed out" in low or "wrote no log" in low:
++            add("chip_sim_not_finished")
++        elif status == "fail" and ev.get("sim_mismatches"):
++            if ev.get("netlist_macc_blocks") and ev.get("sim_wrong_all_have_a_negative_input") and not ev.get("sim_undefined_outputs"):
++                add("chip_signed_multiplier")
++            elif ev.get("sim_undefined_outputs") == ev.get("sim_mismatches"):
++                add("chip_netlist_outputs_undefined")
++            else:
++                add("chip_netlist_differs")
++    elif stage == "check":
++        if "chip repo changed" in low:
++            add("chip_repo_modified")
++        elif "timing not met" in low:
++            add("chip_timing_not_met")
++    return out
+--- a/agents/chain_debug_agent.py
++++ b/agents/chain_debug_agent.py
+@@ -24,6 +24,20 @@
+    Write it as your normal reply text. Do NOT call a tool to deliver the answer.
+ 5. All evidence is simulation and tool logs. Never claim timing, gate-level or silicon findings."""
+ 
++CHIP_MENU = "\n".join(f"   - {k}: {cd.cause_info(k)['suspect']}" for k in cd.chip_menu_ids()) + "\n   - unknown: none of the above fits the evidence"
++
++CHIP_PROMPT = f"""You are the debug agent for a hardware compiler flow on the BM Labs chip (sky130-reram-fpga): operator Verilog -> chip-pin
++wrapper -> the chip repo's flow (Yosys with the repo techmaps, nextpnr) -> bitstream checked by the V0 audit -> simulation of the SYNTHESIZED
++NETLIST, compared with a NumPy golden model. A chain run did NOT pass. Find the most likely root cause.
++Rules:
++1. Call chain_evidence first. Base every claim on what it returns. Do not invent numbers, file contents or causes.
++2. Choose cause_id ONLY from this menu. "unknown" is a GOOD answer when the evidence does not clearly support an entry.
++{CHIP_MENU}
++3. A netlist output shown as None means UNDEFINED (x or z), not a wrong number.
++4. Final answer: ONLY a JSON object with keys cause_id, confidence ("low"|"medium"|"high"), explanation, proposed_fix, next_check.
++   Write it as your normal reply text. Do NOT call a tool to deliver the answer.
++5. All evidence is netlist simulation and tool logs. Timing is nextpnr's estimate. Never claim configured-fabric or silicon findings."""
++
+ TOOL_SCHEMAS = [{"name": "chain_evidence",
+                  "description": "Facts about the failed chain run of one operator: stage results, bitstream size, simulation result and first mismatch lines.",
+                  "input_schema": {"type": "object", "properties": {"op": {"type": "string"}}}}]
+@@ -50,13 +64,18 @@
+         cause = cands[0] if cands else "unknown"
+         return Action("final", text=json.dumps({"cause_id": cause, "confidence": "medium" if cands else "low",
+                                                 "explanation": f"[mock] first rule-based candidate: {cause}",
+-                                                "proposed_fix": cd.CAUSES.get(cause, {}).get("fix", "none known"), "next_check": "run the chain again"}))
++                                                "proposed_fix": cd.cause_info(cause).get("fix", "none known"), "next_check": "run the chain again"}))
+ 
+ 
+-def run_chain_debug_agent(llm, op, result, jobs_dir=cd.JOBS, max_steps=3, blind=False):
+-    """result: one entry of fab_chain_report.json["results"]. blind=True hides the rule candidates from the LLM (to measure the LLM itself)."""
+-    ev = cd.collect_evidence(op, result, jobs_dir)
+-    cands = cd.rule_candidates(ev)
++def run_chain_debug_agent(llm, op, result, jobs_dir=None, max_steps=3, blind=False, target="demo", build_dir=None):
++    """result: one entry of fab_chain_report.json["results"] (target "chip": chip_chain_report.json). blind=True hides the rule candidates
++    from the LLM (to measure the LLM itself)."""
++    if target == "chip":
++        ev = cd.collect_chip_evidence(op, result, jobs_dir or cd.CHIP_JOBS, build_dir or cd.CHIP_BUILD)
++        cands, prompt = cd.chip_rule_candidates(ev), CHIP_PROMPT
++    else:
++        ev = cd.collect_evidence(op, result, jobs_dir or cd.JOBS)
++        cands, prompt = cd.rule_candidates(ev), PROMPT
+ 
+     def tool(name, args):
+         if name != "chain_evidence":
+@@ -67,7 +86,7 @@
+ 
+     final_text, stopped, steps, llm_error = "", "finished", 0, None
+     try:
+-        action = llm.start(f"Diagnose why the chain run did not pass. op={op}", TOOL_SCHEMAS, system_prompt=PROMPT)
++        action = llm.start(f"Diagnose why the chain run did not pass. op={op}", TOOL_SCHEMAS, system_prompt=prompt)
+         for step in range(1, max_steps + 1):
+             if action.kind == "final":
+                 break
+@@ -87,8 +106,9 @@
+         llm_error, stopped = f"{type(e).__name__}: {str(e)[:350]}", "llm_error"
+     parsed = _parse_json(final_text)
+     cause, source, checks = cd.decide(parsed, cands, llm_error)
+-    return {"op": op, "final_cause": cause, "final_cause_source": source, "suspect": cd.CAUSES.get(cause, {}).get("suspect"),
+-            "known_fix": cd.CAUSES.get(cause, {}).get("fix"), "seen": cd.CAUSES.get(cause, {}).get("seen"),
++    info = cd.cause_info(cause)
++    return {"op": op, "target": target, "final_cause": cause, "final_cause_source": source, "suspect": info.get("suspect"),
++            "known_fix": info.get("fix"), "seen": info.get("seen"),
+             "diagnosis": parsed, "raw_answer": None if parsed else (final_text or "")[:300], "validation": checks, "validated": all(checks.values()),
+             "rule_based_candidates": cands, "evidence": ev, "stopped": stopped, "steps": steps, "llm_error": llm_error,
+             "evidence_level": "reading of chain reports and logs (NOT a new verification result; NOT timing, NOT silicon)"}
+--- a/run_chain_debug.py
++++ b/run_chain_debug.py
+@@ -3,6 +3,7 @@
+ 
+     python run_chain_debug.py                      # every operator in reports/fab_chain_report.json that did not pass
+     python run_chain_debug.py --op add8_sat --llm groq
++    python run_chain_debug.py --target chip         # the chain on the BM Labs chip: reports/chip_chain_report.json, reports/chip_jobs/, chip_build/
+ 
+ Run it right after run_fab_chain.py (it reads that run's report and the job folders; it changes nothing and runs nothing in Ubuntu).
+ The LLM proposes a root cause from a fixed list; code accepts it only if the evidence rules support it, otherwise the rules answer.
+@@ -19,6 +20,7 @@
+ from verification import chain_debug as cd
+ 
+ OUT = Path("reports/chain_debug_report.json")
++CHIP_OUT = Path("reports/chip_chain_debug_report.json")
+ KEYS = {"groq": "GROQ_API_KEY", "gemini": "GEMINI_API_KEY"}
+ 
+ 
+@@ -35,13 +37,16 @@
+     ap.add_argument("--llm", choices=["mock", "groq", "gemini"], default="mock")
+     ap.add_argument("--model", default=None)
+     ap.add_argument("--blind", action="store_true", help="hide the rules' candidates from the LLM (measures the LLM itself)")
++    ap.add_argument("--target", choices=["demo", "chip"], default="demo", help="which chain's report: demo fabric or the BM Labs chip")
+     a = ap.parse_args(argv)
+-    if not cd.REPORT.exists():
+-        sys.exit(f"{cd.REPORT.as_posix()} not found: run  python run_fab_chain.py --op <op>  first")
++    chip = a.target == "chip"
++    report, out_path = (cd.CHIP_REPORT, CHIP_OUT) if chip else (cd.REPORT, OUT)
++    if not report.exists():
++        sys.exit(f"{report.as_posix()} not found: run  python run_fab_chain.py --op <op>{' --target chip' if chip else ''}  first")
+     try:
+-        results = json.loads(cd.REPORT.read_text(encoding="utf-8")).get("results", [])
++        results = json.loads(report.read_text(encoding="utf-8")).get("results", [])
+     except ValueError:
+-        sys.exit(f"{cd.REPORT.as_posix()} is not readable JSON: run the chain again")
++        sys.exit(f"{report.as_posix()} is not readable JSON: run the chain again")
+     by_op = {r.get("op"): r for r in results}
+     ops = a.op or [r["op"] for r in results if not str(r.get("verdict", "")).startswith("PASS")]
+     missing = [o for o in ops if o not in by_op]
+@@ -58,10 +63,10 @@
+         if str(r.get("verdict", "")).startswith("PASS"):
+             print(f"\n{op}: the chain passed, nothing to diagnose")
+             continue
+-        d = run_chain_debug_agent(llm_factory(a.llm, a.model), op, r, blind=a.blind)
++        d = run_chain_debug_agent(llm_factory(a.llm, a.model), op, r, blind=a.blind, target=a.target)
+         rows.append(d)
+         ev = d["evidence"]
+-        print(f"\nCHAIN DEBUG  op={op}  chain verdict {ev['verdict']}  llm={a.llm}" + (" (mock: NOT a real model)" if a.llm == "mock" else ""))
++        print(f"\n{'CHIP ' if chip else ''}CHAIN DEBUG  op={op}  chain verdict {ev['verdict']}  llm={a.llm}" + (" (mock: NOT a real model)" if a.llm == "mock" else ""))
+         print(f"  first stage that did not pass: {ev['first_bad_stage']} ({ev['first_bad_status']}): {ev['first_bad_detail'][:220]}")
+         if ev["sim_first_mismatches"]:
+             print(f"  first mismatches: {' | '.join(ev['sim_first_mismatches'])}")
+@@ -77,9 +82,9 @@
+               + (f" | llm error: {d['llm_error'][:120]}" if d["llm_error"] else ""))
+         if d["diagnosis"] and d["final_cause_source"] == "llm_validated" and d["diagnosis"].get("explanation"):
+             print(f"  llm explanation (validated cause, wording unchecked): {str(d['diagnosis']['explanation'])[:300]}")
+-    OUT.parent.mkdir(parents=True, exist_ok=True)
+-    OUT.write_text(json.dumps({"llm": a.llm, "blind": a.blind, "diagnoses": rows}, indent=2, default=str), encoding="utf-8")
+-    print(f"\nreport: {OUT.as_posix()}\n[reading of chain reports and logs: NOT a new verification result, NOT timing, NOT silicon]")
++    out_path.parent.mkdir(parents=True, exist_ok=True)
++    out_path.write_text(json.dumps({"llm": a.llm, "blind": a.blind, "target": a.target, "diagnoses": rows}, indent=2, default=str), encoding="utf-8")
++    print(f"\nreport: {out_path.as_posix()}\n[reading of chain reports and logs: NOT a new verification result, NOT timing, NOT silicon]")
+     return 0
+ 
+ 
+--- a/run_fab_chain.py
++++ b/run_fab_chain.py
+@@ -272,22 +272,27 @@
+     return lines
+ 
+ 
+-def diagnose(op, r):
++def diagnose(op, r, target="demo"):
+     """For a run that did not pass: the root cause the evidence RULES support (verification/chain_debug.py; no LLM is called here, so the chain
+     stays deterministic). The result is kept in r["diagnosis"] for the report. Lines to print; nothing for a passing run."""
+     if str(r.get("verdict", "")).startswith("PASS"):
+         return []
+     try:
+-        ev = chain_debug.collect_evidence(op, r, JOBS)
+-        cands = chain_debug.rule_candidates(ev)
++        if target == "chip":
++            ev = chain_debug.collect_chip_evidence(op, r)
++            cands = chain_debug.chip_rule_candidates(ev)
++        else:
++            ev = chain_debug.collect_evidence(op, r, JOBS)
++            cands = chain_debug.rule_candidates(ev)
+     except Exception as e:  # noqa: BLE001  - a diagnosis is a hint; it must never break the chain's own result
+         r["diagnosis"] = {"error": f"{type(e).__name__}: {e}"}
+         return []
+     r["diagnosis"] = {"rule_based_candidates": cands, "source": "rules (no LLM)"}
+-    ask = "python run_chain_debug.py --llm groq   (asks the debug agent; the answer is checked against the same evidence)"
++    ask = (f"python run_chain_debug.py{' --target chip' if target == 'chip' else ''} --llm groq   "
++           "(asks the debug agent; the answer is checked against the same evidence)")
+     if not cands:
+         return [f"  likely cause: not one of the known causes. Second opinion: {ask}"]
+-    c = chain_debug.CAUSES[cands[0]]
++    c = chain_debug.cause_info(cands[0])
+     return [f"  likely cause [{cands[0]}]: {c['suspect']}", f"    fix: {c['fix']}", f"    (from the evidence rules, no LLM. Second opinion: {ask})"]
+ 
+ 
+@@ -369,7 +374,7 @@
+         r = fc.run_chain(op, steps, cfg.from_stage, say)
+         results.append(r)
+         say("\n".join(cc.format_summary(r) if chip else fc.format_summary(r)))
+-        for line in ([] if chip else diagnose(op, r)):          # the A3/rule diagnosis knows the demo chain's causes only
++        for line in diagnose(op, r, a.target):                  # A3's evidence rules (no LLM): demo or chip causes
+             say(line)
+     versions = (preflight.get("info") or {}).get("versions", {})
+     write_report(results, cfg, versions)
