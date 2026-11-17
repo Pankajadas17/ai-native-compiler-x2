@@ -7,8 +7,6 @@ AI agents and a verification framework that compile INT8 neural networks onto th
 takes a model through partitioning, scheduling, Verilog, bitstream and simulation. Every stage is checked against an
 independent reference, and that check, not an agent, decides PASS.
 
-Developed during an internship at BM Labs.
-
 The chip's resources and what the deployment engine uses of them:
 
 |    Primitive    | Available | Used by the engine |                       Role here                        |
