@@ -1,5 +1,5 @@
 import json
-from verification import tools
+from x2c.verification import tools
 
 def test_run_suite_healthy(tmp_path):
     rp = str(tmp_path / "r.json")

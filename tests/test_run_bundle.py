@@ -1,13 +1,13 @@
-"""run_bundle.py: a deployment bundle replays from its files alone; a changed cell or a changed expectation is caught."""
+"""x2c replay: a deployment bundle replays from its files alone; a changed cell or a changed expectation is caught."""
 import json
 from pathlib import Path
 
 import numpy as np
 import pytest
 
-import deploy_chip as D
-import run_bundle as RB
-from compiler import int8_net as N
+import x2c.commands.deploy as D
+import x2c.commands.replay as RB
+from x2c.compiler import int8_net as N
 
 IR = Path(__file__).resolve().parent / "fixtures" / "ir"
 
@@ -82,6 +82,6 @@ def test_an_old_bundle_is_refused_with_the_fix(bundles, tmp_path):
     prog["steps"][0]["epilogue"] = "repo requant"                     # the format before replay support
     del prog["steps"][0]["x2"]
     (tmp_path / "host_program.json").write_text(json.dumps(prog))
-    with pytest.raises(ValueError, match="older deploy_chip.py"):
+    with pytest.raises(ValueError, match="older x2c deploy"):
         RB.replay(tmp_path)
     assert RB.main([str(tmp_path)]) == 1

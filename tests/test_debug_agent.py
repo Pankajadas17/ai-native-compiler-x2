@@ -1,8 +1,8 @@
 import json, os
 import pytest
-from agents.debug_agent import run_debug_agent
-from agents.llm_client import Action, MockDebugLLM
-from verification import debug_tools, tools, workloads
+from x2c.agents.debug_agent import run_debug_agent
+from x2c.agents.llm_client import Action, MockDebugLLM
+from x2c.verification import debug_tools, tools, workloads
 from tests import faults
 
 BENCH = [("sign_flip", "matmul", faults.sign_flip, "output_sign_inverted"),
@@ -92,7 +92,7 @@ def test_hypothesis_and_reproduce_tools(make_report):
 
 # ---------- Groq "final answer as a fake tool call" recovery ----------
 import types as _types
-from agents.llm_client import GroqLLM
+from x2c.agents.llm_client import GroqLLM
 from tests.test_agent import _GroqClient, _gmsg
 
 
@@ -187,7 +187,7 @@ def test_blind_mode_hides_the_answer_key(make_report):
 
 
 def test_prompt_contains_cause_menu_but_no_ranking():
-    from agents.debug_agent import DEBUG_PROMPT
+    from x2c.agents.debug_agent import DEBUG_PROMPT
     assert "mapper_dropped_fold:" in DEBUG_PROMPT and "unknown:" in DEBUG_PROMPT
 
 
@@ -229,7 +229,7 @@ def test_no_json_falls_back_to_rules(make_report, tmp_path):
 
 
 def test_report_kind_and_menu_applicability(make_report):
-    from agents.debug_agent import DEBUG_PROMPT
+    from x2c.agents.debug_agent import DEBUG_PROMPT
     assert debug_tools.diagnose_report(make_report("k1", "matmul", faults.sign_flip))["report_kind"].startswith("matmul_suite")
     assert debug_tools.diagnose_report(make_report("k2", "workload", faults.drop_last_fold))["report_kind"].startswith("workload_report")
     assert "applies only to" in DEBUG_PROMPT and "NEVER for plain matmul reports" in DEBUG_PROMPT
@@ -258,7 +258,7 @@ def run_agent_for_test(llm, path, tmp_path, max_steps=2):
 
 def test_gemini_last_round_switches_tool_calling_off(make_report, tmp_path):
     pytest.importorskip("google.genai")
-    from agents.llm_client import GeminiLLM
+    from x2c.agents.llm_client import GeminiLLM
     path = make_report("sf_gem", "matmul", faults.sign_flip)
     configs = []
     class FC:
@@ -284,7 +284,7 @@ class _Http(Exception):
 
 
 def test_404_on_a_model_that_worked_before_is_retried_not_skipped():
-    from agents.llm_client import call_with_fallback
+    from x2c.agents.llm_client import call_with_fallback
     calls, naps = [], []
     def attempt(m):
         calls.append(m)
@@ -298,7 +298,7 @@ def test_404_on_a_model_that_worked_before_is_retried_not_skipped():
 
 
 def test_404_on_a_model_that_never_worked_skips_immediately():
-    from agents.llm_client import call_with_fallback
+    from x2c.agents.llm_client import call_with_fallback
     naps, seen = [], []
     def attempt(m):
         seen.append(m)
@@ -330,7 +330,7 @@ def test_auth_errors_still_raise_instead_of_being_hidden(make_report, tmp_path):
 
 # ---------- time budget, request timeouts, live progress ----------
 def test_time_budget_stops_endless_retries():
-    from agents.llm_client import LLMUnavailable, call_with_fallback
+    from x2c.agents.llm_client import LLMUnavailable, call_with_fallback
     clock = {"t": 0.0}
     def fake_clock(): return clock["t"]
     def sleeper(s): clock["t"] += s
@@ -366,7 +366,7 @@ class _Bad400(Exception):
 
 
 def test_non_chat_models_are_dropped_and_the_chain_is_capped():
-    from agents.llm_client import filter_chat_models
+    from x2c.agents.llm_client import filter_chat_models
     llm = GroqLLM(model="openai/gpt-oss-120b", client=_GroqClient([]),
                   fallback_models=["whisper-large-v3", "canopylabs/orpheus-v1-english", "openai/gpt-oss-20b", "x", "y"])
     assert llm.fallbacks == ["openai/gpt-oss-20b", "x"] and len(llm.notes) == 2
@@ -422,7 +422,7 @@ def test_transposed_weights_report_points_to_the_specific_cause_only(make_report
 
 
 def test_transposition_evidence_parser():
-    from verification.knowledge_base import transposed_weight_evidence as ev
+    from x2c.verification.knowledge_base import transposed_weight_evidence as ev
     assert ev("ValueError: incompatible shapes (2, 3) @ (4, 3)") is True          # inner dim fits B's 2nd dim
     assert ev("ValueError: incompatible shapes (8, 1) @ (8, 1)") is True
     assert ev("ValueError: incompatible shapes (2, 3) @ (5, 4)") is False         # fits neither orientation
@@ -432,7 +432,7 @@ def test_transposition_evidence_parser():
 
 
 def test_generic_shape_errors_still_map_to_the_adapter_cause():
-    from verification.knowledge_base import rule_based_candidates
+    from x2c.verification.knowledge_base import rule_based_candidates
     f = [{"diagnosis": {"category": "interface_error"}, "error": "ValueError: incompatible shapes (2, 3) @ (5, 4)"}]
     assert rule_based_candidates(f) == ["adapter_interface_mismatch"]
     f = [{"diagnosis": {"category": "interface_error"}, "error": "ValueError: boom"}]       # unparseable: both stay possible
@@ -475,7 +475,7 @@ def test_tool_choice_none_violation_without_text_retries_without_tools(make_repo
 
 # ---------- all-zero output is its own category (found by the real-geometry benchmark) ----------
 def test_all_zero_output_is_not_called_scaled():
-    from verification.failure_classifier import classify_failure
+    from x2c.verification.failure_classifier import classify_failure
     r = {"passed": False, "reason": "mismatch", "expected": [[1.0, 2.0], [3.0, 4.0]], "actual": [[0.0, 0.0], [0.0, 0.0]]}
     assert classify_failure(r)["category"] == "zero_output"
     r2 = {"passed": False, "reason": "mismatch", "expected": [[1.0, 2.0], [3.0, 4.0]], "actual": [[2.0, 4.0], [6.0, 8.0]]}
@@ -483,7 +483,7 @@ def test_all_zero_output_is_not_called_scaled():
 
 
 def test_zero_output_needs_mapper_evidence_to_blame_the_mapper():
-    from verification.knowledge_base import rule_based_candidates
+    from x2c.verification.knowledge_base import rule_based_candidates
     plain = [{"diagnosis": {"category": "zero_output"}}]                           # matmul report: no pass counts
     assert rule_based_candidates(plain) == []
     wl = [{"diagnosis": {"category": "zero_output"}, "mapping_check": {"passes_executed": 0, "mvm_ops_from_mapper": 4, "ok": False}}]

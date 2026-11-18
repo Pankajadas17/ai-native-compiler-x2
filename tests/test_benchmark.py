@@ -3,13 +3,13 @@ import os
 
 import pytest
 
-from agents.debug_agent import run_debug_agent
-from agents.llm_client import Action, MockDebugLLM
-from agents.verification_agent import run_agent
-from emulators.x2_adapter import x2_vecmat
-from inputs.bmsemi_source import ReadOnlyRepo
-from orchestration.benchmark import STAGE_STATUS, run_benchmark
-from verification import debug_tools, tools
+from x2c.agents.debug_agent import run_debug_agent
+from x2c.agents.llm_client import Action, MockDebugLLM
+from x2c.agents.verification_agent import run_agent
+from x2c.bmsemi.x2_adapter import x2_vecmat
+from x2c.inputs.bmsemi_source import ReadOnlyRepo
+from x2c.bmsemi.benchmark import STAGE_STATUS, run_benchmark
+from x2c.verification import debug_tools, tools
 from tests import faults
 
 CV2 = "bm_compiler_v2_tiny_mobilenetv2"
@@ -98,7 +98,7 @@ def test_wrong_mapping_is_detected_as_a_dropped_fold():
 
 
 def test_compiler_tile_mismatch_would_be_reported(monkeypatch, tmp_path):
-    import orchestration.benchmark as b
+    import x2c.bmsemi.benchmark as b
     monkeypatch.setattr(b, "reproduce_compiler_tiles", lambda L, rows=64: 99)
     rep = b.run_benchmark(workload_ids=[CV2], report_path=str(tmp_path / "r.json"))
     bad = [r for r in rep["results"] if r["stage"] == "S04" and not r["passed"]]
@@ -144,8 +144,8 @@ def test_full_benchmark_all_three_workloads(tmp_path):
 # ---------------------------------------------------------------- digest must not depend on the OS line endings
 def _mini_repo(tmp_path, crlf, mutate=None):
     import shutil
-    from inputs.graph_check import GRAPH, LAYERS
-    from inputs.catalog import COMPILER_V2
+    from x2c.inputs.graph_check import GRAPH, LAYERS
+    from x2c.inputs.catalog import COMPILER_V2
     real = ReadOnlyRepo()
     for rel in ("catalog.json", GRAPH, LAYERS, f"{COMPILER_V2}/artifacts/maestro_schedule.json"):
         data = real.path(rel).read_bytes().replace(b"\r\n", b"\n")

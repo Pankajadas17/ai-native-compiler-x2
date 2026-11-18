@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from run_fab_prep import FLOW_SCRIPT, main as prep_main
-from agents.rtl_agent import REFERENCE_VERILOG
+from x2c.commands.demo_prep import FLOW_SCRIPT, main as prep_main
+from x2c.agents.rtl_agent import REFERENCE_VERILOG
 
-spec = importlib.util.spec_from_file_location("fab_connect", Path(__file__).parent.parent / "tools" / "fab_connect.py")
+spec = importlib.util.spec_from_file_location("fab_connect", Path(__file__).parent.parent / "src" / "x2c" / "verification" / "fab_connect.py")
 fc = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(fc)
 
@@ -74,7 +74,7 @@ def test_script_is_valid_bash_with_lf_endings():
 
 def test_script_order_generate_then_connect_then_compile():
     i_gen = FLOW_SCRIPT.index("run_FABulous_fabric; gen_user_design_wrapper")
-    i_fix = FLOW_SCRIPT.index('python3 "$ROOT/tools/fab_connect.py"')
+    i_fix = FLOW_SCRIPT.index('python3 "$ROOT/src/x2c/verification/fab_connect.py"')
     i_cmp = FLOW_SCRIPT.index("load_fabric; compile_design")
     assert i_gen < i_fix < i_cmp
     assert "exit_code.txt" in FLOW_SCRIPT and "97" in FLOW_SCRIPT           # a failed connect is never reported as a good run

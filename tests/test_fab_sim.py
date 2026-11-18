@@ -8,10 +8,10 @@ from pathlib import Path
 
 import pytest
 
-from agents.rtl_agent import REFERENCE_VERILOG
-from run_flow_check import main as check_main
-from verification.fab_sim import make_fab_testbench, parse_sim_log, sim_vectors, tb_vector_count
-from verification.fab_wrap import make_fab_wrapper, wrapper_layout
+from x2c.agents.rtl_agent import REFERENCE_VERILOG
+from x2c.commands.demo_flow_check import main as check_main
+from x2c.verification.fab_sim import make_fab_testbench, parse_sim_log, sim_vectors, tb_vector_count
+from x2c.verification.fab_wrap import make_fab_wrapper, wrapper_layout
 
 REAL = Path(__file__).parent / "fixtures" / "real_flow_run"
 PASS_LINE = "FAB_SIM RESULT: PASS vectors=500 numpy_mismatches=0 rtl_mismatches=0"
@@ -181,12 +181,12 @@ def test_numpy_check_catches_a_wrong_operator_even_when_the_rtl_reference_agrees
 
 # ---------------- prep writes the simulation files ----------------
 def test_prep_also_writes_testbench_and_sim_script(tmp_path, monkeypatch):
-    from run_fab_prep import SIM_SCRIPT, main as prep_main
+    from x2c.commands.demo_prep import SIM_SCRIPT, main as prep_main
     if shutil.which("bash") is None:
         pytest.skip("bash not available")
     monkeypatch.chdir(tmp_path)
-    (tmp_path / "reports" / "rtl").mkdir(parents=True)
-    (tmp_path / "reports" / "rtl" / "add8_sat.v").write_text(REFERENCE_VERILOG["add8_sat"])
+    (tmp_path / "hardware" / "operators").mkdir(parents=True)
+    (tmp_path / "hardware" / "operators" / "add8_sat.v").write_text(REFERENCE_VERILOG["add8_sat"])
     assert prep_main(["--op", "add8_sat"]) == 0
     job = tmp_path / "reports" / "fab_jobs" / "add8_sat"
     assert (job / "add8_sat_fab_tb.v").read_text() == make_fab_testbench("add8_sat")

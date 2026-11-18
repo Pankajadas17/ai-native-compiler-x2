@@ -26,7 +26,6 @@ desktop.ini
 /chip_build/
 /deploy/
 /reports/*
-!/reports/rtl/
 *_to_delete/
 inventory.json
 inventory_report.txt

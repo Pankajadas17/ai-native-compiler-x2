@@ -4,14 +4,14 @@ import json
 
 import pytest
 
-from agents import llm_client as lc
-from agents.llm_client import Action, MockMappingLLM
-from agents.mapping_agent import _Session, run_mapping_agent
-from compiler.ir_builder import build_ir_from_chain_workload, build_ir_from_compiler_graph
-from compiler.partition import (allowed_targets, load_hardware, plan_from_targets, propose_partition_baseline,
+from x2c.agents import llm_client as lc
+from x2c.agents.llm_client import Action, MockMappingLLM
+from x2c.agents.mapping_agent import _Session, run_mapping_agent
+from x2c.compiler.ir_builder import build_ir_from_chain_workload, build_ir_from_compiler_graph
+from x2c.compiler.partition import (allowed_targets, load_hardware, plan_from_targets, propose_partition_baseline,
                                 search_space_size, validate_partition)
-from inputs.bmsemi_source import ReadOnlyRepo
-from inputs.normalize import compiler_v2_workload, deepgate_workload
+from x2c.inputs.bmsemi_source import ReadOnlyRepo
+from x2c.inputs.normalize import compiler_v2_workload, deepgate_workload
 
 
 @pytest.fixture(scope="module")

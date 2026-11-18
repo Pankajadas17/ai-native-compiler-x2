@@ -1,4 +1,4 @@
-"""deploy_chip.py: one command from a model's IR to a verified deployment bundle for the chip."""
+"""x2c deploy: one command from a model's IR to a verified deployment bundle for the chip."""
 import json
 import shutil
 from pathlib import Path
@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import deploy_chip as D
+import x2c.commands.deploy as D
 
 IR = Path(__file__).resolve().parent / "fixtures" / "ir"
 
@@ -47,7 +47,7 @@ def test_engine_bitstream_is_bundled_when_built(tmp_path):
     if built:
         assert (out / "engine" / "design.pcf").is_file()                     # the pin map travels with the bitstream
     else:
-        assert "run_chip_flow.py --example x2_engine2_4bit" in r["engine_bitstream"]["build"]
+        assert "x2c build --example x2_engine2_4bit" in r["engine_bitstream"]["build"]
 
 
 @pytest.mark.skipif(not (shutil.which("iverilog") and shutil.which("vvp")), reason="Icarus not on PATH (Ubuntu terminal)")
@@ -67,7 +67,7 @@ def test_real_bmsemi_workloads(tmp_path):
 
 
 def test_real_weights_replace_the_seeded_ones(tmp_path):
-    import compiler.int8_net as N
+    import x2c.compiler.int8_net as N
     g = D.load_ir("mobilenetv2", str(IR / "mobilenetv2.json"))
     net = N.build_mobilenet(g)
     first = next(s for s in net.steps if isinstance(s, N.Layer))

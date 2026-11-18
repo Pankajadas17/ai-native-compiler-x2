@@ -1,4 +1,4 @@
-"""verification/formal.py + run_formal.py (review item 4). Parsing and setup run everywhere; the proofs need the chip
+"""verification/formal.py + x2c formal (review item 4). Parsing and setup run everywhere; the proofs need the chip
 toolchain (Ubuntu) and are skipped elsewhere."""
 import json
 import shutil
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from verification import formal as F
+from x2c.verification import formal as F
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -44,8 +44,8 @@ def test_strip_pads_turns_pad_cells_into_wires():
 def test_specs_mutants_and_engine_hooks_match_the_sources():
     for op in F.OPS:
         assert f"module {op}_spec(" in F.SPECS[op]
-        assert F.MUTANTS[op][0] in (ROOT / "reports" / "rtl" / f"{op}.v").read_text()
-    eng = (ROOT / "examples" / "chip_designs" / "x2_engine2.v").read_text()
+        assert F.MUTANTS[op][0] in (ROOT / "hardware" / "operators" / f"{op}.v").read_text()
+    eng = (ROOT / "hardware" / "designs" / "x2_engine2.v").read_text()
     assert F.ENGINE_MUTANT[0] in eng and '`ifdef FORMAL\n`include "x2_engine2_props.vh"\n`endif' in eng
     props = (F.FORMAL_DIR / "x2_engine2_props.vh").read_text()
     assert all(f"// {p}" in props for p in ("P1", "P2", "P3"))
@@ -54,10 +54,10 @@ def test_specs_mutants_and_engine_hooks_match_the_sources():
 
 
 def _chip_tools():
-    from chip import chip_flow as cf
+    from x2c.chip import chip_flow as cf
     env = cf.tool_env()
     if not all(shutil.which(t, path=env["PATH"]) for t in ("yosys", "make", "verilator", "sby")):
-        pytest.skip("chip toolchain not on PATH (Ubuntu: python3 run_formal.py)")
+        pytest.skip("chip toolchain not on PATH (Ubuntu: x2c formal)")
     import subprocess
     v = cf.yosys_version(subprocess.run([shutil.which("yosys", path=env["PATH"]), "-V"], capture_output=True, text=True).stdout)
     if v is None or v < cf.MIN_YOSYS:
@@ -67,7 +67,7 @@ def _chip_tools():
 
 def test_live_operator_proofs_and_lint(tmp_path, monkeypatch):
     _chip_tools()
-    import run_formal
+    import x2c.commands.formal as run_formal
     monkeypatch.setattr(run_formal, "WORK", tmp_path / "work")
     monkeypatch.setattr(run_formal, "REPORT", tmp_path / "report.json")
     assert run_formal.main(["--part", "spec,netlist,lint"]) == 0

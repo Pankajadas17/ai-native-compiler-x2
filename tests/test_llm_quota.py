@@ -1,7 +1,7 @@
 """Step 15: say WHICH rate limit was hit, and do not sit through waits that will not clear soon."""
 import pytest
 
-from agents import llm_client as lc
+from x2c.agents import llm_client as lc
 
 
 class Err(Exception):

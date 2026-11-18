@@ -15,7 +15,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from verification import chip_tools as ct  # noqa: E402
+from x2c.verification import chip_tools as ct  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "chip_tools"
 
@@ -41,7 +41,7 @@ def test_status_from_recorded_reports(tmp_path):
     d = s["designs"]["x2_engine2"]
     assert d["status"] == "ok" and d["x2_blocks"] == 2 and d["pins"] == 35 and d["meets_project_clock"] is True
     assert d["v0_audit"].split("/")[0] == d["v0_audit"].split("/")[1]
-    assert s["designs"]["x2_engine2_4bit"] == {"status": "not run", "how": "python3 run_chip_flow.py --example x2_engine2_4bit   (Ubuntu terminal)"}
+    assert s["designs"]["x2_engine2_4bit"] == {"status": "not run", "how": "x2c build --example x2_engine2_4bit   (Ubuntu terminal)"}
     e = s["two_block_engine"]
     assert e["all_pass"] and set(e["latency_cut_percent"]) == {"conv", "dw", "pw", "fc"} and e["max_model_error_percent"] < 0.1
     L = s["layers_simulated"]
@@ -54,7 +54,7 @@ def test_nothing_run_yet(tmp_path):
     s = ct.chip_status(tmp_path)
     assert s["chain"]["status"] == "not run" and "--target chip" in s["chain"]["how"]
     assert all(v["status"] == "not run" for v in s["designs"].values())
-    assert s["two_block_engine"]["how"].startswith("python3 run_x2_engine2_check.py")
+    assert s["two_block_engine"]["how"].startswith("x2c sim engine2")
 
 
 def test_fmax_is_judged_against_the_project_clock(tmp_path):
@@ -70,8 +70,8 @@ def test_bad_layer_positions():
 
 # ---------------------------------------------------------------- registered tools and the agent (project machine)
 def test_tools_are_registered_and_guarded():
-    pytest.importorskip("emulators.x2_adapter")
-    from verification import tools
+    pytest.importorskip("x2c.bmsemi.x2_adapter")
+    from x2c.verification import tools
     assert {"chip_status", "chip_schedule", "run_chip_layers"} <= set(tools.TOOLS)
     assert {s["name"] for s in tools.TOOL_SCHEMAS} == set(tools.TOOLS)
     assert "positions must be between 1 and 16" in tools.call_tool("run_chip_layers", {"positions": 99})["error"]
@@ -80,9 +80,9 @@ def test_tools_are_registered_and_guarded():
 
 
 def test_agent_adds_chip_facts_recomputed_by_code(tmp_path):
-    pytest.importorskip("emulators.x2_adapter")
-    from agents.llm_client import Action
-    from agents.verification_agent import run_agent
+    pytest.importorskip("x2c.bmsemi.x2_adapter")
+    from x2c.agents.llm_client import Action
+    from x2c.agents.verification_agent import run_agent
 
     class L:
         def start(self, goal, schemas):
@@ -95,7 +95,7 @@ def test_agent_adds_chip_facts_recomputed_by_code(tmp_path):
 
 
 def test_real_schedule_and_layers():
-    pytest.importorskip("inputs.bmsemi_source")
+    pytest.importorskip("x2c.inputs.bmsemi_source")
     try:
         s = ct.chip_schedule()
     except Exception as e:  # noqa: BLE001

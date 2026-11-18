@@ -1,4 +1,4 @@
-"""Flow step 5: the chain on the BM Labs chip (run_fab_chain.py --target chip, verification/chip_chain.py).
+"""The operator chain on the BM Labs chip (x2c chain --target chip, verification/chip_chain.py).
 
 * which operators fit the chip's 36 pins, and the wrapper for each passes Yosys vs NumPy (faults are caught);
 * recorded netlist simulations (real chip flow, sandbox) are judged right: relu8 / add8_sat pass, requant fails with the
@@ -19,9 +19,9 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from verification import chip_chain as cc  # noqa: E402
-from verification import fab_chain as fc  # noqa: E402
-from verification.rtl_check import _yosys  # noqa: E402
+from x2c.verification import chip_chain as cc  # noqa: E402
+from x2c.verification import fab_chain as fc  # noqa: E402
+from x2c.verification.rtl_check import _yosys  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "chip_chain"
 
@@ -38,7 +38,7 @@ needs_yosys = pytest.mark.skipif(not have_yosys(), reason="Yosys (yowasp-yosys) 
 
 
 def reference(op):
-    from agents.rtl_agent import REFERENCE_VERILOG
+    from x2c.agents.rtl_agent import REFERENCE_VERILOG
     return REFERENCE_VERILOG[op]
 
 
@@ -80,7 +80,7 @@ def test_testbench_uses_pins_only():
         assert f"DONE %0d\", {len(next(iter(cc.vectors_for(op).values())))}" in tb
 
 
-def test_scripts_put_chipenv_before_the_cad_suite():
+def test_scripts_put_the_chip_python_before_the_cad_suite():
     """The repo Makefile runs bit_gen.py with the first python3 on PATH; OSS CAD Suite ships one without fasm."""
     for text in (cc.PREFLIGHT_SCRIPT, cc.STEP_SCRIPT):
         assert 'export PATH="$(dirname "$PY"):$CAD/bin:$PATH' in text.replace("{{", "{").replace("}}", "}")
@@ -88,13 +88,13 @@ def test_scripts_put_chipenv_before_the_cad_suite():
 
 
 def test_missing_fasm_is_named():
-    from chip.chip_flow import classify
+    from x2c.chip.chip_flow import classify
     tail = "    import fasm\nModuleNotFoundError: No module named 'fasm'\nmake: *** [makefile.include:90: bitstream] Error 1"
     assert classify("bitstream", tail) == "python_module_missing"
 
 
 def test_iobuf_stand_in_has_chip_polarity():
-    text = (ROOT / "sim" / "IOBUF_chip_sim.v").read_text()
+    text = (ROOT / "hardware" / "sim" / "IOBUF_chip_sim.v").read_text()
     assert "assign PAD = EN_mux ? IN_mux : 1'bz;" in text and "module IOBUF" in text
 
 
@@ -158,7 +158,7 @@ def cfg():
     return SimpleNamespace(runner="native", distro="Ubuntu", heartbeat_s=30, timeout_s=60, from_stage="rtl")
 
 
-PREFLIGHT_OK = "\n".join(["FOUND yosys", "FOUND nextpnr-generic", "FOUND iverilog", "FOUND vvp", "FOUND make", "FOUND chipenv",
+PREFLIGHT_OK = "\n".join(["FOUND yosys", "FOUND nextpnr-generic", "FOUND iverilog", "FOUND vvp", "FOUND make", "FOUND chip python",
                           "FOUND fasm+numpy", "FOUND make python3", "FOUND chip repo", "FOUND chip profile", "VERSION yosys Yosys 0.70+368 (git sha1 x)",
                           "VERSION nextpnr-generic \"nextpnr-generic\" -- (Version nextpnr-0.11.1-89-gabc)",
                           "VERSION iverilog Icarus Verilog version 14.0 (devel)", "PREFLIGHT DONE"])
@@ -187,8 +187,8 @@ class FakeUbuntu:
 @pytest.fixture
 def work(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    (tmp_path / "reports" / "rtl").mkdir(parents=True)
-    (tmp_path / "reports" / "rtl" / "relu8.v").write_text(reference("relu8"))
+    (tmp_path / "hardware" / "operators").mkdir(parents=True)
+    (tmp_path / "hardware" / "operators" / "relu8.v").write_text(reference("relu8"))
     return tmp_path
 
 
@@ -222,9 +222,9 @@ def test_stale_report_is_never_this_runs(work):
 
 @needs_yosys
 def test_missing_tools_block(work):
-    r = chain(FakeUbuntu("relu8", preflight=PREFLIGHT_OK.replace("FOUND chipenv", "MISSING chipenv python (/home/u/chipenv/bin/python)")))
+    r = chain(FakeUbuntu("relu8", preflight=PREFLIGHT_OK.replace("FOUND chip python", "MISSING chip python (/home/u/.venv/bin/python)")))
     rows = {x["stage"]: x for x in r["stages"]}
-    assert r["verdict"] == "NOT RUN" and rows["env"]["status"] == "blocked" and "chipenv" in rows["env"]["detail"]
+    assert r["verdict"] == "NOT RUN" and rows["env"]["status"] == "blocked" and "chip python" in rows["env"]["detail"]
 
 
 @needs_yosys
@@ -241,7 +241,7 @@ def test_no_sim_log_fails(work):
 
 # ------------------------------------------------------------------ the CLI
 def test_plan_through_run_fab_chain(capsys):
-    import run_fab_chain
+    import x2c.commands.chain as run_fab_chain
     assert run_fab_chain.main(["--op", "all", "--target", "chip", "--plan", "--runner", "native"]) == 0
     out = capsys.readouterr().out
     assert "skipping x2_acc_step" in out and "chip plan for requant_i32_i8" in out and "run_chip_step.sh flow" in out
@@ -250,8 +250,31 @@ def test_plan_through_run_fab_chain(capsys):
 def test_live_chain(tmp_path):
     import os
     tools = all(shutil.which(t) for t in ("yosys", "nextpnr-generic", "iverilog", "vvp", "make"))
-    chipenv = Path(os.environ.get("CHIP_PY", Path.home() / "chipenv" / "bin" / "python")).is_file()
-    if not (tools and chipenv) or sys.platform.startswith("win"):
-        pytest.skip("live chip chain runs in Ubuntu: python3 run_fab_chain.py --op relu8 --target chip --runner native")
-    import run_fab_chain
+    import importlib.util
+    fasm = importlib.util.find_spec("fasm") is not None                     # uv sync --all-extras
+    if not (tools and fasm) or sys.platform.startswith("win"):
+        pytest.skip("live chip chain runs in Ubuntu: x2c chain --op relu8 --target chip --runner native")
+    import x2c.commands.chain as run_fab_chain
     assert run_fab_chain.main(["--op", "relu8", "--target", "chip", "--runner", "native"]) == 0
+
+
+def test_preflight_finds_the_chip_repo_from_bm_chip_repo(tmp_path):
+    """The chip repo may live outside the project folder ($BM_CHIP_REPO, as in the public export's test run)."""
+    import os
+    import subprocess
+    if sys.platform.startswith("win") or not shutil.which("bash"):
+        pytest.skip("runs the preflight script with bash (Ubuntu)")
+    project, chip = tmp_path / "project", tmp_path / "chip_repo"
+    project.mkdir()
+    (chip / "user_designs").mkdir(parents=True)
+    (chip / "user_designs" / "makefile.include").write_text("# stub\n")
+    script = tmp_path / "preflight.sh"
+    script.write_text(cc.PREFLIGHT_SCRIPT, encoding="utf-8", newline="\n")
+
+    def run(extra):
+        env = {k: v for k, v in os.environ.items() if k != "BM_CHIP_REPO"}
+        env.update(extra)
+        return subprocess.run(["bash", str(script), str(project)], capture_output=True, text=True, env=env, timeout=120).stdout
+
+    assert "MISSING chip repo" in run({})                       # neither $BM_CHIP_REPO nor <project>/sky130-reram-fpga
+    assert "FOUND chip repo" in run({"BM_CHIP_REPO": str(chip)})

@@ -1,9 +1,9 @@
-"""run_pipeline.py: the stage order, one summary report, partial runs labelled as partial, failures counted."""
+"""x2c pipeline: the stage order, one summary report, partial runs labelled as partial, failures counted."""
 import json
 
 import pytest
 
-import run_pipeline as P
+import x2c.commands.pipeline as P
 
 
 def test_stage_order_is_the_pipeline_order():

@@ -14,8 +14,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from chip import chip_flow as cf  # noqa: E402
-from chip import x2_facts as xf  # noqa: E402
+from x2c.chip import chip_flow as cf  # noqa: E402
+from x2c.chip import x2_facts as xf  # noqa: E402
 
 
 @pytest.fixture
@@ -43,8 +43,8 @@ def test_no_override_file_means_the_defaults(overrides):
 
 
 def test_an_override_reaches_the_schedule(overrides):
-    from compiler import x2_schedule as xs
-    from compiler.partition import load_hardware, propose_partition_baseline
+    from x2c.compiler import x2_schedule as xs
+    from x2c.compiler.partition import load_hardware, propose_partition_baseline
     sys.path.insert(0, str(ROOT / "tests"))
     from x2_schedule_graphs import mini
     g, hw = mini(), load_hardware()
@@ -69,7 +69,7 @@ def test_malformed_overrides_are_rejected(overrides, bad, msg):
 
 
 def test_clock_is_met_by_every_design_and_used_by_the_chain(overrides):
-    from verification import chip_chain as cc
+    from x2c.verification import chip_chain as cc
     recorded = {"x2_engine2_4bit": 14.45, "x2_engine2": 16.67, "x2_engine": 17.51, "relu8": 151.52, "add8_sat": 42.19}
     assert xf.value("clock_mhz") <= min(recorded.values())
     rep = {"status": "ok", "chip_repo_read_only": True, "bitstream_audit": {"set_bits": 1, "required_bits": 1}}
@@ -82,8 +82,8 @@ def test_clock_is_met_by_every_design_and_used_by_the_chain(overrides):
 
 
 def test_schedule_reports_microseconds(overrides):
-    from compiler import x2_schedule as xs
-    from compiler.partition import load_hardware, propose_partition_baseline
+    from x2c.compiler import x2_schedule as xs
+    from x2c.compiler.partition import load_hardware, propose_partition_baseline
     sys.path.insert(0, str(ROOT / "tests"))
     from x2_schedule_graphs import mini
     g, hw = mini(), load_hardware()
@@ -97,7 +97,8 @@ def test_tool_env_puts_the_chip_toolchain_first(tmp_path):
     (tmp_path / "tools" / "chip" / "oss-cad-suite" / "bin").mkdir(parents=True)
     import os
     old_path = os.pathsep.join(["/home/u/tools/oss-cad-suite/bin", "/usr/bin"])
-    parts = cf.tool_env({"HOME": str(tmp_path), "PATH": old_path})["PATH"].split(os.pathsep)   # ';' on Windows (C:\...)
+    parts = cf.tool_env({"HOME": str(tmp_path), "PATH": old_path,
+                     "CHIP_PY": str(tmp_path / "chipenv" / "bin" / "python")})["PATH"].split(os.pathsep)   # ';' on Windows (C:\...)
     assert parts[:2] == [str(tmp_path / "chipenv" / "bin"), str(tmp_path / "tools" / "chip" / "oss-cad-suite" / "bin")]
     assert parts[2:] == old_path.split(os.pathsep)                                   # the old suite stays, but after ours
     assert cf.tool_env({"HOME": str(tmp_path / "nothing"), "PATH": "/usr/bin"})["PATH"].split(os.pathsep)[-1] == "/usr/bin"

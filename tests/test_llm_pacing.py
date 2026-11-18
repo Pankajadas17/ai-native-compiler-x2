@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from agents import llm_client as lc
+from x2c.agents import llm_client as lc
 
 
 @pytest.fixture(autouse=True)

@@ -14,11 +14,11 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from chip.x2_check import parse_log  # noqa: E402
-from compiler import chip_x2  # noqa: E402
-from compiler import x2_pack as xp  # noqa: E402
-from compiler.partition import has_chip, load_hardware  # noqa: E402
-import run_x2_pack_check as rc  # noqa: E402
+from x2c.chip.x2_check import parse_log  # noqa: E402
+from x2c.compiler import chip_x2  # noqa: E402
+from x2c.compiler import x2_pack as xp  # noqa: E402
+from x2c.compiler.partition import has_chip, load_hardware  # noqa: E402
+import x2c.commands.sim_pack as rc  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "x2_pack"
 
@@ -27,7 +27,7 @@ FIX = ROOT / "tests" / "fixtures" / "x2_pack"
 def hw4():
     hw = load_hardware()
     if not has_chip(hw):
-        pytest.skip("hardware_config.json is the old 0.1 file: run run_hardware_config.py")
+        pytest.skip("hardware_config.json is the old 0.1 file: run x2c chip config")
     return hw
 
 
@@ -123,5 +123,5 @@ def test_bm_x2_model_logs_rebuild_numpy(hw1, layer):
 
 def test_live_simulation(tmp_path):
     if not (shutil.which("iverilog") and shutil.which("vvp")):
-        pytest.skip("iverilog not on PATH (expected on Windows; run run_x2_pack_check.py --sim in Ubuntu)")
+        pytest.skip("iverilog not on PATH (expected on Windows; run x2c sim pack --sim in Ubuntu)")
     assert rc.main(["--sim", "--out", str(tmp_path)]) == 0

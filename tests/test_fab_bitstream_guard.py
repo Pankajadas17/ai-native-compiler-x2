@@ -9,8 +9,8 @@ from pathlib import Path
 
 import pytest
 
-import run_fab_chain as chain
-from run_fab_prep import SIM_SCRIPT
+import x2c.commands.chain as chain
+from x2c.commands.demo_prep import SIM_SCRIPT
 from tests.test_fab_chain import PASS_LINE, cfg, proj, result  # noqa: F401  (proj is a fixture)
 
 needs_bash = pytest.mark.skipif(sys.platform == "win32" or not (Path("/bin/bash").exists() or Path("/usr/bin/bash").exists()),

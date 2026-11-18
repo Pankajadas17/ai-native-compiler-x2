@@ -14,9 +14,9 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from chip import chip_bitstream as cb  # noqa: E402
-from chip.chip_repo import ChipRepo, ChipRepoError  # noqa: E402
-from verification.bitstream_audit import (audit_against_fasm, audit_structure, parse_fasm,  # noqa: E402
+from x2c.chip import chip_bitstream as cb  # noqa: E402
+from x2c.chip.chip_repo import ChipRepo, ChipRepoError  # noqa: E402
+from x2c.verification.bitstream_audit import (audit_against_fasm, audit_structure, parse_fasm,  # noqa: E402
                                           required_bits)
 
 FIX = ROOT / "tests" / "fixtures" / "chip_bitstream"

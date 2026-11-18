@@ -1,8 +1,8 @@
 import numpy as np
-from emulators.x2_adapter import x2_matmul
-from verification.golden_reference import golden_matmul
-from verification.comparator import compare
-from run_verification import run_all
+from x2c.bmsemi.x2_adapter import x2_matmul
+from x2c.verification.matmul_check import golden_matmul
+from x2c.verification.matmul_check import compare
+from x2c.commands.bmsemi_verify import run_all
 
 def test_fixed_2x2():
     A=np.array([[1,2],[3,4]]); B=np.array([[5,6],[7,8]])

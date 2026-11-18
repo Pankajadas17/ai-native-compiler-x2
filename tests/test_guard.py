@@ -1,5 +1,5 @@
 import BMsemi_Model.bm_models.core.pe as pe
-from emulators.x2_adapter import x2_matmul_report
+from x2c.bmsemi.x2_adapter import x2_matmul_report
 import numpy as np
 
 def test_real_simulator_is_used():
@@ -9,6 +9,6 @@ def test_real_simulator_is_used():
     assert r["total_cycles"] > 100          # a NumPy stand-in would be tiny
 
 def test_orientation_non_square():
-    from emulators.x2_adapter import x2_matmul
+    from x2c.bmsemi.x2_adapter import x2_matmul
     A = np.arange(6).reshape(2, 3); B = np.arange(12).reshape(3, 4)
     assert np.allclose(x2_matmul(A, B)[0], A @ B)

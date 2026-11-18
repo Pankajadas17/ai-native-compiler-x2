@@ -1,6 +1,6 @@
-"""A3 for the chain on the BM Labs chip (run_fab_chain.py --target chip, run_chain_debug.py --target chip).
+"""A3 for the chain on the BM Labs chip (x2c chain --target chip, x2c agent a3 --target chip).
 
-* four REAL chip-chain failures (recorded in the bm_verif sandbox by breaking one thing each: a chipenv without fasm, the Makefile's
+* four REAL chip-chain failures (recorded in a test environment by breaking one thing each: a chipenv without fasm, the Makefile's
   python3 without fasm, the repo's unsigned multiplier map, the repo's IOBUF sim model) are named correctly by the rules and the agent;
 * the causes with no real run yet are named from the exact messages the chip chain prints;
 * an LLM that lies, picks an unsupported or a demo-only cause, or rambles is overruled by code; unknown stays unknown;
@@ -12,11 +12,11 @@ from pathlib import Path
 
 import pytest
 
-import run_chain_debug as cli
-import run_fab_chain as chain
-from agents.chain_debug_agent import CHIP_PROMPT, PROMPT, MockChainDebugLLM, run_chain_debug_agent
-from agents.llm_client import Action
-from verification import chain_debug as cd
+import x2c.commands.agent_a3 as cli
+import x2c.commands.chain as chain
+from x2c.agents.chain_debug_agent import CHIP_PROMPT, PROMPT, MockChainDebugLLM, run_chain_debug_agent
+from x2c.agents.llm_client import Action
+from x2c.verification import chain_debug as cd
 
 FIX = Path(__file__).resolve().parent / "fixtures" / "chip_debug"
 ORDER = ["rtl", "prep", "env", "flow", "sim", "check"]
@@ -81,7 +81,7 @@ def test_undefined_outputs_are_not_the_multiplier(root):
     ("rtl", "fail", "Yosys vs NumPy: 3/256 vectors differ", "rtl_not_verified"),
     ("rtl", "blocked", "GROQ_API_KEY is not set in this window", "llm_key_missing"),
     ("rtl", "fail", "RuntimeError: Yosys not found: pip install yowasp-yosys (or install OSS CAD Suite)", "yosys_missing"),   # real run
-    ("prep", "fail", "no verified core reports/rtl/relu8.v (the rtl stage writes it)", "rtl_not_verified"),
+    ("prep", "fail", "no verified core hardware/operators/relu8.v (the rtl stage writes it)", "rtl_not_verified"),
     ("prep", "fail", "wrapper check function: 3/256 vectors differ from NumPy through the chip pins", "chip_wrapper_check_failed"),
     ("env", "blocked", "Ubuntu (WSL) did not answer within 180 s", "ubuntu_not_answering"),
     ("flow", "blocked", "wsl.exe could not start Ubuntu", "ubuntu_not_answering"),
@@ -120,7 +120,7 @@ def test_defined_wrong_values_without_multipliers(root):
     job = root / "reports" / "chip_jobs" / "relu8"
     job.mkdir(parents=True)
     good = (FIX / "sim_outputs_undefined" / "job" / "sim.log").read_text()          # use the format of a real log, with relu8's vectors
-    from verification import chip_chain as cc
+    from x2c.verification import chip_chain as cc
     import re
     v = cc.vectors_for("relu8")["x"]
     lines = [f"VEC {i} {(max(int(x), 0) ^ (1 if i == 7 else 0)) & 0xFF:08b}" for i, x in enumerate(v)]

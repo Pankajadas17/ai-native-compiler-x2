@@ -5,10 +5,10 @@ import json
 
 import pytest
 
-import run_chain_debug as cli
-from agents.chain_debug_agent import MockChainDebugLLM, run_chain_debug_agent
-from agents.llm_client import Action, LLMUnavailable
-from verification import chain_debug as cd
+import x2c.commands.agent_a3 as cli
+from x2c.agents.chain_debug_agent import MockChainDebugLLM, run_chain_debug_agent
+from x2c.agents.llm_client import Action, LLMUnavailable
+from x2c.verification import chain_debug as cd
 
 REAL_XX_LOG = """Read bitstream hex from build/add8_sat_fab.hex
 FAB_SIM MISMATCH vector 0: io_in=0x0008080 expected=0x80 fabric=0xxx
@@ -89,7 +89,7 @@ def test_memory_block_and_dead_simulation(jobs):
 
 
 def test_flow_env_and_rtl_causes(jobs):
-    assert cands(jobs, result("flow", "fail", "FABulous could not connect the pins of the wrapper (tools/fab_connect.py refused); see flow_console.log")) == ["pins_not_connected"]
+    assert cands(jobs, result("flow", "fail", "FABulous could not connect the pins of the wrapper (src/x2c/verification/fab_connect.py refused); see flow_console.log")) == ["pins_not_connected"]
     (jobs / "exit_code.txt").write_text("97\n")
     assert cands(jobs, result("flow", "fail", "something else")) == ["pins_not_connected"]
     (jobs / "exit_code.txt").write_text("1\n")
@@ -257,7 +257,7 @@ def test_cli_diagnoses_what_did_not_pass(xx, capsys):
 
 def test_cli_edges(xx, capsys, monkeypatch):
     r, _ = xx
-    with pytest.raises(SystemExit, match="run_fab_chain.py"):
+    with pytest.raises(SystemExit, match="x2c chain"):
         cli.main([])
     write_report([{"op": "relu8", "verdict": "PASS (partial: rtl not re-run)", "stages": []}])
     assert cli.main([]) == 0 and "nothing to diagnose" in capsys.readouterr().out

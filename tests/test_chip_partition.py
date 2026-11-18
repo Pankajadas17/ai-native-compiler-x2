@@ -15,9 +15,9 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from compiler import chip_x2  # noqa: E402
-from compiler.ir import IRGraph, IRNode, TensorType  # noqa: E402
-from compiler.partition import (has_chip, load_hardware, plan_from_targets, propose_partition_baseline,  # noqa: E402
+from x2c.compiler import chip_x2  # noqa: E402
+from x2c.compiler.ir import IRGraph, IRNode, TensorType  # noqa: E402
+from x2c.compiler.partition import (has_chip, load_hardware, plan_from_targets, propose_partition_baseline,  # noqa: E402
                                 validate_partition)
 
 SPEC = ROOT / "specifications"
@@ -27,7 +27,7 @@ SPEC = ROOT / "specifications"
 def hw_file():
     hw = load_hardware()
     if not has_chip(hw):
-        pytest.skip("hardware_config.json is the old 0.1 file: run run_hardware_config.py")
+        pytest.skip("hardware_config.json is the old 0.1 file: run x2c chip config")
     return hw
 
 
@@ -81,12 +81,12 @@ def test_hardware_config_comes_from_the_chip_profile(hw_file):
 
 
 def test_hardware_config_is_current():
-    import run_hardware_config
+    import x2c.commands.chip_config as run_hardware_config
     assert run_hardware_config.main(["--check"]) == 0
 
 
 def test_generator_can_model_the_chips_1bit_cells():
-    import run_hardware_config
+    import x2c.commands.chip_config as run_hardware_config
     prof = json.loads((SPEC / "chip_profile.json").read_text())
     one = run_hardware_config.build(prof, cell_bits=1)
     assert one["x2"]["cell_bits"] == 1 and "DECISION" not in one["x2"]["basis"]["cell_bits"]
@@ -221,8 +221,8 @@ def test_old_config_still_works_without_a_chip_view():
 
 
 def test_mapping_agent_reports_the_chip_view(hw, tmp_path):
-    from agents.mapping_agent import run_mapping_agent
-    from agents.llm_client import Action
+    from x2c.agents.mapping_agent import run_mapping_agent
+    from x2c.agents.llm_client import Action
 
     class Scripted:
         def start(self, goal, schemas, system_prompt=None):

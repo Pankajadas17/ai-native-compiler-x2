@@ -11,14 +11,14 @@ from pathlib import Path
 
 import pytest
 
-import run_fab_chain as chain
-from run_fab_prep import FLOW_SCRIPT
+import x2c.commands.chain as chain
+from x2c.commands.demo_prep import FLOW_SCRIPT
 from tests.test_fab_chain import FakeUbuntu, cfg, proj, result, run_main  # noqa: F401  (proj is a fixture)
-from verification import chain_debug as cd
-from verification import fab_chain as fc
-from verification.fab_sim import make_fab_testbench, sim_vectors, tb_vector_count
-from verification.fab_wrap import wrapper_layout
-from verification.rtl_check import OPS, vectors_for
+from x2c.verification import chain_debug as cd
+from x2c.verification import fab_chain as fc
+from x2c.verification.fab_sim import make_fab_testbench, sim_vectors, tb_vector_count
+from x2c.verification.fab_wrap import wrapper_layout
+from x2c.verification.rtl_check import OPS, vectors_for
 
 needs_bash = pytest.mark.skipif(sys.platform == "win32" or not (Path("/bin/bash").exists() or Path("/usr/bin/bash").exists()),
                                 reason="runs real bash (on Windows `bash` is WSL's launcher and cannot open Windows temp paths)")
@@ -139,9 +139,9 @@ def test_summary_shows_timing_when_nextpnr_reported_it():
 
 
 def test_main_records_the_clock_target_and_names_the_cause(proj, capsys):
-    (proj / "reports" / "rtl").mkdir(parents=True, exist_ok=True)
-    from agents.rtl_agent import REFERENCE_VERILOG
-    (proj / "reports" / "rtl" / "requant_i32_i8.v").write_text(REFERENCE_VERILOG["requant_i32_i8"])
+    (proj / "hardware" / "operators").mkdir(parents=True, exist_ok=True)
+    from x2c.agents.rtl_agent import REFERENCE_VERILOG
+    (proj / "hardware" / "operators" / "requant_i32_i8.v").write_text(REFERENCE_VERILOG["requant_i32_i8"])
     rc = run_main(["--op", "requant_i32_i8"], Flow())
     out = capsys.readouterr().out
     assert rc == 1 and "wrapper check (requant_i32_i8_fab): PASS at function | 485 vectors" in out and "40 flip-flop bits" in out
@@ -169,8 +169,8 @@ def test_flow_script_passes_the_clock_target_to_nextpnr_only_when_given(tmp_path
     root = tmp_path / "proj"
     job = root / "reports" / "fab_jobs" / "add8_sat"
     job.mkdir(parents=True)
-    (root / "tools").mkdir()
-    (root / "tools" / "fab_connect.py").write_text("print('fab_connect: ok')\n")
+    (root / "src" / "x2c" / "verification").mkdir(parents=True)
+    (root / "src" / "x2c" / "verification" / "fab_connect.py").write_text("print('fab_connect: ok')\n")
     (job / "run_fab_flow.sh").write_text(FLOW_SCRIPT, newline="\n")
     (job / "add8_sat_fab.v").write_text("module add8_sat_fab; endmodule\n")
     env = {**os.environ, "HOME": str(home)}

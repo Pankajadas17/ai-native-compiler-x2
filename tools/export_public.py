@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+sys.path[:0] = [str(ROOT / "src"), str(ROOT)]
 
 PRIVATE = ("tests/fixtures/ir/",)                    # the team's model graphs (copied from BMsemi_Model)
 PRIVATE_MARKERS = ("repo_commit", "Neuromorphic_compiler_V2/artifacts")   # BMsemi data inside a fixture

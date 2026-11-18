@@ -6,14 +6,14 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from emulators.x2_adapter import x2_vecmat
-from inputs.bmsemi_source import ReadOnlyRepo, RepoAccessError
-from inputs.catalog import COMPILER_V2, discover
-from inputs.graph_check import GRAPH, LAYERS, validate_compiler_graph
-from inputs.normalize import all_workloads, compiler_v2_workload, deepgate_workload, mnist_workload
-from inputs.schemas import WorkloadSpec, validate_workload
-from orchestration.benchmark import naive_core_mapper_tiles, reproduce_compiler_tiles
-from verification.layer_exec import grouped_conv_golden, grouped_conv_on_x2, input_hw
+from x2c.bmsemi.x2_adapter import x2_vecmat
+from x2c.inputs.bmsemi_source import ReadOnlyRepo, RepoAccessError
+from x2c.inputs.catalog import COMPILER_V2, discover
+from x2c.inputs.graph_check import GRAPH, LAYERS, validate_compiler_graph
+from x2c.inputs.normalize import all_workloads, compiler_v2_workload, deepgate_workload, mnist_workload
+from x2c.inputs.schemas import WorkloadSpec, validate_workload
+from x2c.bmsemi.benchmark import naive_core_mapper_tiles, reproduce_compiler_tiles
+from x2c.verification.layer_exec import grouped_conv_golden, grouped_conv_on_x2, input_hw
 from tests import faults
 
 
@@ -34,10 +34,10 @@ def mini_repo(tmp_path):
 # ---------------------------------------------------------------- read-only source
 def test_paths_cannot_escape_the_repo(repo):
     with pytest.raises(RepoAccessError):
-        repo.read_text("../run_agent.py")
+        repo.read_text("../pyproject.toml")
     with pytest.raises(RepoAccessError):
         repo.path("projects/../../x")
-    assert repo.exists("../run_agent.py") is False
+    assert repo.exists("../pyproject.toml") is False
 
 
 def test_source_has_no_write_api(repo):

@@ -1,5 +1,5 @@
 """Small IR graphs for tests/test_x2_schedule.py (shapes like tiny MobileNetV2 blocks; built with compiler.ir)."""
-from compiler.ir import IRGraph, IRNode, TensorType as T
+from x2c.compiler.ir import IRGraph, IRNode, TensorType as T
 
 def conv(name, inp, op, K, C, R, Y, groups=1):
     return IRNode(name, op, [inp], T((1, K, Y, Y)), {"K": K, "C": C, "R": R, "S": R, "Y": Y, "X": Y, "groups": groups,

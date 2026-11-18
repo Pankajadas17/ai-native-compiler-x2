@@ -1,5 +1,5 @@
 """Step 24: the one-command chain. Logic is tested with a FAKE Ubuntu (no WSL, no FABulous needed); the commands it WOULD run are checked as text.
-What this cannot show: that the real flow passes. That is what `python run_fab_chain.py --op add8_sat` on your machine shows."""
+What this cannot show: that the real flow passes. That is what `x2c chain --op add8_sat` on your machine shows."""
 import json
 import shutil
 import subprocess
@@ -9,10 +9,10 @@ from types import SimpleNamespace
 
 import pytest
 
-import run_fab_chain as chain
-from agents.rtl_agent import REFERENCE_VERILOG
-from verification.fab_sim import tb_vector_count
-from verification import fab_chain as fc
+import x2c.commands.chain as chain
+from x2c.agents.rtl_agent import REFERENCE_VERILOG
+from x2c.verification.fab_sim import tb_vector_count
+from x2c.verification import fab_chain as fc
 
 FIX = Path(__file__).parent / "fixtures"
 PASS_LINE = "FAB_SIM RESULT: PASS vectors=500 numpy_mismatches=0 rtl_mismatches=0\n"
@@ -20,7 +20,7 @@ PASS_LINE = "FAB_SIM RESULT: PASS vectors=500 numpy_mismatches=0 rtl_mismatches=
 
 # ------------------------------------------------------------ paths and commands
 def test_windows_path_becomes_a_mnt_path():
-    assert fc.to_wsl_path(r"E:\vm\KLOK\bm_verif") == "/mnt/e/vm/KLOK/bm_verif"
+    assert fc.to_wsl_path(r"E:\work\ai-native-compiler-x2") == "/mnt/e/work/ai-native-compiler-x2"
     assert fc.to_wsl_path("e:/vm/x/a.sh") == "/mnt/e/vm/x/a.sh"
     assert fc.to_wsl_path("E:\\") == "/mnt/e/"
     assert fc.to_wsl_path("/home/u/x") == "/home/u/x"
@@ -29,10 +29,10 @@ def test_windows_path_becomes_a_mnt_path():
 
 
 def test_wsl_refuses_paths_it_could_split():
-    assert fc.script_path("wsl", r"E:\vm\KLOK\bm_verif\reports\fab_jobs\add8_sat\run_fab_flow.sh") == \
-        "/mnt/e/vm/KLOK/bm_verif/reports/fab_jobs/add8_sat/run_fab_flow.sh"
+    assert fc.script_path("wsl", r"E:\work\ai-native-compiler-x2\reports\fab_jobs\add8_sat\run_fab_flow.sh") == \
+        "/mnt/e/work/ai-native-compiler-x2/reports/fab_jobs/add8_sat/run_fab_flow.sh"
     with pytest.raises(ValueError, match="spaces"):
-        fc.script_path("wsl", r"E:\my projects\bm_verif\run.sh")
+        fc.script_path("wsl", r"E:\my projects\ai-native-compiler-x2\run.sh")
     assert fc.script_path("native", "/home/u/my projects/run.sh") == "/home/u/my projects/run.sh"     # native uses an argument list: no splitting
 
 
@@ -42,7 +42,7 @@ def test_runner_choice():
 
 
 def test_commands_have_the_exact_shape_that_worked_by_hand():
-    s = "/mnt/e/vm/KLOK/bm_verif/reports/fab_jobs/add8_sat/run_fab_flow.sh"
+    s = "/mnt/e/work/ai-native-compiler-x2/reports/fab_jobs/add8_sat/run_fab_flow.sh"
     assert fc.build_command("wsl", s, ["add8_sat"], "Ubuntu") == ["wsl", "-d", "Ubuntu", "--", "bash", s, "add8_sat"]
     assert fc.build_command("native", s, ["add8_sat"]) == ["bash", s, "add8_sat"]
     with pytest.raises(ValueError):
@@ -302,9 +302,9 @@ class FakeUbuntu:
 @pytest.fixture
 def proj(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    (tmp_path / "reports" / "rtl").mkdir(parents=True)
+    (tmp_path / "hardware" / "operators").mkdir(parents=True)
     for op in ("add8_sat", "relu8"):
-        (tmp_path / "reports" / "rtl" / f"{op}.v").write_text(REFERENCE_VERILOG[op])
+        (tmp_path / "hardware" / "operators" / f"{op}.v").write_text(REFERENCE_VERILOG[op])
     return tmp_path
 
 
@@ -378,7 +378,7 @@ WIDE2 = {"top": "wide2", "inputs": {"a": 20, "b": 20}, "output": ("y", 8), "text
 
 
 def test_all_skips_what_does_not_fit_the_pins(proj, capsys, monkeypatch):
-    from verification.rtl_check import OPS
+    from x2c.verification.rtl_check import OPS
     monkeypatch.setitem(OPS, "wide2", WIDE2)
     run_main(["--op", "all"], FakeUbuntu())
     out = capsys.readouterr().out
@@ -387,7 +387,7 @@ def test_all_skips_what_does_not_fit_the_pins(proj, capsys, monkeypatch):
 
 
 def test_asking_for_an_operator_that_cannot_be_wrapped_is_refused(proj):
-    from verification.rtl_check import OPS
+    from x2c.verification.rtl_check import OPS
     OPS["wide2"] = WIDE2
     try:
         with pytest.raises(SystemExit) as e:
@@ -401,14 +401,14 @@ def test_asking_for_an_operator_that_cannot_be_wrapped_is_refused(proj):
 
 
 def test_a_bad_existing_verilog_file_is_not_trusted(proj, capsys):
-    (proj / "reports" / "rtl" / "relu8.v").write_text("module relu8(input signed [7:0] x, output signed [7:0] y); assign y = x; endmodule\n")
+    (proj / "hardware" / "operators" / "relu8.v").write_text("module relu8(input signed [7:0] x, output signed [7:0] y); assign y = x; endmodule\n")
     assert run_main(["--op", "relu8"], FakeUbuntu()) == 0              # re-check failed -> A2 (mock) wrote the reference again
     assert "existing file failed its re-check" in capsys.readouterr().out
 
 
 def test_real_llm_without_a_key_is_blocked_not_run(proj, capsys, monkeypatch):
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
-    (proj / "reports" / "rtl" / "relu8.v").unlink()
+    (proj / "hardware" / "operators" / "relu8.v").unlink()
     assert run_main(["--op", "relu8", "--llm", "groq"], FakeUbuntu()) == 1
     out = capsys.readouterr().out
     assert "GROQ_API_KEY is not set" in out and "NOT RUN" in out

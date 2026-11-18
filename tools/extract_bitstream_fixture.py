@@ -4,8 +4,8 @@ Copies the .bin, .fasm, fabric.csv and the nextpnr log, and writes a REDUCED spe
 as JSON so the fixture stays small. A MANIFEST.json records provenance and sha256 of every file."""
 import argparse, hashlib, json, shutil, sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from verification.bitstream_audit import load_spec, parse_fasm
+sys.path[:0] = [str(Path(__file__).resolve().parents[1] / "src"), str(Path(__file__).resolve().parents[1])]
+from x2c.verification.bitstream_audit import load_spec, parse_fasm
 
 ap = argparse.ArgumentParser(); ap.add_argument("project"); ap.add_argument("design"); ap.add_argument("out")
 ap.add_argument("--note", default=""); ap.add_argument("--tool", action="append", default=[], help="name=version (repeatable)")

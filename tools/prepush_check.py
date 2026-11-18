@@ -2,7 +2,7 @@
 prepush_check.py: run before every push. It reads what git WOULD commit and refuses when something must not go to
 GitHub. It changes nothing in the folder except, with --pin, specifications/external_repos.json.
 
-    git init                                 # once (VS Code terminal, inside bm_verif)
+    git init                                 # once (inside the project folder)
     python tools/prepush_check.py --pin      # records which commits of the two cloned repos this work was tested on
     python tools/prepush_check.py            # before every push: must end with "PRE-PUSH CHECK PASSED"
 
@@ -12,7 +12,7 @@ ERRORS (exit 1, do not push):
     generated reports or caches that would be committed (.gitignore is missing or wrong)
   * a file of 95 MB or more (GitHub refuses files over 100 MB)
 WARNINGS (push allowed, read them):
-  * third-party imports that no requirements*.txt lists, files over 20 MB, .docx/.pdf, no .gitattributes
+  * third-party imports that pyproject.toml does not list, files over 20 MB, .docx/.pdf, no .gitattributes
 """
 import argparse
 import ast
@@ -26,7 +26,7 @@ _HERE = Path(__file__).resolve().parent
 ROOT = _HERE.parent if _HERE.name == "tools" else _HERE
 CLONES = ("BMsemi_Model", "sky130-reram-fpga")
 FORBIDDEN = CLONES + ("venv", ".venv", "env", "chip_build", "deploy", "__pycache__", ".pytest_cache")
-REPORTS_ALLOWED = ("reports/rtl/",)                   # A2's verified operators are kept; other reports are generated
+REPORTS_ALLOWED = ()                                  # reports/ is generated output only (A2's operators: hardware/operators/)
 BINARY_EXT = {".bit", ".bin", ".npz", ".npy", ".png", ".jpg", ".pdf", ".docx", ".zip", ".vvp", ".pyc"}
 SECRETS = [
     ("Groq API key", re.compile(r"gsk_[A-Za-z0-9]{20,}")),
@@ -57,7 +57,7 @@ def forbidden(p):
     if any(x in FORBIDDEN for x in parts) or any(x.endswith("_to_delete") for x in parts):
         return "cloned repo / environment / generated folder"
     if parts[0] == "reports" and not p.startswith(REPORTS_ALLOWED):
-        return "generated report (only reports/rtl/ is kept)"
+        return "generated report"
     if parts[-1] == ".env" or parts[-1].endswith(".env"):
         return "environment file (holds keys)"
     if parts[-1] in ("inventory.json", "inventory_report.txt"):
@@ -86,7 +86,7 @@ def scan_secrets(paths):
 
 def third_party(paths):
     local = {p.split("/", 1)[0].removesuffix(".py") for p in paths} | {Path(p).stem for p in paths if p.endswith(".py")} \
-        | set(CLONES) | {"tests", "conftest"}
+        | set(CLONES) | {"tests", "conftest", "x2c"}
     std = set(getattr(sys, "stdlib_module_names", ())) | {"__future__"}
     found = {}
     for p in paths:
@@ -104,11 +104,15 @@ def third_party(paths):
                 if top not in std and top not in local:
                     found.setdefault(top, p)
     listed = set()
-    for req in ROOT.glob("requirements*.txt"):
-        for line in req.read_text(encoding="utf-8", errors="ignore").splitlines():
-            name = re.split(r"[<>=!~\[;\s]", line.strip(), maxsplit=1)[0].lower()
-            if name and not name.startswith(("#", "-")):
-                listed |= {name, name.replace("-", "_"), IMPORT_NAME.get(name, name)}
+    import tomllib
+    pp = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    deps = list(pp.get("project", {}).get("dependencies", []))
+    for group in (*pp.get("project", {}).get("optional-dependencies", {}).values(), *pp.get("dependency-groups", {}).values()):
+        deps += [d for d in group if isinstance(d, str)]
+    for line in deps:
+        name = re.split(r"[<>=!~\[;\s]", line.strip(), maxsplit=1)[0].lower()
+        if name:
+            listed |= {name, name.replace("-", "_"), IMPORT_NAME.get(name, name)}
     return {m: p for m, p in sorted(found.items()) if m.lower() not in listed}
 
 
@@ -138,7 +142,7 @@ def main(argv=None):
     try:
         git("rev-parse", "--is-inside-work-tree")
     except (RuntimeError, FileNotFoundError):
-        print("not a git repository yet (or git is not installed): run  git init  inside bm_verif first")
+        print("not a git repository yet (or git is not installed): run  git init  inside the project folder first")
         return 1
     if a.pin:
         pin()
@@ -160,7 +164,7 @@ def main(argv=None):
     if not (ROOT / "specifications" / "external_repos.json").is_file():
         warnings.append("cloned repos not pinned yet: run with --pin")
     for m, p in third_party([p for p in paths if not forbidden(p)]).items():
-        warnings.append(f"import '{m}' (first in {p}) is in no requirements*.txt")
+        warnings.append(f"import '{m}' (first in {p}) is not a dependency in pyproject.toml")
     total = sum(sizes.get(p, 0) for p in paths if not forbidden(p))
     print(f"git would commit {len(paths)} files ({total / 1e6:.1f} MB)")
     for w in warnings:

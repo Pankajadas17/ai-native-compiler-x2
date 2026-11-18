@@ -14,8 +14,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from chip import fabric_profile as fp  # noqa: E402
-from chip.chip_repo import INPUT_FILES, ChipRepo, ChipRepoError, lf_sha256, locate_repo  # noqa: E402
+from x2c.chip import fabric_profile as fp  # noqa: E402
+from x2c.chip.chip_repo import INPUT_FILES, ChipRepo, ChipRepoError, lf_sha256, locate_repo  # noqa: E402
 
 BELS = """# BEL descriptions
 #Tile_X0Y0

@@ -1,4 +1,4 @@
-"""Flow step 2: the eFPGA recombiner (x2_acc_step operator + x2_recombiner design).
+"""The fabric recombiner (x2_acc_step operator + x2_recombiner design).
 
 * the operator passes rtl_check (Yosys eval vs NumPy) like the other A2 operators (also via test_rtl_agent.py);
 * rtl_check now reads Yosys' decimal result form (needed for 32-bit outputs);
@@ -16,10 +16,10 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import run_x2_recombine_check as rr  # noqa: E402
-from compiler import x2_pack as xp  # noqa: E402
-from compiler.partition import has_chip, load_hardware  # noqa: E402
-from verification.rtl_check import OPS, golden_x2_acc_step, parse_eval_results, vectors_for  # noqa: E402
+import x2c.commands.sim_recombine as rr  # noqa: E402
+from x2c.compiler import x2_pack as xp  # noqa: E402
+from x2c.compiler.partition import has_chip, load_hardware  # noqa: E402
+from x2c.verification.rtl_check import OPS, golden_x2_acc_step, parse_eval_results, vectors_for  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "x2_recombine"
 
@@ -28,7 +28,7 @@ FIX = ROOT / "tests" / "fixtures" / "x2_recombine"
 def hws():
     hw4 = load_hardware()
     if not has_chip(hw4):
-        pytest.skip("hardware_config.json is the old 0.1 file: run run_hardware_config.py")
+        pytest.skip("hardware_config.json is the old 0.1 file: run x2c chip config")
     hw1 = copy.deepcopy(hw4); hw1["x2"]["cell_bits"] = 1
     return hw4, hw1
 
@@ -86,5 +86,5 @@ def test_a_wrong_step_is_caught(all_cases):
 
 def test_live_simulation(tmp_path):
     if not (shutil.which("iverilog") and shutil.which("vvp")):
-        pytest.skip("iverilog not on PATH (expected on Windows; run run_x2_recombine_check.py --sim in Ubuntu)")
+        pytest.skip("iverilog not on PATH (expected on Windows; run x2c sim recombine --sim in Ubuntu)")
     assert rr.main(["--sim", "--out", str(tmp_path)]) == 0

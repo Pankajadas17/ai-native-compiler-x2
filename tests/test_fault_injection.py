@@ -1,6 +1,6 @@
 """Proves the referee can FAIL, and that failures are classified correctly."""
 import pytest
-from verification import tools
+from x2c.verification import tools
 from tests import faults
 
 CASES = [("sign_flip", faults.sign_flip, "sign_inverted"),

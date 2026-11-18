@@ -1,8 +1,8 @@
 """Step 20: the flow checker against a REAL FABulous run (fixtures/real_flow_run), plus clearly-labelled mutations of it."""
 from pathlib import Path
 
-from verification.bitstream_audit import parse_fasm
-from verification.flow_logs import check_flow, parse_nextpnr_log
+from x2c.verification.bitstream_audit import parse_fasm
+from x2c.verification.flow_logs import check_flow, parse_nextpnr_log
 
 FX = Path(__file__).parent / "fixtures" / "real_flow_run"
 LOG = (FX / "nextpnr_log.txt").read_text()

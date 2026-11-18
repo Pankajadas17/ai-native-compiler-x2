@@ -8,10 +8,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import deploy_chip as D
-import run_bundle as RB
-from compiler import int8_net as N
-from compiler.ir import IRGraph
+import x2c.commands.deploy as D
+import x2c.commands.replay as RB
+from x2c.compiler import int8_net as N
+from x2c.compiler.ir import IRGraph
 
 ROOT = Path(__file__).resolve().parents[1]
 PUB = ROOT / "tests" / "fixtures" / "ir_public"
@@ -49,7 +49,7 @@ def test_a_wrong_x2_result_is_caught_on_the_stand_in():
     x = np.random.default_rng(7).integers(0, 128, size=net.input_shape)
     N.calibrate(net, x)
     gold = N.golden(net, x)
-    from compiler import x2_pack as xp
+    from x2c.compiler import x2_pack as xp
     bad = next(s.name for s in net.steps if isinstance(s, N.Layer) and s.name == "b1_dw")
 
     def mm(L, P):

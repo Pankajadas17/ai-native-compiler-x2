@@ -8,10 +8,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from compiler import int8_net as N
-from compiler import x2_pack as xp
-from compiler.ir import IRGraph
-from compiler.partition import load_hardware
+from x2c.compiler import int8_net as N
+from x2c.compiler import x2_pack as xp
+from x2c.compiler.ir import IRGraph
+from x2c.compiler.partition import load_hardware
 
 IR = Path(__file__).resolve().parent / "fixtures" / "ir"
 

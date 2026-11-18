@@ -4,11 +4,11 @@ from pathlib import Path
 
 import pytest
 
-from agents.rtl_agent import REFERENCE_VERILOG
-from run_fab_prep import FLOW_SCRIPT, main as prep_main
-from run_flow_check import main as check_main
-from verification.fab_wrap import check_fab_wrapper, make_fab_wrapper, top_name, wrapper_layout
-import verification.rtl_check as rc
+from x2c.agents.rtl_agent import REFERENCE_VERILOG
+from x2c.commands.demo_prep import FLOW_SCRIPT, main as prep_main
+from x2c.commands.demo_flow_check import main as check_main
+from x2c.verification.fab_wrap import check_fab_wrapper, make_fab_wrapper, top_name, wrapper_layout
+import x2c.verification.rtl_check as rc
 
 try:
     rc._yosys()
@@ -35,7 +35,7 @@ def test_requant_is_loaded_in_two_steps_and_two_wide_inputs_still_do_not_fit(mon
     lay = wrapper_layout("requant_i32_i8")
     assert lay["mode"] == "two_step" and lay["half"] == 16 and lay["sel_pin"] == 16 and lay["in_bits"] == 17 and lay["out_lsb"] == 17 and lay["in_width"] == 32
     assert wrapper_layout("relu8")["mode"] == "direct" and wrapper_layout("add8_sat")["mode"] == "direct"
-    from verification.fab_wrap import split_halves
+    from x2c.verification.fab_wrap import split_halves
     assert split_halves(-1, lay) == (0xFFFF, 0x1FFFF) and split_halves(0x12345678, lay) == (0x5678, 0x11234) and split_halves(-2 ** 31, lay) == (0, 0x18000)
     monkeypatch.setitem(rc.OPS, "wide2", WIDE2)
     with pytest.raises(ValueError, match="28 I/O pins"):
@@ -44,7 +44,7 @@ def test_requant_is_loaded_in_two_steps_and_two_wide_inputs_still_do_not_fit(mon
 
 def test_two_step_wrapper_passes_and_its_mistakes_are_caught():
     """The same breaks were tried on the real FABulous flow's input: each one is caught here, before Ubuntu is needed."""
-    from agents.rtl_agent import REFERENCE_VERILOG
+    from x2c.agents.rtl_agent import REFERENCE_VERILOG
     t = make_fab_wrapper("requant_i32_i8", REFERENCE_VERILOG["requant_i32_i8"])
     r = check_fab_wrapper("requant_i32_i8", t)
     assert r["status"] == "pass" and r["vectors"] == 485 and r["flop_bits"] == 40                       # 32 stored input bits + 8 result bits
@@ -69,7 +69,7 @@ def test_two_step_wrapper_passes_and_its_mistakes_are_caught():
 
 
 def test_a_comment_line_does_not_hide_the_first_module():
-    from agents.rtl_agent import REFERENCE_VERILOG
+    from x2c.agents.rtl_agent import REFERENCE_VERILOG
     t = make_fab_wrapper("relu8", REFERENCE_VERILOG["relu8"]).replace("module relu8_fab (", "// a comment before the module\nmodule relu8_fab (", 1)
     assert check_fab_wrapper("relu8", t)["status"] == "pass"
 
@@ -132,7 +132,7 @@ def test_wrong_ports_and_garbage_are_rejected():
 # ---- CLI + job folder ----
 def test_prep_refuses_unverified_or_unwrappable(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
-    with pytest.raises(SystemExit, match="run_rtl_agent"):
+    with pytest.raises(SystemExit, match="x2c agent a2"):
         prep_main(["--op", "add8_sat"])
     monkeypatch.setitem(rc.OPS, "wide2", WIDE2)
     with pytest.raises(SystemExit, match="cannot wrap wide2"):
@@ -143,8 +143,8 @@ def test_prep_refuses_unverified_or_unwrappable(tmp_path, monkeypatch):
 
 def test_prep_writes_the_job_folder(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
-    (tmp_path / "reports" / "rtl").mkdir(parents=True)
-    (tmp_path / "reports" / "rtl" / "add8_sat.v").write_text(REFERENCE_VERILOG["add8_sat"])
+    (tmp_path / "hardware" / "operators").mkdir(parents=True)
+    (tmp_path / "hardware" / "operators" / "add8_sat.v").write_text(REFERENCE_VERILOG["add8_sat"])
     assert prep_main(["--op", "add8_sat"]) == 0
     job = tmp_path / "reports" / "fab_jobs" / "add8_sat"
     assert (job / "add8_sat_fab.v").exists() and (job / "run_fab_flow.sh").read_text() == FLOW_SCRIPT

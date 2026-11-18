@@ -1,7 +1,7 @@
 """Step 13: waiting must be visible ([llm] progress lines) and no single request may outlive the time budget."""
 import pytest
 
-from agents import llm_client as lc
+from x2c.agents import llm_client as lc
 
 
 class Err(Exception):

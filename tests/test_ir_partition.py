@@ -3,13 +3,13 @@ import json
 
 import pytest
 
-from compiler.ir import IRGraph, IRNode, TensorType
-from compiler.ir_builder import build_ir_from_chain_workload, build_ir_from_compiler_graph
-from compiler.ir_validate import validate_ir
-from compiler.partition import load_hardware, propose_partition_baseline, validate_partition
-from inputs.bmsemi_source import ReadOnlyRepo
-from inputs.graph_check import GRAPH
-from inputs.normalize import compiler_v2_workload, deepgate_workload, mnist_workload
+from x2c.compiler.ir import IRGraph, IRNode, TensorType
+from x2c.compiler.ir_builder import build_ir_from_chain_workload, build_ir_from_compiler_graph
+from x2c.compiler.ir_validate import validate_ir
+from x2c.compiler.partition import load_hardware, propose_partition_baseline, validate_partition
+from x2c.inputs.bmsemi_source import ReadOnlyRepo
+from x2c.inputs.graph_check import GRAPH
+from x2c.inputs.normalize import compiler_v2_workload, deepgate_workload, mnist_workload
 
 
 @pytest.fixture(scope="module")
@@ -133,7 +133,7 @@ def test_a_different_but_legal_justification_text_is_still_accepted(ir, hw):
 
 # ---------------------------------------------------------------- benchmark integration
 def test_benchmark_reports_ir_and_partition_stages(tmp_path):
-    from orchestration.benchmark import run_benchmark
+    from x2c.bmsemi.benchmark import run_benchmark
     rep = run_benchmark(workload_ids=["bm_compiler_v2_tiny_mobilenetv2"], report_path=str(tmp_path / "r.json"))
     by = {x["test"].split("/")[-1]: x for x in rep["results"]}
     assert by["ir"]["stage"] == "S03" and by["ir"]["passed"] and by["ir"]["details"]["nodes"] == 51
@@ -143,9 +143,9 @@ def test_benchmark_reports_ir_and_partition_stages(tmp_path):
 
 def test_a_corrupted_graph_fails_the_ir_and_graph_stages(tmp_path):
     import shutil
-    from inputs.catalog import COMPILER_V2
-    from inputs.graph_check import LAYERS
-    from orchestration.benchmark import run_benchmark
+    from x2c.inputs.catalog import COMPILER_V2
+    from x2c.inputs.graph_check import LAYERS
+    from x2c.bmsemi.benchmark import run_benchmark
     real = ReadOnlyRepo()
     for rel in ("catalog.json", GRAPH, LAYERS, f"{COMPILER_V2}/artifacts/maestro_schedule.json"):
         dst = tmp_path / rel; dst.parent.mkdir(parents=True, exist_ok=True); shutil.copy(real.path(rel), dst)

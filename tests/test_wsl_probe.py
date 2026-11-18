@@ -13,9 +13,9 @@ from pathlib import Path
 
 import pytest
 
-import run_wsl_probe as probe
-from run_fab_prep import SIM_SCRIPT
-from verification import wsl_probe as wp
+import x2c.commands.doctor_wsl as probe
+from x2c.commands.demo_prep import SIM_SCRIPT
+from x2c.verification import wsl_probe as wp
 
 needs_bash = pytest.mark.skipif(sys.platform == "win32" or not (Path("/bin/bash").exists() or Path("/usr/bin/bash").exists()),
                                 reason="runs real bash (on Windows `bash` is WSL's launcher and cannot open Windows temp paths)")
@@ -518,7 +518,7 @@ def test_runner_says_so_when_ubuntu_does_not_answer_after_the_run(jobdir, capsys
 
 def test_runner_needs_the_job_folder_and_a_working_ubuntu(jobdir):
     (jobdir / "reports" / "fab_jobs" / "add8_sat" / "add8_sat_fab_tb.v").unlink()
-    with pytest.raises(SystemExit, match="run_fab_chain.py"):
+    with pytest.raises(SystemExit, match="x2c chain"):
         probe.main(["--runner", "native"], exec_fn=FakeUbuntu(), host_reader=host_reader([5.0]))
     (jobdir / "reports" / "fab_jobs" / "add8_sat" / "add8_sat_fab_tb.v").write_text("x")
     with pytest.raises(SystemExit, match="did not answer"):
@@ -626,7 +626,7 @@ def test_simulation_memory_sentences():
     assert "commit headroom fell to 1.0 GB" in low and "most likely stopped for lack of memory" in low and "--op add8_sat --from-stage sim" in low
     assert "--op relu8" in wp.sim_memory_sentence(h, "relu8")
     mid = wp.sim_memory_sentence({**h, "min_commit_headroom_gb": 2.5})
-    assert "commit headroom got low (2.5 GB" in mid and "may be the reason" in mid and "most likely" not in mid and "run_wsl_probe.py" in mid
+    assert "commit headroom got low (2.5 GB" in mid and "may be the reason" in mid and "most likely" not in mid and "x2c doctor wsl" in mid
     assert "may be the reason" in wp.sim_memory_sentence({**h, "min_commit_headroom_gb": 2.0}) and "most likely" in wp.sim_memory_sentence({**h, "min_commit_headroom_gb": 1.99})
     assert "probably not" in wp.sim_memory_sentence({**h, "min_commit_headroom_gb": 3.0}) and "may be" in wp.sim_memory_sentence({**h, "min_commit_headroom_gb": 2.99})
     old = {**h, "min_commit_headroom_gb": None}                                                  # no headroom reading: free RAM, with the old lines

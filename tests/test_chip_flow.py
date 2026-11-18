@@ -13,7 +13,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from chip import chip_flow as cf  # noqa: E402
+from x2c.chip import chip_flow as cf  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "chip_flow"
 PROFILE = ROOT / "specifications" / "chip_profile.json"
@@ -25,7 +25,7 @@ def text(name):
 
 def profile_or_skip():
     if not PROFILE.is_file():
-        pytest.skip("specifications/chip_profile.json missing (run run_chip_profile.py)")
+        pytest.skip("specifications/chip_profile.json missing (run x2c chip profile)")
     return json.loads(PROFILE.read_text())
 
 
@@ -79,7 +79,7 @@ def test_expected_bitstream_size_matches_real_bitstream():
 
 
 def test_frame_geometry_from_repo():
-    from chip.chip_repo import ChipRepo, ChipRepoError
+    from x2c.chip.chip_repo import ChipRepo, ChipRepoError
     try:
         repo = ChipRepo()
     except ChipRepoError as e:
@@ -138,7 +138,7 @@ def test_recorded_reports(name, status, cause):
 # ---------------------------------------------------------------- live (Ubuntu)
 def test_live_examples(tmp_path):
     if not all(shutil.which(t) for t in cf.TOOLS):
-        pytest.skip("yosys/nextpnr not on PATH (expected on Windows; run run_chip_flow.py --examples in Ubuntu)")
+        pytest.skip("yosys/nextpnr not on PATH (expected on Windows; run x2c build --examples in Ubuntu)")
     profile_or_skip()
-    import run_chip_flow
+    import x2c.commands.build as run_chip_flow
     assert run_chip_flow.main(["--examples", "--out", str(tmp_path)]) == 0

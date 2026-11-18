@@ -1,7 +1,7 @@
 """$BM_X2_REPO: the X2 behavioral model can come from a separate X2 repo; every reader follows it."""
 import pytest
 
-from chip import chip_repo as cr
+from x2c.chip import chip_repo as cr
 
 
 @pytest.fixture

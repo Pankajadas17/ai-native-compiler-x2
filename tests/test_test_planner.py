@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
-from agents.llm_client import Action, MockPlannerLLM
-from agents.test_agent import plan_tests
-from agents.verification_agent import run_agent
-from run_verification import run_all
-from verification import test_planner as tp, tools
+from x2c.agents.llm_client import Action, MockPlannerLLM
+from x2c.agents.test_agent import plan_tests
+from x2c.agents.verification_agent import run_agent
+from x2c.commands.bmsemi_verify import run_all
+from x2c.verification import test_planner as tp, tools
 from tests import faults
 
 

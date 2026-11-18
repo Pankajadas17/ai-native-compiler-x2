@@ -1,6 +1,6 @@
 """The X2 tile schedule (compiler/x2_schedule.py) and A1 choosing it (agents/mapping_agent.py).
 
-* the cost model's constants re-fit from the four recorded X2 engine simulations (flow step 4);
+* the cost model's constants re-fit from the four recorded X2 engine simulations (one-block engine);
 * the validator rejects every kind of illegal schedule and computes a latency checked by hand;
 * code's best schedule is never worse than any candidate, and on a graph with a 1-tile layer it is NOT today's choice;
 * A1: an LLM schedule is kept only if legal and at least as fast as code's; the final plan always passes validate_partition;
@@ -17,10 +17,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from agents.llm_client import Action  # noqa: E402
-from agents.mapping_agent import _Session, run_mapping_agent  # noqa: E402
-from compiler import x2_schedule as xs  # noqa: E402
-from compiler.partition import chip_view, load_hardware, propose_partition_baseline, validate_partition  # noqa: E402
+from x2c.agents.llm_client import Action  # noqa: E402
+from x2c.agents.mapping_agent import _Session, run_mapping_agent  # noqa: E402
+from x2c.compiler import x2_schedule as xs  # noqa: E402
+from x2c.compiler.partition import chip_view, load_hardware, propose_partition_baseline, validate_partition  # noqa: E402
 from x2_schedule_graphs import mini, with_small_layer  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "x2_engine"
@@ -40,7 +40,7 @@ def plan_of(g, hw):
 
 # ------------------------------------------------------------ calibration
 def test_cost_model_refits_from_the_engine_simulations():
-    import run_x2_engine_check as ec
+    import x2c.commands.sim_engine1 as ec
     hw1 = load_hardware()
     hw1 = copy.deepcopy(hw1); hw1["x2"]["cell_bits"] = 1
     rows, meas = [], []
@@ -217,11 +217,11 @@ def test_schedule_tools_need_a_legal_assignment_and_a_chip(hw):
 
 
 def test_real_tiny_mobilenetv2(hw, tmp_path):
-    pytest.importorskip("inputs.bmsemi_source")
-    from agents.llm_client import MockMappingLLM
-    from compiler.ir_builder import build_ir_from_compiler_graph
-    from inputs.bmsemi_source import ReadOnlyRepo
-    from inputs.normalize import compiler_v2_workload
+    pytest.importorskip("x2c.inputs.bmsemi_source")
+    from x2c.agents.llm_client import MockMappingLLM
+    from x2c.compiler.ir_builder import build_ir_from_compiler_graph
+    from x2c.inputs.bmsemi_source import ReadOnlyRepo
+    from x2c.inputs.normalize import compiler_v2_workload
     try:
         repo = ReadOnlyRepo()
     except Exception as e:  # noqa: BLE001

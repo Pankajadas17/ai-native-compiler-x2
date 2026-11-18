@@ -1,6 +1,6 @@
 """Deliberately BROKEN X2 wrappers. Each wraps the real simulator, then corrupts one thing."""
 import numpy as np
-from emulators.x2_adapter import x2_matmul_report
+from x2c.bmsemi.x2_adapter import x2_matmul_report
 
 
 def _mutate(fn):

@@ -1,0 +1,38 @@
+[project]
+name = "ai-native-compiler-x2"
+version = "0.1.0"
+description = "AI agents and a verification framework that compile INT8 networks onto the sky130 ReRAM FPGA"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+]
+
+[project.optional-dependencies]
+agents = [
+    "groq",
+    "google-genai",
+]
+chip = [              # the chip repo's bit_gen.py needs fasm
+    "fasm",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/x2c"]
+
+[project.scripts]
+x2c = "x2c.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "src"]
+markers = ['slow: heavier tests (real-model workloads); skip with -m "not slow"']

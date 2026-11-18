@@ -15,8 +15,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from chip.x2_check import all_scenarios, compare, parse_log  # noqa: E402
-from chip.x2_golden import (MODE_COMPUTE, MODE_READ, MODE_RESET, MODE_SET, Result,  # noqa: E402
+from x2c.chip.x2_check import all_scenarios, compare, parse_log  # noqa: E402
+from x2c.chip.x2_golden import (MODE_COMPUTE, MODE_READ, MODE_RESET, MODE_SET, Result,  # noqa: E402
                             X2Config, X2Golden, unpack_result)
 
 FIX = ROOT / "tests" / "fixtures" / "x2_check"
@@ -193,15 +193,15 @@ def test_planted_bug_is_caught(mutant):
 # ---------------------------------------------------------------- live simulation
 def test_live_simulation(tmp_path):
     if not (shutil.which("iverilog") and shutil.which("vvp")):
-        pytest.skip("iverilog not on PATH (expected on Windows; run run_x2_check.py --sim in Ubuntu)")
-    from chip.chip_repo import INPUT_FILES, ChipRepo, ChipRepoError
+        pytest.skip("iverilog not on PATH (expected on Windows; run x2c sim x2 --sim in Ubuntu)")
+    from x2c.chip.chip_repo import INPUT_FILES, ChipRepo, ChipRepoError
     try:
         repo = ChipRepo()
     except ChipRepoError as e:
         pytest.skip(str(e))
     if not (repo.root / INPUT_FILES["x2_behavioral"]).is_file():
         pytest.skip("X2 behavioral model missing (submodule not checked out)")
-    import run_x2_check
+    import x2c.commands.sim_x2 as run_x2_check
     assert run_x2_check.main(["--sim", "--out", str(tmp_path)]) == 0
     for sc in all_scenarios():
         assert (tmp_path / f"{sc.name}.sim.txt").read_text() == (FIX / f"{sc.name}.sim.txt").read_text()
@@ -209,7 +209,7 @@ def test_live_simulation(tmp_path):
 
 def test_fixture_was_recorded_from_this_model_version():
     """If the chip repo's X2 model changes, the bundled logs are stale: say so instead of passing."""
-    from chip.chip_repo import INPUT_FILES, ChipRepo, ChipRepoError, lf_sha256
+    from x2c.chip.chip_repo import INPUT_FILES, ChipRepo, ChipRepoError, lf_sha256
     try:
         repo = ChipRepo()
     except ChipRepoError as e:
@@ -218,4 +218,4 @@ def test_fixture_was_recorded_from_this_model_version():
         pytest.skip("X2 behavioral model missing (submodule not checked out)")
     man = json.loads((FIX / "MANIFEST.json").read_text())
     assert lf_sha256(repo.read_bytes(INPUT_FILES["x2_behavioral"])) == man["behavioral_model_lf_sha256"], \
-        "chip repo has a different X2 model than the bundled logs: re-run run_x2_check.py --sim"
+        "chip repo has a different X2 model than the bundled logs: re-run x2c sim x2 --sim"

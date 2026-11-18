@@ -1,0 +1,23 @@
+# Manual run (Ubuntu):  cd hardware/formal && sby -f x2_engine2.sby bit4     (x2c formal --part engine does the same, plus a broken copy)
+[tasks]
+bit4
+bit1
+
+[options]
+mode bmc
+depth 10
+
+[engines]
+smtbmc bitwuzla
+
+[script]
+read -formal RERAM_CIM_32x32_formal.v
+read -formal -I. x2_engine2.v
+bit4: chparam -set CELL_BITS 4 x2_engine2
+bit1: chparam -set CELL_BITS 1 x2_engine2
+prep -top x2_engine2
+
+[files]
+RERAM_CIM_32x32_formal.v
+x2_engine2_props.vh
+../designs/x2_engine2.v

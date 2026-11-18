@@ -1,4 +1,4 @@
-"""Flow step 4: the X2 engine (bridge + on-fabric recombination).
+"""One-block X2 engine (bridge + on-fabric recombination).
 
 * the fabric column rule (accumulator = col / CPW, sign and digit from col % CPW) holds for every placement;
 * the engine's rule rebuilds NumPy exactly for 4-bit AND 1-bit cells (Python model of the RTL rule);
@@ -17,10 +17,10 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import run_x2_engine_check as ec  # noqa: E402
-import run_x2_pack_check as pc  # noqa: E402
-from compiler import x2_pack as xp  # noqa: E402
-from compiler.partition import has_chip, load_hardware  # noqa: E402
+import x2c.commands.sim_engine1 as ec  # noqa: E402
+import x2c.commands.sim_pack as pc  # noqa: E402
+from x2c.compiler import x2_pack as xp  # noqa: E402
+from x2c.compiler.partition import has_chip, load_hardware  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "x2_engine"
 
@@ -29,7 +29,7 @@ FIX = ROOT / "tests" / "fixtures" / "x2_engine"
 def hws():
     hw4 = load_hardware()
     if not has_chip(hw4):
-        pytest.skip("hardware_config.json is the old 0.1 file: run run_hardware_config.py")
+        pytest.skip("hardware_config.json is the old 0.1 file: run x2c chip config")
     hw1 = copy.deepcopy(hw4); hw1["x2"]["cell_bits"] = 1
     return {4: hw4, 1: hw1}
 
@@ -68,14 +68,14 @@ def test_a_missed_result_is_caught(hws):
 
 
 def test_stand_in_delays_every_output():
-    text = (ROOT / "sim" / "RERAM_CIM_32x32_sim.v").read_text()
+    text = (ROOT / "hardware" / "sim" / "RERAM_CIM_32x32_sim.v").read_text()
     outs = set(re.findall(r"output\s+wire\s+([A-Z_0-9]+)", text))
     delayed = set(re.findall(r"assign\s+#1\s+([A-Z_0-9]+)\s*=", text))
     assert len(outs) == 32 and outs == delayed     # 21 data + 11 status/handshake
 
 
 def test_engine_rtl_states_the_same_rule():
-    rtl = (ROOT / "examples" / "chip_designs" / "x2_engine.v").read_text()
+    rtl = (ROOT / "hardware" / "designs" / "x2_engine.v").read_text()
     for frag in ("CPW   = 2 * ((8 + CELL_BITS - 1) / CELL_BITS)", "slot    = r_col % CPW", "r_neg   = (slot >= HALF)",
                  "r_shift = (slot % HALF) * CELL_BITS + (slice ? SPLIT : 0)", "r_acc   = r_col / CPW"):
         assert frag in rtl, frag
@@ -83,5 +83,5 @@ def test_engine_rtl_states_the_same_rule():
 
 def test_live_simulation(tmp_path):
     if not (shutil.which("iverilog") and shutil.which("vvp")):
-        pytest.skip("iverilog not on PATH (expected on Windows; run run_x2_engine_check.py --sim in Ubuntu)")
+        pytest.skip("iverilog not on PATH (expected on Windows; run x2c sim engine1 --sim in Ubuntu)")
     assert ec.main(["--sim", "--out", str(tmp_path)]) == 0

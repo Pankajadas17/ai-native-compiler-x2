@@ -1,8 +1,8 @@
-"""Flow step 3: the X2 controller (host bridge) on the eFPGA.
+"""The X2 controller (host bridge) on the eFPGA.
 
 * the bridge connects every port of the chip's RERAM_CIM_32x32 primitive;
 * the simulation stand-in connects the BM Labs macro exactly like the chip's src/fabric_wrapper.sv;
-* bundled Icarus logs (host -> bridge pins -> X2 model) equal the X2 golden model, flow step 1's direct run, and NumPy.
+* bundled Icarus logs (host -> bridge pins -> X2 model) equal the X2 golden model, the direct X2 run, and NumPy.
 """
 import copy
 import re
@@ -15,9 +15,9 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import run_x2_bridge_check as bc  # noqa: E402
-from chip.chip_repo import ChipRepo, ChipRepoError  # noqa: E402
-from compiler.partition import has_chip, load_hardware  # noqa: E402
+import x2c.commands.sim_bridge as bc  # noqa: E402
+from x2c.chip.chip_repo import ChipRepo, ChipRepoError  # noqa: E402
+from x2c.compiler.partition import has_chip, load_hardware  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "x2_bridge"
 PRIM = "ip/extra-tiles/primitives/RERAM_CIM_32x32/yosys/primitives/RERAM_CIM_32x32.v"
@@ -36,7 +36,7 @@ def repo():
 def hw1():
     hw = load_hardware()
     if not has_chip(hw):
-        pytest.skip("hardware_config.json is the old 0.1 file: run run_hardware_config.py")
+        pytest.skip("hardware_config.json is the old 0.1 file: run x2c chip config")
     hw = copy.deepcopy(hw); hw["x2"]["cell_bits"] = 1
     return hw
 
@@ -50,7 +50,7 @@ def _connections(text, instance_marker):
 def test_bridge_connects_every_primitive_port(repo):
     prim = set(re.findall(r"(?:input|output)\s+wire\s+([A-Z_0-9]+)", repo.read_text(PRIM)))
     assert len(prim) == 58
-    bridge = (ROOT / "examples" / "chip_designs" / "x2_bridge.v").read_text()
+    bridge = (ROOT / "hardware" / "designs" / "x2_bridge.v").read_text()
     conns = _connections(bridge, ") x2 (")
     assert prim == conns
 
@@ -58,7 +58,7 @@ def test_bridge_connects_every_primitive_port(repo):
 def test_sim_stand_in_wires_the_macro_like_the_chip(repo):
     chip = repo.read_text("src/fabric_wrapper.sv")
     want = _connections(chip, "sky130_bmlabs_reram__cim32x32 reram_0 (")
-    stand_in = (ROOT / "sim" / "RERAM_CIM_32x32_sim.v").read_text()
+    stand_in = (ROOT / "hardware" / "sim" / "RERAM_CIM_32x32_sim.v").read_text()
     got = _connections(stand_in, "sky130_bmlabs_reram__cim32x32 macro (")
     assert got == want and len(want) == 44
 
@@ -88,5 +88,5 @@ def test_a_corrupted_log_is_caught(hw1):
 
 def test_live_simulation(tmp_path):
     if not (shutil.which("iverilog") and shutil.which("vvp")):
-        pytest.skip("iverilog not on PATH (expected on Windows; run run_x2_bridge_check.py --sim in Ubuntu)")
+        pytest.skip("iverilog not on PATH (expected on Windows; run x2c sim bridge --sim in Ubuntu)")
     assert bc.main(["--sim", "--out", str(tmp_path)]) == 0

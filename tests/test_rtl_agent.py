@@ -3,13 +3,13 @@ import json
 
 import pytest
 
-from agents import llm_client as lc
-from agents.llm_client import Action
-from agents.rtl_agent import REFERENCE_VERILOG, MockRTLLLM, _Session, run_rtl_agent
-from verification.rtl_check import OPS, check_rtl, describe_op, vectors_for
+from x2c.agents import llm_client as lc
+from x2c.agents.llm_client import Action
+from x2c.agents.rtl_agent import REFERENCE_VERILOG, MockRTLLLM, _Session, run_rtl_agent
+from x2c.verification.rtl_check import OPS, check_rtl, describe_op, vectors_for
 
 try:
-    from verification.rtl_check import _yosys
+    from x2c.verification.rtl_check import _yosys
     _yosys()
     HAVE = True
 except RuntimeError:

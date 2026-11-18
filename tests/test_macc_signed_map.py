@@ -21,11 +21,11 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from chip import chip_flow as cf  # noqa: E402
-from chip.chip_repo import ChipRepo, ChipRepoError  # noqa: E402
-from verification import chip_chain as cc  # noqa: E402
+from x2c.chip import chip_flow as cf  # noqa: E402
+from x2c.chip.chip_repo import ChipRepo, ChipRepoError  # noqa: E402
+from x2c.verification import chip_chain as cc  # noqa: E402
 
-MAP = ROOT / "chip" / "techmap" / "MACC_8x8_20_map_signed.v"
+MAP = ROOT / "src" / "x2c" / "chip" / "techmap" / "MACC_8x8_20_map_signed.v"
 FIX = ROOT / "tests" / "fixtures" / "chip_chain"
 TILE = "ip/fabulous-tiles/primitives/MACC_8x8_20/fabulous/MACC_8x8_20.v"
 CASES = [(aw, bw, sa, sb, yw) for aw in range(1, 9) for bw in range(1, 9) for sa in (0, 1) for sb in (0, 1)
@@ -89,11 +89,11 @@ def test_map_text():
 
 # ---------------------------------------------------------------- the override
 def test_override_is_in_the_generated_makefile():
-    mk = cf.MAKEFILE.format(name="d", top="d", rtl="rtl/d.v", multiplier_map="/x/bm_verif/chip/techmap/MACC_8x8_20_map_signed.v",
+    mk = cf.MAKEFILE.format(name="d", top="d", rtl="rtl/d.v", multiplier_map="/x/project/src/x2c/chip/techmap/MACC_8x8_20_map_signed.v",
                             multiplier_args="8 8 2 2 12")
     lines = mk.splitlines()
     fixed = lines.index("MULTIPLIER_MAP_PATH := $(call fix,$(MULTIPLIER_MAP_PATH))")
-    ours = lines.index("MULTIPLIER_MAP_PATH := -multiplier-map /x/bm_verif/chip/techmap/MACC_8x8_20_map_signed.v 8 8 2 2 12")
+    ours = lines.index("MULTIPLIER_MAP_PATH := -multiplier-map /x/project/src/x2c/chip/techmap/MACC_8x8_20_map_signed.v 8 8 2 2 12")
     assert ours > fixed > lines.index("include $(UD)/makefile.include")       # the later assignment wins
 
 

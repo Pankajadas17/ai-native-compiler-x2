@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from verification.bitstream_audit import (FabricProfile, audit_against_fasm, audit_structure, decode_set_bits,
+from x2c.verification.bitstream_audit import (FabricProfile, audit_against_fasm, audit_structure, decode_set_bits,
                                           load_spec, parse_fasm, profile_from_fabric_csv, required_bits)
 
 FIX = Path(__file__).parent / "fixtures" / "fabulous_demo"

@@ -7,6 +7,8 @@ AI agents and a verification framework that compile INT8 neural networks onto th
 takes a model through partitioning, scheduling, Verilog, bitstream and simulation. Every stage is checked against an
 independent reference, and that check, not an agent, decides PASS.
 
+Developed during an internship at BM Labs.
+
 The chip's resources and what the deployment engine uses of them:
 
 |    Primitive    | Available | Used by the engine |                       Role here                        |
@@ -17,14 +19,15 @@ The chip's resources and what the deployment engine uses of them:
 | MACC_8x8_20     | 18        | 0                  | used by the requantize operator (4)                    |
 | GBUF            | 4         | 1                  | clock                                                  |
 
-The engine bitstream is the same for every model. A model is deployed by programming the X2 cells and running a host program.
+The engine bitstream is the same for every model. A model is deployed by programming the X2 cells and running a host
+program.
 
-# The agents
+## The agents
 
 | Agent | Job | Decided by |
 |:-----:|-----|------------|
-| A1 | partition the model (matrix ops → X2, the rest → eFPGA/host) and schedule tiles over both X2 blocks | a validator and a cycle model fitted to simulation |
-| A2 | write eFPGA operators in Verilog (`relu8`, `add8_sat`, `requant_i32_i8`) | Yosys evaluation vs NumPy, chip build, formal proof |
+| A1 | partition the model (matrix ops → X2, the rest → fabric/host) and schedule tiles over both X2 blocks | a validator and a cycle model fitted to simulation |
+| A2 | write fabric operators in Verilog (`relu8`, `add8_sat`, `requant_i32_i8`) | Yosys evaluation vs NumPy, chip build, formal proof |
 | A3 | name the cause of a failed run from its logs | rules first; LLM answers are checked against the evidence |
 | A4 | generate tests and report the chip status | the Python oracle |
 
@@ -35,7 +38,7 @@ Agents can use Groq or Gemini, or run with a mock or no LLM; the results do not 
 | # | Stage | What PASS means |
 |:-:|-------|-----------------|
 | 1 | Environment | tool versions recorded, chip repo found and fingerprinted |
-| 2 | eFPGA operators | each A2 operator through the chip flow: bitstream, V0 audit (every required bit decoded), netlist simulation = NumPy, timing ≥ 14 MHz |
+| 2 | Fabric operators | each A2 operator through the chip flow: bitstream, V0 audit (every required bit decoded), netlist simulation = NumPy, timing ≥ 14 MHz |
 | 3 | Formal | operators equal independent specs for **all** inputs; chip-synthesized netlists equal their RTL; Verilator lint clean; engine handshake bounded-checked |
 | 4 | Engine bitstream | `x2_engine2_4bit`: built (or reused if unchanged), audited, meets 14 MHz |
 | 5 | X2 model | the Python X2 model equals the X2 developer's Verilog model on the same commands |
@@ -44,11 +47,11 @@ Agents can use Groq or Gemini, or run with a mock or no LLM; the results do not 
 | 8 | Replay | each deployment bundle reproduces its results from its own files |
 | 9 | Status | chip repo unchanged; open X2 facts listed |
 
-## Requirements
+## Setup
 
 > [!NOTE]
-> Linux, or WSL on Windows. Clone the chip repository **next to this one's code**, with submodules, at the pinned commit
-> in `specifications/external_repos.json`. It is only read, never modified:
+> Linux, or WSL on Windows. Clone the chip repository **inside this one**, with submodules, at the pinned commit in
+> `specifications/external_repos.json`. It is only read, never modified:
 >
 > ```console
 > git clone https://github.com/Pankajadas17/ai-native-compiler-x2 && cd ai-native-compiler-x2
@@ -57,14 +60,15 @@ Agents can use Groq or Gemini, or run with a mock or no LLM; the results do not 
 > git -C sky130-reram-fpga submodule update --init --recursive
 > ```
 
-- Python 3.11+: `python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt`
-- [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build) with Yosys 0.70 or newer (nextpnr, Icarus, SymbiYosys, Verilator included). Put it on `PATH`, or unpack it to `~/tools/chip/oss-cad-suite` (or set `CHIP_CAD`).
-- A Python environment for the chip's bitstream generator: `python3 -m venv ~/chipenv && ~/chipenv/bin/pip install fasm numpy`
+- [uv](https://docs.astral.sh/uv/), then `uv sync --all-extras`. This installs everything from `pyproject.toml` and
+  `uv.lock`, including `fasm` for the chip's bitstream generator.
+- [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build) with Yosys 0.70 or newer (nextpnr, Icarus,
+  SymbiYosys and Verilator included). Put it on `PATH`, unpack it to `~/tools/chip/oss-cad-suite`, or set `CHIP_CAD`.
 
 ## Run the whole pipeline
 
 ```console
-python3 bm.py pipeline
+uv run x2c pipeline
 ```
 
 ```text
@@ -72,7 +76,7 @@ python3 bm.py pipeline
       1792/2160 cells, 35/36 pins, both X2, V0 audit 47236/47236, 14.45 MHz >= 14
         saved here: chip_build/x2_engine2_4bit/x2_engine2_4bit.bit
         ...
-PIPELINE PASS: 9/9 stages in 4.7 min
+PIPELINE PASS: 9/9 stages in 4.5 min
 summary saved here: reports/pipeline/REPORT.md
 ```
 
@@ -82,12 +86,13 @@ and `--only`/`--skip` to pick stages.
 
 ## Run single steps
 
-`python3 bm.py` lists every command. Arguments pass through to the underlying script.
+`uv run x2c` lists every command, grouped. `x2c <command> --help` shows its options. (With `.venv` activated, plain
+`x2c` works too.)
 
 #### Build the engine bitstream
 
 ```console
-python3 bm.py build --example x2_engine2_4bit
+uv run x2c build --example x2_engine2_4bit
 ```
 
 The bitstream, pin map (`design.pcf`), audit and timing log go to `chip_build/x2_engine2_4bit/`.
@@ -95,37 +100,44 @@ The bitstream, pin map (`design.pcf`), audit and timing log go to `chip_build/x2
 #### Run the A2 operators on the chip
 
 ```console
-python3 bm.py chain --op all --target chip --runner native
+uv run x2c chain --op all --target chip --runner native
 ```
 
 #### Formal proofs and lint
 
 ```console
-python3 bm.py formal                      # or --part spec,netlist,lint,engine and --depth N
+uv run x2c formal                # or --part spec,netlist,lint,engine and --depth N
 ```
 
 #### Deploy a model and replay its bundle
 
 ```console
-python3 bm.py deploy --workload mobilenetv2 --ir tests/fixtures/ir_public/invres_net.json --sim
-python3 bm.py replay deploy/mobilenetv2
+uv run x2c deploy --workload mobilenetv2 --ir tests/fixtures/ir_public/invres_net.json --sim
+uv run x2c replay deploy/mobilenetv2
 ```
 
 The bundle in `deploy/<model>/` holds `plan.json`, `host_program.json`, `x2_program.npz` (cell levels per tile),
 `expected.npz` and `report.json`. `--weights file.npz` loads real INT8 weights.
 
+#### Simulate the X2 path
+
+```console
+uv run x2c sim x2 --sim          # Python X2 model == the X2 developer's Verilog model
+uv run x2c sim engine2 --sim     # the two-block engine, cycles vs A1's cost model
+```
+
 #### Tests
 
 ```console
-python3 -m pytest -q
+uv run pytest -q
 ```
 
 ## Results
 
 | | |
 |---|---|
-| Pipeline | 9/9 stages in under 5 minutes |
-| Formal | 21/21. The proof finds a signed-multiply bug in the chip's stock `MACC_8x8_20` multiplier map (acc = −2³¹ gives +127, not −128); a corrected map in `chip/techmap/` is used without editing the chip repo |
+| Pipeline | 9/9 stages in about 5 minutes |
+| Formal | 21/21. The proof finds a signed-multiply bug in the chip's stock `MACC_8x8_20` multiplier map (acc = −2³¹ gives +127, not −128); a corrected map in `src/x2c/chip/techmap/` is used without editing the chip repo. The latest upstream fabulous-tiles still has the original map |
 | Engine | 1792/2160 cells, 35/36 pins, 14.45 MHz; two X2 blocks give 43–54 % lower latency than one; cycle model within 0.04 % |
 | Deployment | MobileNetV2: 17/17 layers exact on the engine RTL, 4.30 M cycles (model error 0.004 %) |
 
@@ -139,11 +151,14 @@ python3 -m pytest -q
 ## Repository layout
 
 ```
-agents/         A1-A4 and the LLM client          compiler/   IR, partition, X2 packing, schedule, INT8 network
-chip/           chip flow, X2 model, audits        verification/  checkers, chain runner, formal, debug rules
-examples/       engine and bridge Verilog          formal/     X2 stand-in and engine properties
-sim/            testbenches                        tests/      ~900 tests and fixtures
-bm.py           one entry point                    run_pipeline.py  the whole pipeline
+src/x2c/          the package: cli.py (the x2c command), commands/, agents/, compiler/, chip/, verification/,
+                  inputs/, bmsemi/ (bridges to the private model repository)
+hardware/         designs/ (X2 recombiner, bridge, engines), operators/ (A2's verified operators),
+                  formal/, sim/ (testbenches), test_designs/ (small designs for the flow tests)
+specifications/   chip profile, hardware config, fabric costs, pinned repos
+tests/            the test suite and its fixtures
+docs/             pipeline, deploy, chip, x2, agents, verification, development
+tools/            maintainer scripts: pre-push check, public export, fixtures
 ```
 
 ## Public mode
@@ -152,6 +167,18 @@ The development team also uses a private model repository with its own trained m
 still runs. Deployment uses the public stand-in graphs in `tests/fixtures/ir_public/`, and the tests that need the
 private repository are not collected; the test header and the pipeline report say "PUBLIC mode". The CI badge runs
 exactly this.
+
+## Documentation
+
+| | |
+|---|---|
+| [docs/pipeline.md](docs/pipeline.md) | every pipeline stage, its output, and replaying a bundle |
+| [docs/deploy.md](docs/deploy.md) | from a model to a verified bundle; how layers map onto the chip |
+| [docs/chip.md](docs/chip.md) | chip profile, chip flow, bitstream audit, the signed-multiplier fix |
+| [docs/x2.md](docs/x2.md) | X2 golden model, packing, recombiner, bridge, engines, real layers, X2 facts and clock |
+| [docs/agents.md](docs/agents.md) | A1's schedule, A3's chip diagnosis, A4 on the chip |
+| [docs/verification.md](docs/verification.md) | formal proofs and lint, operators on the chip, benchmark stages |
+| [docs/development.md](docs/development.md) | setup, layout, public mode, maintainer tools, fabric costs |
 
 ## Feedback
 

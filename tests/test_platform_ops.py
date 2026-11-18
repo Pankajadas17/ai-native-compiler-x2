@@ -1,7 +1,7 @@
 """Regression tests for canvas operations (values reproduced from the repo code; confirm
 them against the GUI result panel once you have access - a mismatch means a different commit)."""
 import pytest
-from emulators.platform_ops import map_layer, schedule_layer, energy_estimate
+from x2c.bmsemi.platform_ops import map_layer, schedule_layer, energy_estimate
 
 def test_map_layer_conv_64x32_3x3():
     r = map_layer({"K": 64, "C": 32, "R": 3, "S": 3, "Y": 16, "X": 16, "pe_rows": 64, "pe_cols": 32})

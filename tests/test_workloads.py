@@ -1,6 +1,6 @@
 import pytest
-from verification import workloads, tools
-from verification.failure_classifier import classify_failure
+from x2c.verification import workloads, tools
+from x2c.verification.failure_classifier import classify_failure
 from tests import faults
 
 

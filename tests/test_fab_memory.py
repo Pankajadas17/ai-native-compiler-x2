@@ -1,15 +1,15 @@
 """Step 26: the chain looks at Windows' free memory (wsl runner only) before the Ubuntu stages, and says whether memory was short when a simulation
-ends without a result. The memory numbers here are FAKE readings; what your machine really has is what the chain and `python run_wsl_probe.py` print."""
+ends without a result. The memory numbers here are FAKE readings; what your machine really has is what the chain and `x2c doctor wsl` print."""
 import sys
 import threading
 import time
 
 import pytest
 
-import run_fab_chain as chain
+import x2c.commands.chain as chain
 from tests.test_fab_chain import FakeUbuntu, PASS_LINE, cfg, proj, result   # noqa: F401  (proj is a fixture)
-from verification import wsl_probe as wp
-from verification.fab_sim import make_fab_testbench
+from x2c.verification import wsl_probe as wp
+from x2c.verification.fab_sim import make_fab_testbench
 
 FAIL_LINE = "FAB_SIM RESULT: FAIL vectors=500 numpy_mismatches=3 rtl_mismatches=3\n"
 

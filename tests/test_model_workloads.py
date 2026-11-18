@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
-from verification import model_workloads as mw, tools
-from verification.failure_classifier import classify_failure
+from x2c.verification import model_workloads as mw, tools
+from x2c.verification.failure_classifier import classify_failure
 from tests import faults
 
 pytestmark = pytest.mark.skipif(not mw.data_available(), reason="BMsemi_Model example data not present")
@@ -40,7 +40,7 @@ def test_deepgate_fault_dropped_fold_points_at_first_layer():
 
 def test_deepgate_fault_sign_flipped_x2():
     def flipped(W, v):
-        from emulators.x2_adapter import x2_vecmat
+        from x2c.bmsemi.x2_adapter import x2_vecmat
         o, c = x2_vecmat(W, v); return -o, c
     r = mw.run_deepgate(0, vecmat=flipped)
     assert r["passed"] is False and r["first_failing_layer"] == 0
@@ -61,8 +61,8 @@ def test_tool_and_path_safety(tmp_path):
 
 @pytest.mark.slow
 def test_agent_reports_model_workload_facts(tmp_path):
-    from agents.llm_client import Action
-    from agents.verification_agent import run_agent
+    from x2c.agents.llm_client import Action
+    from x2c.agents.verification_agent import run_agent
     class L:
         def start(self, g, s): return Action("tool_calls", calls=[("run_model_workloads", {})])
         def send_tool_results(self, r): return Action("final", text="done")

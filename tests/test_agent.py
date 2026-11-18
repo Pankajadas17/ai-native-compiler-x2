@@ -1,7 +1,7 @@
 import json, pytest
-from agents.llm_client import MockLLM, Action
-from agents.verification_agent import run_agent
-from verification import tools
+from x2c.agents.llm_client import MockLLM, Action
+from x2c.agents.verification_agent import run_agent
+from x2c.verification import tools
 from tests import faults
 
 
@@ -49,7 +49,7 @@ def test_call_tool_blocks_path_escape_and_unknown_args():
 
 def test_gemini_adapter_with_fake_client(tmp_path):
     pytest.importorskip("google.genai")
-    from agents.llm_client import GeminiLLM
+    from x2c.agents.llm_client import GeminiLLM
 
     class FC:  # fake function call
         def __init__(s, n, a): s.name, s.args = n, a
@@ -82,7 +82,7 @@ def _resp(text="done"):
 
 def test_gemini_retries_then_succeeds(tmp_path):
     pytest.importorskip("google.genai")
-    from agents.llm_client import GeminiLLM
+    from x2c.agents.llm_client import GeminiLLM
     seq = [_server_error(), _server_error(), _resp("ok")]
     class M:
         def generate_content(self, **kw):
@@ -98,7 +98,7 @@ def test_gemini_retries_then_succeeds(tmp_path):
 
 def test_gemini_falls_back_to_second_model(tmp_path):
     pytest.importorskip("google.genai")
-    from agents.llm_client import GeminiLLM
+    from x2c.agents.llm_client import GeminiLLM
     seen = []
     class M:
         def generate_content(self, model, **kw):
@@ -113,7 +113,7 @@ def test_gemini_falls_back_to_second_model(tmp_path):
 
 def test_gemini_total_outage_raises_clean_error(tmp_path):
     pytest.importorskip("google.genai")
-    from agents.llm_client import GeminiLLM, LLMUnavailable
+    from x2c.agents.llm_client import GeminiLLM, LLMUnavailable
     class M:
         def generate_content(self, **kw): raise _server_error()
     class C: models = M()
@@ -125,7 +125,7 @@ def test_gemini_total_outage_raises_clean_error(tmp_path):
 def test_auth_errors_fail_fast_not_retried(tmp_path):
     pytest.importorskip("google.genai")
     from google.genai import errors
-    from agents.llm_client import GeminiLLM
+    from x2c.agents.llm_client import GeminiLLM
     calls = []
     class M:
         def generate_content(self, **kw):
@@ -164,7 +164,7 @@ class _HttpErr(Exception):
 
 
 def test_groq_full_loop_and_message_protocol(tmp_path):
-    from agents.llm_client import GroqLLM
+    from x2c.agents.llm_client import GroqLLM
     c = _GroqClient([_gmsg(calls=[("call_1", "run_suite", '{"n_random": 3}')]), _gmsg(content="All good.")])
     out = run_agent(GroqLLM(model="m", client=c), "verify", log_path=str(tmp_path / "l.jsonl"))
     assert out["llm_summary"] == "All good." and out["verified_facts_from_report"]["total"] == 8
@@ -175,7 +175,7 @@ def test_groq_full_loop_and_message_protocol(tmp_path):
 
 
 def test_groq_bad_json_arguments_are_rejected_safely(tmp_path):
-    from agents.llm_client import GroqLLM
+    from x2c.agents.llm_client import GroqLLM
     c = _GroqClient([_gmsg(calls=[("c1", "run_suite", "{not json")]), _gmsg(content="gave up")])
     out = run_agent(GroqLLM(model="m", client=c), "verify", log_path=str(tmp_path / "l.jsonl"))
     entries = [json.loads(l) for l in (tmp_path / "l.jsonl").read_text().splitlines()]
@@ -183,7 +183,7 @@ def test_groq_bad_json_arguments_are_rejected_safely(tmp_path):
 
 
 def test_groq_retry_and_fallback(tmp_path):
-    from agents.llm_client import GroqLLM
+    from x2c.agents.llm_client import GroqLLM
     c = _GroqClient([_HttpErr(503), _HttpErr(429), _gmsg(content="ok")])
     naps = []
     llm = GroqLLM(model="p", client=c, fallback_models=[], sleep=naps.append)
@@ -195,7 +195,7 @@ def test_groq_retry_and_fallback(tmp_path):
 
 
 def test_groq_auth_error_not_retried(tmp_path):
-    from agents.llm_client import GroqLLM
+    from x2c.agents.llm_client import GroqLLM
     c = _GroqClient([_HttpErr(401), _gmsg(content="never")])
     with pytest.raises(_HttpErr):
         run_agent(GroqLLM(model="p", client=c, fallback_models=["b"], sleep=lambda s: None), "v",
@@ -218,7 +218,7 @@ def test_full_coverage_has_no_warning(tmp_path):
 
 
 def test_groq_retired_model_404_falls_through_to_next_model(tmp_path):
-    from agents.llm_client import GroqLLM
+    from x2c.agents.llm_client import GroqLLM
     c = _GroqClient([_HttpErr(404), _gmsg(content="ok via fallback")])
     naps = []
     llm = GroqLLM(model="retired-model", client=c, fallback_models=["good-model"], sleep=naps.append)

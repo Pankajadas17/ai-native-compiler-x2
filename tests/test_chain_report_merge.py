@@ -2,8 +2,8 @@
 import json
 from types import SimpleNamespace
 
-import run_fab_chain as rfc
-from verification import chip_chain as cc
+import x2c.commands.chain as rfc
+from x2c.verification import chip_chain as cc
 
 
 def test_merge_and_clock_labels(tmp_path, monkeypatch):

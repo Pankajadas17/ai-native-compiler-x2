@@ -1,4 +1,4 @@
-"""Two-block X2 engine (examples/chip_designs/x2_engine2.v): both blocks used at once, measured in simulation.
+"""Two-block X2 engine (hardware/designs/x2_engine2.v): both blocks used at once, measured in simulation.
 
 * recorded Icarus runs (host -> engine pins -> two chip-wired BM X2 models), both layouts, all 4 layers: every accumulator
   equals the engine rule and every output equals NumPy;
@@ -16,9 +16,9 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import run_x2_engine2_check as e2  # noqa: E402
-import run_x2_engine_check as ec  # noqa: E402
-from compiler.partition import load_hardware  # noqa: E402
+import x2c.commands.sim_engine2 as e2  # noqa: E402
+import x2c.commands.sim_engine1 as ec  # noqa: E402
+from x2c.compiler.partition import load_hardware  # noqa: E402
 
 FIX = ROOT / "tests" / "fixtures" / "x2_engine2"
 
@@ -69,7 +69,7 @@ def test_a_lost_result_is_caught(runs):
 
 
 def test_rtl_states_its_pins_arbiter_and_forwarding():
-    rtl = (ROOT / "examples" / "chip_designs" / "x2_engine2.v").read_text()
+    rtl = (ROOT / "hardware" / "designs" / "x2_engine2.v").read_text()
     ports = re.findall(r"^\s*(input|output)\s+wire\s*(\[(\d+):0\])?\s*(\w+)", rtl, re.M)
     assert sum(int(w) + 1 if w else 1 for _, _, w, _ in ports) == 35
     for frag in ("wire        g0 = rv[0] && (!rv[1] || last_g1);", ".RESULT_READY(g0)", ".RESULT_READY(g1)",
@@ -79,5 +79,5 @@ def test_rtl_states_its_pins_arbiter_and_forwarding():
 
 def test_live_simulation(tmp_path):
     if not (shutil.which("iverilog") and shutil.which("vvp")):
-        pytest.skip("iverilog not on PATH (expected on Windows; run run_x2_engine2_check.py --sim in Ubuntu)")
+        pytest.skip("iverilog not on PATH (expected on Windows; run x2c sim engine2 --sim in Ubuntu)")
     assert e2.main(["--sim", "--out", str(tmp_path)]) == 0

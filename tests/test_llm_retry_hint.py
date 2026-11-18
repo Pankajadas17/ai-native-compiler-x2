@@ -1,7 +1,7 @@
 """Step 12: rate-limit (429) waits follow the provider's own hint; the default Groq fallback is a model that exists."""
 import pytest
 
-from agents import llm_client as lc
+from x2c.agents import llm_client as lc
 
 
 class Err(Exception):

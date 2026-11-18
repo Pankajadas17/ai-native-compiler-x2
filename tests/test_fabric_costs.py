@@ -1,7 +1,7 @@
 """chip/fabric_costs.py: block costs are read from real build reports; a missing build is reported, never guessed."""
 import json
 
-from chip import fabric_costs as fc
+from x2c.chip import fabric_costs as fc
 
 PNR = "Info: Max frequency for clock 'clk': {f} MHz (PASS at 12.00 MHz)\n"
 
@@ -23,7 +23,7 @@ def test_measure_and_estimate(tmp_path):
     m = fc.measure(tmp_path)
     assert m["blocks"]["x2_engine"]["used"]["logic_cells"] == 1792 and m["blocks"]["x2_engine"]["fmax_mhz"] == 14.45
     assert m["blocks"]["requant"]["timing"].startswith("combinational")
-    assert m["blocks"]["add"]["status"] == "not built" and "run_fab_chain.py --op add8_sat" in m["blocks"]["add"]["how"]
+    assert m["blocks"]["add"]["status"] == "not built" and "x2c chain --op add8_sat" in m["blocks"]["add"]["how"]
     e = fc.estimate(["x2_engine", "relu", "requant"], m)
     assert e["used"]["logic_cells"] == 1941 and e["used"]["macc"] == 4
     assert e["used"]["pins"] == 35 and e["used"]["gbuf"] == 1            # pins = engine's, clock buffer shared
@@ -40,7 +40,7 @@ def test_over_budget_is_reported(tmp_path):
 
 def test_blocks_a_network_needs():
     import numpy as np
-    from compiler import int8_net as N
+    from x2c.compiler import int8_net as N
     rng = np.random.default_rng(0)
     net = N.build_chain("t", [{"name": "a", "W": rng.integers(-8, 8, size=(4, 6)), "requant": lambda a: np.clip(a, -128, 127)}], (6,), True)
     need, host_only = fc.blocks_for(net)

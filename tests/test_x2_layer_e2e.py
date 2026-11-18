@@ -1,4 +1,4 @@
-"""run_x2_layer_e2e.py: real layer shapes end to end (4-bit in Python with the ASSUMED cell rule; 1-bit simulated, Ubuntu)."""
+"""x2c sim layers: real layer shapes end to end (4-bit in Python with the ASSUMED cell rule; 1-bit simulated, Ubuntu)."""
 import json
 import shutil
 import sys
@@ -9,7 +9,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-import run_x2_layer_e2e as le  # noqa: E402
+import x2c.commands.sim_layers as le  # noqa: E402
 
 SHAPES = ["16,3,3,3,1", "16,16,3,3,16", "24,16,1,1,1", "10,32,1,1,1"]
 
@@ -42,7 +42,7 @@ def test_too_big_layers_are_skipped_not_hidden(tmp_path):
 
 
 def test_real_ir_layers():
-    pytest.importorskip("inputs.bmsemi_source")
+    pytest.importorskip("x2c.inputs.bmsemi_source")
     try:
         layers = le.layers_from_ir()
     except Exception as e:  # noqa: BLE001
@@ -52,7 +52,7 @@ def test_real_ir_layers():
 
 def test_live_simulation(tmp_path):
     if not (shutil.which("iverilog") and shutil.which("vvp")):
-        pytest.skip("iverilog not on PATH (expected on Windows; run run_x2_layer_e2e.py --sim in Ubuntu)")
+        pytest.skip("iverilog not on PATH (expected on Windows; run x2c sim layers --sim in Ubuntu)")
     assert le.main(["--sim", "--shape", "10,32,1,1,1", "--out", str(tmp_path)]) == 0
     row = json.loads((tmp_path / "report.json").read_text())["rows"][0]
     assert row["bits1"]["alternate"]["pass"] and row["bits1"]["latency_cut_percent"] > 40

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from verification.flow_logs import check_flow, parse_yosys_log
+from x2c.verification.flow_logs import check_flow, parse_yosys_log
 
 FX = Path(__file__).parent / "fixtures" / "yosys_real"
 

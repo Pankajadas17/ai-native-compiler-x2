@@ -40,7 +40,7 @@
     "ram_32x4_blocks": 36,
     "global_buffers": 4,
     "io_pins": 36,
-    "basis": "BEL counts in .FABulous/bel.txt (one LUT4 + FF per FABULOUS_LC); io_pins = IOBUF sites, the team confirmed all[0..27] in constraints.pcf are example assignments only. Per-operator resource estimates still need RTL (run_chip_flow.py)."
+    "basis": "BEL counts in .FABulous/bel.txt (one LUT4 + FF per FABULOUS_LC); io_pins = IOBUF sites, the team confirmed all[0..27] in constraints.pcf are example assignments only. Per-operator resource estimates still need RTL (x2c build)."
   },
   "activation_bytes": 1,
   "activation_bytes_basis": "X2 inputs are 8-bit (ip/sky130_bmlabs_reram/verilog/behavioral/sky130_bmlabs_reram__cim32x32.sv l.38); DeepGate activations are unsigned INT8 (Crossbar_array.py l.28). compiler_graph.json itself records no dtype.",

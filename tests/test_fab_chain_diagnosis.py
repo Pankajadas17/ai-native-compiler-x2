@@ -1,7 +1,7 @@
 """The chain names the likely root cause of a run that did not pass (rules only, no LLM), and never for a run that passed."""
 import json
 
-import run_fab_chain as chain
+import x2c.commands.chain as chain
 from tests.test_fab_chain import FakeUbuntu, proj, run_main  # noqa: F401  (proj is a fixture)
 from tests.test_fab_memory import Reader
 
@@ -10,7 +10,7 @@ def test_a_memory_block_is_named_with_its_fix(proj, capsys):
     rc = chain.main(["--runner", "wsl", "--op", "add8_sat"], exec_fn=FakeUbuntu(), host_reader=Reader(0.6))
     out = capsys.readouterr().out
     assert rc == 1 and "likely cause [windows_memory_low]: Windows had too little commit headroom" in out and "fix: close browsers" in out
-    assert "from the evidence rules, no LLM" in out and "run_chain_debug.py --llm groq" in out
+    assert "from the evidence rules, no LLM" in out and "x2c agent a3 --llm groq" in out
     rep = json.loads(chain.REPORT.read_text())
     assert rep["results"][0]["diagnosis"] == {"rule_based_candidates": ["windows_memory_low"], "source": "rules (no LLM)"}
 
