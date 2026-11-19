@@ -155,3 +155,57 @@ def test_audit_log_written(out):
 def test_unknown_op_raises():
     with pytest.raises(ValueError):
         run_rtl_agent(MockRTLLLM("relu8"), "nope")
+
+
+# ------------------------------------------------------------ the agent on Google's harness (stand-in model, no key)
+def _a2_model(replies):
+    """get_spec first; then each scripted reply in turn: ('submit', verilog) or ('say', text). The last one repeats."""
+    from tests.fake_model import calls_so_far
+    def script(messages, request):
+        calls = calls_so_far(messages)
+        if "get_spec" not in calls:
+            return ("tool", "get_spec", {})
+        n = sum(1 for m in messages if m.get("role") == "assistant") - 1          # replies after get_spec
+        kind, value = replies[min(n, len(replies) - 1)]
+        return ("tool", "submit_verilog", {"verilog": value}) if kind == "submit" else ("text", value)
+    return script
+
+
+@pytest.fixture
+def harness_sdk():
+    pytest.importorskip("google.antigravity", reason="the agent harness is an optional extra: uv sync --extra agents")
+    from tests.fake_model import FakeModel
+    from x2c.agents import harness
+    harness.reset_skipped()
+    return FakeModel, harness
+
+
+def test_on_the_harness_a_rejected_design_is_sent_back_until_the_checker_passes(out, tmp_path, harness_sdk):
+    FakeModel, harness = harness_sdk
+    bad = REFERENCE_VERILOG["relu8"].replace("x[7]", "x[6]")
+    with FakeModel(_a2_model([("submit", bad), ("say", "Done, relu8 is correct."), ("submit", REFERENCE_VERILOG["relu8"]),
+                              ("say", "relu8 passed the checker.")])) as fm:
+        r = run_rtl_agent(harness.Gemini(model="fake", base_url=fm.url), "relu8", **out)
+    assert fm.tools_offered() == ["get_spec", "submit_verilog"]
+    assert r["verified"] and r["attempts"] == 2 and r["end_of_turn_sendbacks"] == 1 and r["model"] == "fake"
+    assert (tmp_path / "rtl" / "relu8.v").read_text() == REFERENCE_VERILOG["relu8"]
+    reasons = [m["content"] for req in fm.requests for m in req["messages"] if "checker rejected" in str(m.get("content"))]
+    assert reasons and "submission(s) left" in reasons[0]
+
+
+def test_on_the_harness_claiming_a_pass_never_saves_a_failed_design(out, tmp_path, harness_sdk):
+    FakeModel, harness = harness_sdk
+    bad = REFERENCE_VERILOG["relu8"].replace("x[7]", "x[6]")
+    with FakeModel(_a2_model([("submit", bad), ("say", "It passes every test, I am sure.")])) as fm:
+        r = run_rtl_agent(harness.Gemini(model="fake", base_url=fm.url), "relu8", **out)
+    assert not r["verified"] and r["verilog_path"] is None and not (tmp_path / "rtl" / "relu8.v").exists()
+    assert r["end_of_turn_sendbacks"] == 3 and r["attempts"] == 1
+
+
+def test_on_the_harness_an_agent_that_never_submits_is_told_to(out, harness_sdk):
+    FakeModel, harness = harness_sdk
+    with FakeModel(_a2_model([("say", "Here is the module: module relu8 ..."), ("submit", REFERENCE_VERILOG["relu8"]),
+                              ("say", "done")])) as fm:
+        r = run_rtl_agent(harness.Gemini(model="fake", base_url=fm.url), "relu8", **out)
+    told = [m for req in fm.requests for m in req["messages"] if "have not submitted any Verilog" in str(m.get("content"))]
+    assert told and r["verified"] and r["end_of_turn_sendbacks"] == 1

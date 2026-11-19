@@ -3,6 +3,13 @@ from x2c.agents.llm_client import MockLLM, Action
 from x2c.agents.verification_agent import run_agent
 from x2c.verification import tools
 from tests import faults
+from x2c.agents.llm_client import GroqLLM as _GroqLLM
+
+
+class _GroqAdapter(_GroqLLM):
+    """GroqLLM's own mechanics (protocol, retries, fallbacks) without the end-of-turn check's replies;
+    those are tested in test_groq_end_of_turn_reply and tests/test_agent_harness.py."""
+    send_text = None
 
 
 @pytest.fixture(autouse=True)
@@ -47,96 +54,6 @@ def test_call_tool_blocks_path_escape_and_unknown_args():
     assert "error" in tools.call_tool("run_suite", {"n_random": 99999})
 
 
-def test_gemini_adapter_with_fake_client(tmp_path):
-    pytest.importorskip("google.genai")
-    from x2c.agents.llm_client import GeminiLLM
-
-    class FC:  # fake function call
-        def __init__(s, n, a): s.name, s.args = n, a
-    class Resp:
-        def __init__(s, calls=None, text=None):
-            s.function_calls, s.text = calls, text
-            s.candidates = [type("C", (), {"content": object()})()]
-    seq = [Resp(calls=[FC("run_suite", {"n_random": 3})]), Resp(text="All good.")]
-    class FakeModels:
-        def generate_content(self, **kw): return seq.pop(0)
-    class FakeClient: models = FakeModels()
-
-    # the real google.genai types validate our contents/config; only the network call is faked
-    llm = GeminiLLM(model="test-model", client=FakeClient())
-    out = run_agent(llm, "verify", log_path=str(tmp_path / "log.jsonl"))
-    assert out["steps"] == 1 and out["llm_summary"] == "All good."
-    assert out["verified_facts_from_report"]["total"] == 8        # 5 fixed + 3 random
-
-
-def _server_error(code=503):
-    from google.genai import errors
-    return errors.ServerError(code, {"error": {"code": code, "message": "high demand", "status": "UNAVAILABLE"}}, None)
-
-
-def _resp(text="done"):
-    r = type("R", (), {})(); r.function_calls = None; r.text = text
-    r.candidates = [type("C", (), {"content": object()})()]
-    return r
-
-
-def test_gemini_retries_then_succeeds(tmp_path):
-    pytest.importorskip("google.genai")
-    from x2c.agents.llm_client import GeminiLLM
-    seq = [_server_error(), _server_error(), _resp("ok")]
-    class M:
-        def generate_content(self, **kw):
-            x = seq.pop(0)
-            if isinstance(x, Exception): raise x
-            return x
-    class C: models = M()
-    naps = []
-    llm = GeminiLLM(model="primary", client=C(), fallback_models=[], sleep=naps.append)
-    out = run_agent(llm, "verify", log_path=str(tmp_path / "l.jsonl"))
-    assert out["llm_summary"] == "ok" and naps == [2, 4]
-
-
-def test_gemini_falls_back_to_second_model(tmp_path):
-    pytest.importorskip("google.genai")
-    from x2c.agents.llm_client import GeminiLLM
-    seen = []
-    class M:
-        def generate_content(self, model, **kw):
-            seen.append(model)
-            if model == "primary": raise _server_error()
-            return _resp("from fallback")
-    class C: models = M()
-    llm = GeminiLLM(model="primary", client=C(), fallback_models=["backup"], retries=1, sleep=lambda s: None)
-    out = run_agent(llm, "verify", log_path=str(tmp_path / "l.jsonl"))
-    assert out["llm_summary"] == "from fallback" and llm.model_used == "backup" and seen[-1] == "backup"
-
-
-def test_gemini_total_outage_raises_clean_error(tmp_path):
-    pytest.importorskip("google.genai")
-    from x2c.agents.llm_client import GeminiLLM, LLMUnavailable
-    class M:
-        def generate_content(self, **kw): raise _server_error()
-    class C: models = M()
-    llm = GeminiLLM(model="p", client=C(), fallback_models=["b"], retries=1, sleep=lambda s: None)
-    with pytest.raises(LLMUnavailable):
-        run_agent(llm, "verify", log_path=str(tmp_path / "l.jsonl"))
-
-
-def test_auth_errors_fail_fast_not_retried(tmp_path):
-    pytest.importorskip("google.genai")
-    from google.genai import errors
-    from x2c.agents.llm_client import GeminiLLM
-    calls = []
-    class M:
-        def generate_content(self, **kw):
-            calls.append(1); raise errors.ClientError(403, {"error": {"code": 403, "message": "bad key"}}, None)
-    class C: models = M()
-    llm = GeminiLLM(model="p", client=C(), fallback_models=["b"], retries=3, sleep=lambda s: None)
-    with pytest.raises(errors.ClientError):
-        run_agent(llm, "verify", log_path=str(tmp_path / "l.jsonl"))
-    assert len(calls) == 1
-
-
 # ---------------- Groq adapter (fake client; real tool-call message shapes) ----------------
 import types as _t
 
@@ -164,7 +81,7 @@ class _HttpErr(Exception):
 
 
 def test_groq_full_loop_and_message_protocol(tmp_path):
-    from x2c.agents.llm_client import GroqLLM
+    GroqLLM = _GroqAdapter
     c = _GroqClient([_gmsg(calls=[("call_1", "run_suite", '{"n_random": 3}')]), _gmsg(content="All good.")])
     out = run_agent(GroqLLM(model="m", client=c), "verify", log_path=str(tmp_path / "l.jsonl"))
     assert out["llm_summary"] == "All good." and out["verified_facts_from_report"]["total"] == 8
@@ -175,7 +92,7 @@ def test_groq_full_loop_and_message_protocol(tmp_path):
 
 
 def test_groq_bad_json_arguments_are_rejected_safely(tmp_path):
-    from x2c.agents.llm_client import GroqLLM
+    GroqLLM = _GroqAdapter
     c = _GroqClient([_gmsg(calls=[("c1", "run_suite", "{not json")]), _gmsg(content="gave up")])
     out = run_agent(GroqLLM(model="m", client=c), "verify", log_path=str(tmp_path / "l.jsonl"))
     entries = [json.loads(l) for l in (tmp_path / "l.jsonl").read_text().splitlines()]
@@ -183,7 +100,7 @@ def test_groq_bad_json_arguments_are_rejected_safely(tmp_path):
 
 
 def test_groq_retry_and_fallback(tmp_path):
-    from x2c.agents.llm_client import GroqLLM
+    GroqLLM = _GroqAdapter
     c = _GroqClient([_HttpErr(503), _HttpErr(429), _gmsg(content="ok")])
     naps = []
     llm = GroqLLM(model="p", client=c, fallback_models=[], sleep=naps.append)
@@ -195,7 +112,7 @@ def test_groq_retry_and_fallback(tmp_path):
 
 
 def test_groq_auth_error_not_retried(tmp_path):
-    from x2c.agents.llm_client import GroqLLM
+    GroqLLM = _GroqAdapter
     c = _GroqClient([_HttpErr(401), _gmsg(content="never")])
     with pytest.raises(_HttpErr):
         run_agent(GroqLLM(model="p", client=c, fallback_models=["b"], sleep=lambda s: None), "v",
@@ -218,7 +135,7 @@ def test_full_coverage_has_no_warning(tmp_path):
 
 
 def test_groq_retired_model_404_falls_through_to_next_model(tmp_path):
-    from x2c.agents.llm_client import GroqLLM
+    GroqLLM = _GroqAdapter
     c = _GroqClient([_HttpErr(404), _gmsg(content="ok via fallback")])
     naps = []
     llm = GroqLLM(model="retired-model", client=c, fallback_models=["good-model"], sleep=naps.append)
@@ -235,3 +152,58 @@ def test_agent_reports_workload_facts(tmp_path):
     out = run_agent(Two(), "verify", log_path=str(tmp_path / "l.jsonl"))
     assert out["steps"] == 2 and out["verified_workload_facts"]["total"] == 5
     assert out["verified_workload_facts"]["failed"] == 0 and out["warnings"] == []
+
+
+# ------------------------------------------------------------ the agent on Google's harness (stand-in model, no key)
+def _scripted(steps):
+    from tests.fake_model import calls_so_far
+    def s(messages, request):
+        n = sum(1 for m in messages if m.get("role") == "assistant")
+        kind, value = steps[min(n, len(steps) - 1)]
+        return ("text", value) if kind == "say" else ("tool", kind, value)
+    return s
+
+
+@pytest.fixture
+def harness_sdk():
+    pytest.importorskip("google.antigravity", reason="the agent harness is an optional extra: uv sync --extra agents")
+    from tests.fake_model import FakeModel
+    from x2c.agents import harness
+    harness.reset_skipped()
+    return FakeModel, harness
+
+
+def test_on_the_harness_nothing_verified_and_reduced_coverage_are_sent_back(tmp_path, harness_sdk):
+    FakeModel, harness = harness_sdk
+    steps = [("say", "Everything passes."), ("run_suite", {"n_random": 1}), ("say", "Suite passed."),
+             ("run_suite", {}), ("say", "The full suite passed.")]
+    with FakeModel(_scripted(steps)) as fm:
+        out = run_agent(harness.Gemini(model="fake", base_url=fm.url), "verify", log_path=str(tmp_path / "log.jsonl"))
+    told = " ".join(str(m.get("content")) for r in fm.requests for m in r["messages"])
+    assert "Nothing has been verified yet" in told and "standard tests" in told
+    assert out["end_of_turn_sendbacks"] == 2 and out["model"] == "fake" and not out["warnings"]
+    facts = out["verified_facts_from_report"]
+    assert facts["failed"] == 0 and facts["coverage"]["tests_run"] == facts["coverage"]["full_suite_size"]
+    assert "run_suite" in fm.tools_offered() and "get_failures" in fm.tools_offered()
+
+
+def test_on_the_harness_a_failing_suite_must_be_diagnosed(tmp_path, harness_sdk):
+    FakeModel, harness = harness_sdk
+    tools.set_x2_backend(faults.sign_flip)
+    steps = [("run_suite", {}), ("say", "Some tests failed."), ("get_failures", {}), ("say", "The output sign is inverted.")]
+    with FakeModel(_scripted(steps)) as fm:
+        out = run_agent(harness.Gemini(model="fake", base_url=fm.url), "verify", log_path=str(tmp_path / "log.jsonl"))
+    assert out["end_of_turn_sendbacks"] == 1
+    assert out["verified_facts_from_report"]["failed"] > 0 and "sign_inverted" in out["verified_facts_from_report"]["failure_categories"]
+
+
+def test_groq_end_of_turn_reply(tmp_path):
+    """The real Groq adapter in the small fallback loop gets the same end-of-turn check as Google's harness:
+    a reduced suite is sent back, and the reply reaches the model as a user message."""
+    from x2c.agents.llm_client import GroqLLM
+    c = _GroqClient([_gmsg(calls=[("c1", "run_suite", '{"n_random": 3}')]), _gmsg(content="All good."),
+                     _gmsg(calls=[("c2", "run_suite", "{}")]), _gmsg(content="All good, full suite.")])
+    out = run_agent(GroqLLM(model="m", client=c, fallback_models=[]), "verify", log_path=str(tmp_path / "l.jsonl"))
+    assert out["end_of_turn_sendbacks"] == 1 and out["llm_summary"] == "All good, full suite." and not out["warnings"]
+    third = c.requests[2]["messages"]
+    assert third[-1]["role"] == "user" and "standard tests" in third[-1]["content"]

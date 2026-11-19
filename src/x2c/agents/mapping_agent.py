@@ -14,10 +14,9 @@ The system keeps the LLM's schedule only if it is legal and at least as fast as 
 """
 import copy
 import json
-import time
 from pathlib import Path
 
-from x2c.agents.llm_client import LLMUnavailable, is_provider_error
+from x2c.agents import harness
 from x2c.compiler import x2_schedule as xs
 from x2c.compiler.partition import (allowed_targets, chip_view, has_chip, load_hardware, plan_from_targets,
                                 propose_partition_baseline, search_space_size, validate_partition)
@@ -138,25 +137,76 @@ class _Session:
             return {"error": f"{type(e).__name__}: {e}"}
 
 
-def _converse(llm, session, max_steps, log):
-    steps = 0
-    goal = f"Choose a target for every node of graph {session.g.name}." + (" Then choose the X2 schedule." if has_chip(session.hw) else "")
-    action = llm.start(goal, MAPPING_TOOL_SCHEMAS, system_prompt=MAPPING_PROMPT + (SCHEDULE_PROMPT if has_chip(session.hw) else ""))
-    for step in range(1, max_steps + 1):
-        if action.kind == "final":
-            return action.text, "finished", steps
-        results = []
-        for name, args in action.calls:
-            res = session.call(name, args)
-            steps += 1
-            log.write(json.dumps({"step": step, "tool": name, "ok": "error" not in res, "legal": res.get("legal"),
-                                  "t": time.strftime("%H:%M:%S")}) + "\n"); log.flush()
-            results.append((name, res))
-        if step == max_steps and getattr(llm, "supports_force_final", False):
-            action = llm.send_tool_results(results, force_final=True)
-        else:
-            action = llm.send_tool_results(results)
-    return (action.text, "finished", steps) if action.kind == "final" else ("", "step_limit_reached", steps)
+def end_check(session, tools_used):
+    """A1's end-of-turn check: the agent may stop only with a plan the VALIDATOR accepts (validate_partition) and, on the
+    chip, a schedule it accepts (validate_schedule). Which plan and schedule the system keeps is still decided after the
+    run by code (llm plan > baseline; llm schedule only if at least as fast as code's best). Returns the reason or None."""
+    if "describe_graph" not in tools_used:
+        return "Call describe_graph first; it lists every node, its allowed targets and the hardware facts."
+    if session.plan is None:
+        return "Call propose_assignment with a target for every node (one entry per node: 'node_name=target')."
+    if session.errors:
+        return (f"The validator rejected your last assignment ({len(session.errors)} error(s); first: {str(session.errors[0])[:200]}). "
+                "Fix it and call propose_assignment again. Only the validator decides what is legal.")
+    if has_chip(session.hw) and (session.plan.get("chip") or {}).get("layers"):
+        if session.schedule is None:
+            return "The assignment is legal. Now call describe_schedule, then propose_schedule with a resident list and a policy."
+        if session.schedule_errors:
+            return (f"The validator rejected your last schedule (first error: {str(session.schedule_errors[0])[:200]}). "
+                    "Fix it and call propose_schedule again.")
+    return None
+
+
+def _sdk_tools(session):
+    """A1's tools as plain functions for the harness. They go through session.call, which checks every argument.
+    Gemini tool schemas cannot hold a free-form object, so targets are 'node=target' strings and tiles a JSON string."""
+    def describe_graph() -> str:
+        """List the IR nodes with their allowed targets, and the hardware facts."""
+        return json.dumps(session.call("describe_graph", {}), default=str)
+
+    def propose_assignment(targets: list[str], rationale: str = "") -> str:
+        """Propose a target for every node; returns the validator's verdict. The last proposal counts.
+
+        Args:
+            targets: One entry per node, written as 'node_name=target' where target is x2, efpga or io.
+            rationale: Why you chose these targets.
+        """
+        parsed, bad = {}, []
+        for item in targets or []:
+            name, sep, target = str(item).partition("=")
+            if sep and name.strip():
+                parsed[name.strip()] = target.strip()
+            else:
+                bad.append(str(item)[:60])
+        if bad:
+            return json.dumps({"error": f"write each entry as 'node_name=target'; not understood: {bad[:5]}"})
+        return json.dumps(session.call("propose_assignment", {"targets": parsed, "rationale": rationale}), default=str)
+
+    tools = [describe_graph, propose_assignment]
+    if has_chip(session.hw):
+        def describe_schedule() -> str:
+            """Chip only: X2 layers, per-tile program/compute cycles, dependencies, legal resident sets, policies, today's latency."""
+            return json.dumps(session.call("describe_schedule", {}), default=str)
+
+        def propose_schedule(resident: list[str], policy: str = "earliest_free", tiles: str = "", rationale: str = "") -> str:
+            """Chip only: propose which layers stay programmed and how the 2 blocks are used; returns the validator's verdict and cycles.
+
+            Args:
+                resident: X2 layers kept programmed.
+                policy: earliest_free, round_robin or single_block (ignored when tiles is given).
+                tiles: Optional explicit issue order as a JSON array [[layer, tile_index, block], ...] covering every X2 tile;
+                    leave empty to use the policy.
+                rationale: Why you chose this schedule.
+            """
+            args = {"resident": list(resident or []), "policy": policy, "rationale": rationale}
+            if tiles and tiles.strip():
+                try:
+                    args["tiles"] = json.loads(tiles)
+                except ValueError as e:
+                    return json.dumps({"error": f"tiles is not valid JSON: {e}"})
+            return json.dumps(session.call("propose_schedule", args), default=str)
+        tools += [describe_schedule, propose_schedule]
+    return tools
 
 
 def final_plan_chip_summary(plan):
@@ -205,18 +255,21 @@ def choose_schedule(g, hw, plan, session):
 
 
 def run_mapping_agent(llm, g, hw=None, max_steps=5, log_path="reports/mapping_agent_log.jsonl"):
+    """llm: harness.Gemini(...) (Google's harness, then Groq if every Gemini model is out), or an object with start /
+    send_tool_results (the stand-in MockMappingLLM the deploy stage uses, GroqLLM, test doubles). Code decides the plan."""
     hw = hw or load_hardware()
     Path(log_path).parent.mkdir(parents=True, exist_ok=True)
-    session, text, stopped, steps, llm_error = _Session(g, hw), "", "finished", 0, None
-    with open(log_path, "w", encoding="utf-8") as log:
-        try:
-            text, stopped, steps = _converse(llm, session, max_steps, log)
-        except LLMUnavailable as e:
-            llm_error, stopped = str(e)[:400], "llm_unavailable"
-        except Exception as e:  # noqa: BLE001
-            if not is_provider_error(e):            # programming errors and auth problems (401/403) must still raise
-                raise
-            llm_error, stopped = f"{type(e).__name__}: {str(e)[:350]}", "llm_error"
+    session, chip = _Session(g, hw), has_chip(hw)
+    goal = f"Choose a target for every node of graph {g.name}." + (" Then choose the X2 schedule." if chip else "")
+    log = harness.jsonl_logger(log_path)
+    run = harness.run(llm, MAPPING_PROMPT + (SCHEDULE_PROMPT if chip else ""), goal, sdk_tools=_sdk_tools(session),
+                      max_steps=max_steps, max_model_calls=max_steps + 7, log=log,
+                      end_check=lambda reply, used: end_check(session, used),
+                      legacy=dict(schemas=MAPPING_TOOL_SCHEMAS, call=session.call,
+                                  on_tool=lambda step, name, args, res: log("tool", step=step, tool=name, ok="error" not in res,
+                                                                            legal=res.get("legal"))))
+    text, stopped, steps, llm_error = run["text"], run["stopped"], run["steps"], run["llm_error"]
+    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"]}
 
     baseline = propose_partition_baseline(g, hw)
     baseline_errors = validate_partition(g, baseline, hw)
@@ -241,4 +294,4 @@ def run_mapping_agent(llm, g, hw=None, max_steps=5, log_path="reports/mapping_ag
                              if space == 1 else "more than one legal plan exists"},
             "hardware_profile": {"version": hw["version"], "status": "assumed" if "ASSUMED" in hw.get("version", "") else "chip_profile"},
             "chip": (final_plan_chip_summary(final) if final else None), "schedule": schedule,
-            "evidence_level": EVIDENCE_LEVEL, "audit_log": log_path}
+            "evidence_level": EVIDENCE_LEVEL, "audit_log": log_path, **extra}

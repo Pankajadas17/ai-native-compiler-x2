@@ -6,10 +6,10 @@ Rule: only a checker 'pass' counts. Nothing the LLM says about its own code is e
 Evidence level: Yosys RTL evaluation vs NumPy golden (NOT nextpnr, NOT bitstream, NOT silicon).
 """
 import json
-import time
 from pathlib import Path
 
-from x2c.agents.llm_client import Action, LLMUnavailable, is_provider_error
+from x2c.agents import harness
+from x2c.agents.llm_client import Action
 from x2c.verification.rtl_check import EVIDENCE_LEVEL, OPS, check_rtl, describe_op
 
 MAX_SUBMISSIONS = 4
@@ -102,40 +102,54 @@ class _Session:
             return {"error": f"{type(e).__name__}: {e}"}
 
 
-def _converse(llm, session, max_steps, log):
-    steps = 0
-    action = llm.start(f"Write Verilog for operator '{session.op}'.", RTL_TOOL_SCHEMAS, system_prompt=RTL_PROMPT)
-    for step in range(1, max_steps + 1):
-        if action.kind == "final":
-            return action.text, "finished", steps
-        results = []
-        for name, args in action.calls:
-            res = session.call(name, args)
-            steps += 1
-            log.write(json.dumps({"step": step, "tool": name, "status": res.get("status"), "stage": res.get("stage"),
-                                  "t": time.strftime("%H:%M:%S")}) + "\n"); log.flush()
-            results.append((name, res))
-        if step == max_steps and getattr(llm, "supports_force_final", False):
-            action = llm.send_tool_results(results, force_final=True)
-        else:
-            action = llm.send_tool_results(results)
-    return (action.text, "finished", steps) if action.kind == "final" else ("", "step_limit_reached", steps)
+def end_check(session, tools_used):
+    """A2's end-of-turn check: the agent may stop only when the CHECKER passed one of its submissions (or no submission
+    is left). What the model says about its own Verilog is never evidence. Returns the send-back reason or None."""
+    if session.best_pass is not None or session.attempts >= MAX_SUBMISSIONS:
+        return None
+    if "submit_verilog" not in tools_used or session.last is None:
+        return "You have not submitted any Verilog. Call submit_verilog with the complete module."
+    errors = "; ".join(str(e) for e in (session.last.get("errors") or [])[:2]) or "see the mismatches it returned"
+    return (f"The checker rejected your last submission (stage '{session.last.get('stage')}': {errors[:300]}). "
+            f"Fix the module and submit it again with submit_verilog ({MAX_SUBMISSIONS - session.attempts} submission(s) "
+            "left). Only a checker 'pass' counts.")
+
+
+def _sdk_tools(session):
+    """A2's two tools as plain functions for the harness; the session enforces the submission limit."""
+    def get_spec() -> str:
+        """Return the operator specification: module name, ports (names, directions, widths, signedness) and behaviour."""
+        return json.dumps(session.get_spec())
+
+    def submit_verilog(verilog: str) -> str:
+        """Check one complete Verilog module in Yosys against the golden model.
+
+        Args:
+            verilog: The complete module text.
+
+        Returns:
+            JSON with status (pass or fail), the stage that failed, errors and a few mismatching vectors.
+        """
+        return json.dumps(session.submit_verilog(verilog), default=str)[:6000]
+    return [get_spec, submit_verilog]
 
 
 def run_rtl_agent(llm, op, out_dir="hardware/operators", max_steps=10, log_path="reports/rtl_agent_log.jsonl"):
+    """llm: harness.Gemini(...) (Google's harness, then Groq if every Gemini model is out), or an object with start /
+    send_tool_results (the stand-in MockRTLLLM the pipeline uses, GroqLLM, test doubles). Only a checker pass is saved."""
     if op not in OPS:
         raise ValueError(f"unknown op '{op}'; known: {sorted(OPS)}")
     Path(log_path).parent.mkdir(parents=True, exist_ok=True)
-    session, text, stopped, steps, llm_error = _Session(op), "", "finished", 0, None
-    with open(log_path, "w", encoding="utf-8") as log:
-        try:
-            text, stopped, steps = _converse(llm, session, max_steps, log)
-        except LLMUnavailable as e:
-            llm_error, stopped = str(e)[:400], "llm_unavailable"
-        except Exception as e:  # noqa: BLE001
-            if not is_provider_error(e):
-                raise
-            llm_error, stopped = f"{type(e).__name__}: {str(e)[:350]}", "llm_error"
+    session = _Session(op)
+    log = harness.jsonl_logger(log_path)
+    run = harness.run(llm, RTL_PROMPT, f"Write Verilog for operator '{op}'.", sdk_tools=_sdk_tools(session), max_steps=max_steps,
+                      max_model_calls=max_steps + 4, max_continues=MAX_SUBMISSIONS - 1, log=log,
+                      end_check=lambda reply, used: end_check(session, used),
+                      legacy=dict(schemas=RTL_TOOL_SCHEMAS, call=session.call,
+                                  on_tool=lambda step, name, args, res: log("tool", step=step, tool=name, status=res.get("status"),
+                                                                            stage=res.get("stage"))))
+    text, stopped, steps, llm_error = run["text"], run["stopped"], run["steps"], run["llm_error"]
+    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"]}
     ok = session.best_pass is not None
     path = None
     if ok:
@@ -146,4 +160,4 @@ def run_rtl_agent(llm, op, out_dir="hardware/operators", max_steps=10, log_path=
     return {"op": op, "verified": ok, "verilog_path": path, "attempts": session.attempts, "stopped": stopped, "steps": steps,
             "llm_error": llm_error, "last_stage": last.get("stage"), "last_errors": (last.get("errors") or [])[:4],
             "vectors": (session.best_pass or {}).get("vectors"), "llm_summary_unverified": text[:600],
-            "evidence_level": EVIDENCE_LEVEL, "audit_log": log_path}
+            "evidence_level": EVIDENCE_LEVEL, "audit_log": log_path, **extra}

@@ -11,7 +11,7 @@ dependencies = [
 [project.optional-dependencies]
 agents = [
     "groq",
-    "google-genai",
+    "google-antigravity>=0.1.23,<0.2",
 ]
 chip = [              # the chip repo's bit_gen.py needs fasm
     "fasm",

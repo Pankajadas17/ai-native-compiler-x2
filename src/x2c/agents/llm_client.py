@@ -1,10 +1,15 @@
 """
-LLM adapters. The agent loop only knows this tiny interface, so swapping providers
-(Gemini, Claude, Qwen, a local model...) means writing ONE new adapter class.
+The small fallback side of the agents (the main path is Google's agent harness, x2c.agents.harness).
 
-    llm.start(goal, tool_schemas)        -> Action
-    llm.send_tool_results([(name, result), ...]) -> Action
+Objects with this tiny interface run in harness.plain_loop:
+    llm.start(goal, tool_schemas, system_prompt=None) -> Action
+    llm.send_tool_results([(name, result), ...])      -> Action
+    llm.send_text(text)                               -> Action   (optional: lets the end-of-turn check reply)
 An Action is either tool calls (kind="tool_calls") or a final answer (kind="final").
+
+Here: GroqLLM (the last fallback when every Gemini model is out, or --llm groq) and the no-model stand-ins (MockLLM,
+MockDebugLLM, MockMappingLLM, MockPlannerLLM): fixed, rule-based behaviour the pipeline and the tests use. They are NOT
+models and are labelled as such in every report.
 """
 import os
 import time
@@ -251,70 +256,6 @@ def _compact(obj):
     return obj
 
 
-class GeminiLLM:
-    """Google Gemini via the official google-genai SDK. Reads GEMINI_API_KEY from the environment."""
-    def __init__(self, model=None, client=None, fallback_models=None, retries=3, sleep=time.sleep):
-        from google import genai
-        from google.genai import types
-        self._types = types
-        self.client = client or genai.Client(http_options=types.HttpOptions(
-            timeout=int(REQUEST_TIMEOUT_S * 1000), retry_options=types.HttpRetryOptions(attempts=1)))
-        self.time_budget_s, self.clock = CONVERSATION_BUDGET_S, time.monotonic
-        self._deadline = None
-        self.model = model or os.environ.get("BM_LLM_MODEL", "gemini-3.5-flash")
-        env_fb = os.environ.get("BM_LLM_FALLBACKS", "gemini-2.5-flash")
-        self.fallbacks = fallback_models if fallback_models is not None else [m for m in env_fb.split(",") if m]
-        self.retries, self._sleep = retries, sleep
-        self.notify = print_progress
-        self.model_used = self.model
-        self._good = set()                    # models that have answered at least once in this session
-
-    def start(self, goal, tool_schemas, system_prompt=None):
-        self._deadline = self.clock() + self.time_budget_s
-        t = self._types
-        decls = [t.FunctionDeclaration(name=s["name"], description=s["description"],
-                                       parameters=s["input_schema"]) for s in tool_schemas]
-        self._config = t.GenerateContentConfig(
-            system_instruction=system_prompt or SYSTEM_PROMPT,
-            tools=[t.Tool(function_declarations=decls)],
-            automatic_function_calling=t.AutomaticFunctionCallingConfig(disable=True))  # WE run tools, not the SDK
-        self._contents = [t.Content(role="user", parts=[t.Part(text=goal)])]
-        return self._step()
-
-    def describe(self):
-        return (f"model={self.model} fallbacks={self.fallbacks} request_timeout={REQUEST_TIMEOUT_S:.0f}s "
-                f"budget={self.time_budget_s:.0f}s")
-
-    supports_force_final = True
-
-    def send_tool_results(self, results, force_final=False):
-        t = self._types
-        parts = [t.Part.from_function_response(name=n, response={"result": r}) for n, r in results]
-        self._contents.append(t.Content(role="user", parts=parts))
-        return self._step(force_final)
-
-    def _generate(self, force_final=False):
-        cfg = self._config
-        if force_final:                       # this turn MUST be a text answer: tool calling switched off
-            t = self._types
-            cfg = cfg.model_copy(update={"tool_config": t.ToolConfig(
-                function_calling_config=t.FunctionCallingConfig(mode="NONE"))})
-        self.model_used, resp = call_with_fallback(
-            [self.model] + self.fallbacks,
-            lambda m: self.client.models.generate_content(model=m, contents=self._contents, config=cfg),
-            self.retries, self._sleep, self._good, self._deadline, self.clock, self.notify)
-        return resp
-
-    def _step(self, force_final=False):
-        resp = self._generate(force_final)
-        self._contents.append(resp.candidates[0].content)   # keep the model turn verbatim (needed by newer models)
-        calls = [(fc.name, dict(fc.args or {})) for fc in (resp.function_calls or [])]
-        if calls:
-            return Action("tool_calls", calls=calls)
-        return Action("final", text=resp.text or "")
-
-
-
 class GroqLLM:
     """Groq (OpenAI-compatible chat completions + tool calling). Reads GROQ_API_KEY from the environment."""
     def __init__(self, model=None, client=None, fallback_models=None, retries=3, sleep=time.sleep):
@@ -432,6 +373,11 @@ class GroqLLM:
         return self._step()
 
     supports_force_final = True
+
+    def send_text(self, text):
+        """The end-of-turn check's reply (harness.plain_loop): one more user message, then the model continues."""
+        self._messages.append({"role": "user", "content": text})
+        return self._step()
 
     def send_tool_results(self, results, force_final=False):
         import json

@@ -73,9 +73,12 @@ def plan(g, hw, llm_name, log):
     elif llm_name == "mock":
         from x2c.agents.llm_client import MockMappingLLM
         llm = MockMappingLLM()
+    elif llm_name == "gemini":                         # Google's agent harness with the end-of-turn check
+        from x2c.agents.harness import Gemini
+        llm = Gemini()
     else:
-        from x2c.agents.llm_client import GeminiLLM, GroqLLM
-        llm = {"groq": GroqLLM, "gemini": GeminiLLM}[llm_name]()
+        from x2c.agents.llm_client import GroqLLM
+        llm = GroqLLM()
     return run_mapping_agent(llm, g, hw, log_path=str(log))
 
 

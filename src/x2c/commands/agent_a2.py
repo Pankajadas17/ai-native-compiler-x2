@@ -2,7 +2,8 @@
 RTL agent (A2): an LLM writes Verilog for an eFPGA-side operator; Yosys + a NumPy golden model decide if it is right.
 
     x2c agent a2                       # mock LLM, all ops
-    x2c agent a2 --llm groq --op relu8 # a real LLM (GROQ_API_KEY must be set in this window)
+    x2c agent a2 --llm gemini --op relu8   # Gemini on Google's agent harness, with the end-of-turn check
+    x2c agent a2 --llm groq --op relu8     # a real LLM through the plain loop (GROQ_API_KEY must be set)
     x2c agent a2 --list
 
 Verilog is saved to hardware/operators/<op>.v ONLY after the checker passes. Op conventions are ASSUMED (see verification/rtl_check.py).
@@ -13,7 +14,8 @@ import json
 import os
 import sys
 
-from x2c.agents.llm_client import GeminiLLM, GroqLLM
+from x2c.agents.harness import Gemini
+from x2c.agents.llm_client import GroqLLM
 from x2c.agents.rtl_agent import MockRTLLLM, run_rtl_agent
 from x2c.verification.rtl_check import OPS
 
@@ -35,12 +37,14 @@ def main(argv=None):
         sys.exit(f"{keys[a.llm]} is not set in THIS terminal window. Set it with Read-Host -AsSecureString, or use --llm mock")
     results = []
     for op in ops:
-        llm = {"mock": lambda: MockRTLLLM(op), "gemini": lambda: GeminiLLM(model=a.model), "groq": lambda: GroqLLM(model=a.model)}[a.llm]()
+        llm = {"mock": lambda: MockRTLLLM(op), "gemini": lambda: Gemini(model=a.model), "groq": lambda: GroqLLM(model=a.model)}[a.llm]()
         r = run_rtl_agent(llm, op)
         results.append(r)
         tag = "VERIFIED" if r["verified"] else "NOT VERIFIED"
         print(f"{op:16} {tag:13} attempts={r['attempts']} vectors={r['vectors']} stopped={r['stopped']}"
               + (f" | last: {r['last_stage']}: {r['last_errors'][0]}" if not r["verified"] and r["last_errors"] else "")
+              + (f" | sent back {r['end_of_turn_sendbacks']}x" if r.get("end_of_turn_sendbacks") else "")
+              + (f" | model: {r['model']}" if r.get("model") else "")
               + (f" | LLM problem: {r['llm_error']}" if r["llm_error"] else ""))
     os.makedirs("reports", exist_ok=True)
     with open("reports/rtl_agent_report.json", "w", encoding="utf-8") as f:

@@ -6,7 +6,8 @@ the ground-truth cause.   x2c eval a3 [--llm mock|gemini|groq] [--model NAME]
 """
 import argparse, json, sys, time
 from x2c.agents.debug_agent import run_debug_agent
-from x2c.agents.llm_client import MockDebugLLM, GeminiLLM, GroqLLM
+from x2c.agents.harness import Gemini
+from x2c.agents.llm_client import MockDebugLLM, GroqLLM
 from x2c.verification import tools, workloads, debug_tools
 from tests import faults
 
@@ -45,7 +46,7 @@ _KEYS = {"groq": "GROQ_API_KEY", "gemini": "GEMINI_API_KEY"}
 if a.llm in _KEYS and not os.environ.get(_KEYS[a.llm]):
     sys.exit(f"{_KEYS[a.llm]} is not set in THIS terminal window (it only lasts for the window where you set it).\n"
              f'Set it, then rerun:  $env:{_KEYS[a.llm]} = "your-key"      (or use --llm mock)')
-make = {"mock": lambda: MockDebugLLM(), "gemini": lambda: GeminiLLM(model=a.model),
+make = {"mock": lambda: MockDebugLLM(), "gemini": lambda: Gemini(model=a.model),          # gemini: Google's harness + end-of-turn check
         "groq": lambda: GroqLLM(model=a.model)}[a.llm]
 
 if a.blind:
@@ -82,6 +83,7 @@ for i, (label, kind, fault, truth) in enumerate(bench, 1):
     if out["llm_error"]:
         got = "LLM-DOWN"
     note = (f"recovered x{out['llm_recovered_answers']} " if out["llm_recovered_answers"] else "") + \
+           (f"sent back x{out['end_of_turn_sendbacks']} " if out.get("end_of_turn_sendbacks") else "") + \
            (f"[{out['llm_error'][:160]}] " if out["llm_error"] else "") + \
            ("STEP LIMIT " if out["stopped"] == "step_limit_reached" else "") + \
            (f"-> system: {out['final_cause']} [{out['final_cause_source']}]" if out["final_cause_source"] not in ("llm_validated", "llm_unknown_confirmed_by_rules") else "")

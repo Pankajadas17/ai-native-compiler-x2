@@ -4,9 +4,9 @@ Guard rails: step limit, validated tool calls, bounded tool output, full JSONL a
 and a final block of facts recomputed from the report by code (not by the LLM).
 """
 import json
-import time
 from pathlib import Path
 
+from x2c.agents.llm_client import SYSTEM_PROMPT
 from x2c.verification import tools
 from x2c.verification.matmul_check import make_cases
 
@@ -35,48 +35,59 @@ def _chip_facts():
         return {"error": f"{type(e).__name__}: {e}"}
 
 
+REPORT_KEYS = {"run_suite": "suite", "run_workloads": "workloads", "run_benchmark": "benchmark",
+               "run_generated_tests": "generated", "run_model_workloads": "model"}
+
+
+def end_check(state, full_size):
+    """A4's end-of-turn check (the verification agent): it may stop only after the FULL standard suite ran
+    (default arguments, never fewer tests) and, if that suite failed, after it read the diagnoses (get_failures).
+    The facts in the result are still recomputed from the reports by code. Returns the send-back reason or None."""
+    suite = state["reports"].get("suite")
+    if suite is None:
+        return "Nothing has been verified yet: call run_suite with its default arguments (no arguments)."
+    facts = tools.summarize_report(suite)
+    total = facts.get("total", 0)
+    if total < full_size:
+        return (f"The suite ran only {total} of {full_size} standard tests. Call run_suite again with its default arguments; "
+                "never lower n_random.")
+    if facts.get("failed", 0) and "get_failures" not in state["tools"]:
+        return "The suite has failures: call get_failures and explain the likely causes from its diagnoses before you finish."
+    return None
+
+
 def run_agent(llm, goal, max_steps=6, log_path=LOG_PATH):
+    """llm: harness.Gemini(...) (Google's harness, then Groq if every Gemini model is out), or an object with start /
+    send_tool_results (the stand-in MockLLM, GroqLLM, test doubles). The facts are recomputed from the reports by code."""
+    from x2c.agents import harness
     Path(log_path).parent.mkdir(parents=True, exist_ok=True)
-    steps, last_report, last_workload, last_model, last_gen, last_bench = [], None, None, None, None, None
-    chip_used = False
-    log = open(log_path, "w", encoding="utf-8")
+    log = harness.jsonl_logger(log_path)
+    state = {"steps": [], "reports": {}, "tools": [], "chip_used": False}
 
-    def record(entry):
-        entry["t"] = time.strftime("%H:%M:%S"); steps.append(entry)
-        log.write(json.dumps(entry) + "\n"); log.flush()
+    def call(name, args):
+        res = tools.call_tool(name, args)
+        state["steps"].append({"tool": name, "args": args, "ok": "error" not in res})
+        state["tools"].append(name)
+        if name in REPORT_KEYS and "report_path" in res:
+            state["reports"][REPORT_KEYS[name]] = res["report_path"]
+        if name in ("chip_status", "chip_schedule", "run_chip_layers") and "error" not in res:
+            state["chip_used"] = True
+        return _compact(res)
 
-    action = llm.start(goal, tools.TOOL_SCHEMAS)
-    final_text, stopped = "", "finished"
-    for step in range(1, max_steps + 1):
-        if action.kind == "final":
-            final_text = action.text; break
-        results = []
-        for name, args in action.calls:
-            res = tools.call_tool(name, args)
-            record({"step": step, "tool": name, "args": args, "ok": "error" not in res})
-            if name == "run_suite" and "report_path" in res:
-                last_report = res["report_path"]
-            if name == "run_workloads" and "report_path" in res:
-                last_workload = res["report_path"]
-            if name == "run_benchmark" and "report_path" in res:
-                last_bench = res["report_path"]
-            if name == "run_generated_tests" and "report_path" in res:
-                last_gen = res["report_path"]
-            if name == "run_model_workloads" and "report_path" in res:
-                last_model = res["report_path"]
-            if name in ("chip_status", "chip_schedule", "run_chip_layers") and "error" not in res:
-                chip_used = True
-            results.append((name, _compact(res)))
-        action = llm.send_tool_results(results)
-    else:
-        if action.kind == "final":
-            final_text = action.text
-        else:
-            stopped = "step_limit_reached"
-    log.close()
+    full = len(make_cases())
+    run = harness.run(llm, SYSTEM_PROMPT, goal, sdk_tools=harness.tools_from_schemas(tools.TOOL_SCHEMAS, call),
+                      max_steps=max_steps, max_model_calls=2 * max_steps + 6, log=log, catch_llm_errors=False,
+                      end_check=lambda reply, used: end_check(state, full),
+                      legacy=dict(schemas=tools.TOOL_SCHEMAS, call=call, system=None, force_final=False,
+                                  on_tool=lambda step, name, args, res: log("tool", step=step, tool=name, args=args,
+                                                                            ok="error" not in res)))
+    final_text, stopped, llm_error = run["text"], run["stopped"], run["llm_error"]
+    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"], "llm_error": llm_error}
+    last_report, last_workload = state["reports"].get("suite"), state["reports"].get("workloads")
+    last_bench, last_gen, last_model = state["reports"].get("benchmark"), state["reports"].get("generated"), state["reports"].get("model")
+    steps, chip_used = state["steps"], state["chip_used"]
 
     facts = tools.summarize_report(last_report) if last_report else {"note": "run_suite was never called"}
-    full = len(make_cases())
     warnings = []
     if "total" in facts:
         facts["coverage"] = {"tests_run": facts["total"], "full_suite_size": full}
@@ -92,4 +103,4 @@ def run_agent(llm, goal, max_steps=6, log_path=LOG_PATH):
             "verified_generated_test_facts": tools.summarize_report(last_gen) if last_gen else None,
             "verified_model_workload_facts": tools.summarize_report(last_model) if last_model else None,
             "verified_chip_facts": _chip_facts() if chip_used else None,
-            "warnings": warnings, "audit_log": log_path}
+            "warnings": warnings, "audit_log": log_path, **extra}

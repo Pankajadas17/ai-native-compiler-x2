@@ -6,10 +6,9 @@ It never edits code or re-runs flows by itself: it proposes, humans/other tools 
 """
 import json
 import re
-import time
 from pathlib import Path
 
-from x2c.agents.llm_client import LLMUnavailable, is_provider_error
+from x2c.agents import harness
 from x2c.verification import debug_tools
 from x2c.verification.knowledge_base import CAUSES, CAUSE_IDS, rule_based_candidates
 
@@ -40,48 +39,63 @@ def _parse_json(text):
         return None
 
 
+ANSWER_KEYS = ("cause_id", "confidence", "explanation", "proposed_fix", "next_check")
+
+
+def check_answer(text, tools_used, first_tool, menu_ids):
+    """End-of-turn check of both A3 agents: the answer CONTRACT (looked at the evidence, one JSON object with every key,
+    a cause from the menu). Whether that cause is supported by the evidence is still decided AFTER the run by code
+    (_finish here, chain_debug.decide for the chain agent), exactly as before. Returns the send-back reason or None."""
+    return harness.check_json_answer(text, tools_used, first_tool=first_tool, keys=ANSWER_KEYS, field_name="cause_id",
+                                     allowed=set(menu_ids))
+
+
+def _sdk_tools():
+    """The three read-only A3 tools as plain functions (the harness builds their schemas from the hints and docstrings)."""
+    def diagnose_report(report_path: str) -> str:
+        """Group the failures in a verification report by category, show examples and candidate root causes from the knowledge base.
+
+        Args:
+            report_path: The report path given in the task (reports/*.json).
+        """
+        return json.dumps(debug_tools.call_debug_tool("diagnose_report", {"report_path": report_path}), default=str)
+
+    def reproduce_failure(report_path: str, test_name: str) -> str:
+        """Re-run one failing test with the current backend to check that the failure is deterministic.
+
+        Args:
+            report_path: The report path given in the task.
+            test_name: Name of one failing test in that report.
+        """
+        return json.dumps(debug_tools.call_debug_tool("reproduce_failure", {"report_path": report_path, "test_name": test_name}),
+                          default=str)
+
+    def check_hypothesis(report_path: str, test_name: str, hypothesis: str) -> str:
+        """Numerically test a hypothesis on one failing test: negated, transposed, constant_offset, scaled or localized_rows.
+
+        Args:
+            report_path: The report path given in the task.
+            test_name: Name of one failing test in that report.
+            hypothesis: One of negated, transposed, constant_offset, scaled, localized_rows.
+        """
+        return json.dumps(debug_tools.call_debug_tool("check_hypothesis", {"report_path": report_path, "test_name": test_name,
+                                                                          "hypothesis": hypothesis}), default=str)
+    return [diagnose_report, reproduce_failure, check_hypothesis]
+
+
 def run_debug_agent(llm, report_path, max_steps=6, log_path="reports/debug_agent_log.jsonl"):
+    """llm: harness.Gemini(...) (Google's harness, then Groq if every Gemini model is out), or an object with start /
+    send_tool_results (the no-model stand-in MockDebugLLM, GroqLLM, test doubles). Code validates the answer either way."""
     Path(log_path).parent.mkdir(parents=True, exist_ok=True)
     goal = f"Diagnose the failures in the verification report. report_path={report_path}"
-    log, steps = open(log_path, "w", encoding="utf-8"), 0
-    final_text, stopped, llm_error = "", "finished", None
-    try:
-        final_text, stopped, steps = _converse(llm, goal, max_steps, log)
-    except LLMUnavailable as e:        # the LLM service is down: the deterministic part must still answer
-        llm_error, stopped = str(e)[:400], "llm_unavailable"
-    except Exception as e:  # noqa: BLE001
-        if not is_provider_error(e):   # programming errors and auth problems (401/403) must still raise
-            raise
-        llm_error, stopped = f"{type(e).__name__}: {str(e)[:350]}", "llm_error"
-    log.close()
-    return _finish(final_text, stopped, steps, llm, report_path, log_path, llm_error)
-
-
-def _converse(llm, goal, max_steps, log):
-    steps = 0
-    action = llm.start(goal, debug_tools.DEBUG_TOOL_SCHEMAS, system_prompt=DEBUG_PROMPT)
-    final_text, stopped = "", "finished"
-    for step in range(1, max_steps + 1):
-        if action.kind == "final":
-            final_text = action.text; break
-        results = []
-        for name, args in action.calls:
-            res = debug_tools.call_debug_tool(name, args)
-            steps += 1
-            log.write(json.dumps({"step": step, "tool": name, "args": args, "ok": "error" not in res,
-                                  "t": time.strftime("%H:%M:%S")}) + "\n"); log.flush()
-            results.append((name, res))
-        last = step == max_steps          # last allowed tool round: the next turn must be a final answer
-        if last and getattr(llm, "supports_force_final", False):
-            action = llm.send_tool_results(results, force_final=True)
-        else:
-            action = llm.send_tool_results(results)
-    else:
-        if action.kind == "final":
-            final_text = action.text
-        else:
-            stopped = "step_limit_reached"
-    return final_text, stopped, steps
+    log = harness.jsonl_logger(log_path)
+    run = harness.run(llm, DEBUG_PROMPT, goal, sdk_tools=_sdk_tools(), max_steps=max_steps, max_model_calls=max_steps + 6,
+                      end_check=lambda text, used: check_answer(text, used, "diagnose_report", CAUSE_IDS), log=log,
+                      legacy=dict(schemas=debug_tools.DEBUG_TOOL_SCHEMAS, call=debug_tools.call_debug_tool,
+                                  on_tool=lambda step, name, args, res: log("tool", step=step, tool=name, args=args,
+                                                                            ok="error" not in res)))
+    out = _finish(run["text"], run["stopped"], run["steps"], llm, report_path, log_path, run["llm_error"])
+    return {**out, "end_of_turn_sendbacks": run["continues"], "model": run["model"]}
 
 
 def _finish(final_text, stopped, steps, llm, report_path, log_path, llm_error):

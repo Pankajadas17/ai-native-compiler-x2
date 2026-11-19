@@ -27,8 +27,11 @@ KEYS = {"groq": "GROQ_API_KEY", "gemini": "GEMINI_API_KEY"}
 def make_llm(name, model=None):
     if name == "mock":
         return MockChainDebugLLM()
-    from x2c.agents.llm_client import GeminiLLM, GroqLLM
-    return {"groq": GroqLLM, "gemini": GeminiLLM}[name](model=model)
+    if name == "gemini":                                   # Google's harness with the end-of-turn check
+        from x2c.agents.harness import Gemini
+        return Gemini(model=model)
+    from x2c.agents.llm_client import GroqLLM
+    return GroqLLM(model=model)
 
 
 def main(argv=None, llm_factory=make_llm):
@@ -79,6 +82,8 @@ def main(argv=None, llm_factory=make_llm):
             print("    the evidence does not match any known cause; read the stage detail above and the logs in the job folder")
         said = (d["diagnosis"] or {}).get("cause_id")
         print(f"  llm said: {said if d['diagnosis'] else 'no usable answer'} | rules support: {', '.join(d['rule_based_candidates']) or 'nothing'}"
+              + (f" | sent back by the end-of-turn check: {d['end_of_turn_sendbacks']}x" if d.get("end_of_turn_sendbacks") else "")
+              + (f" | model: {d['model']}" if d.get("model") else "")
               + (f" | llm error: {d['llm_error'][:120]}" if d["llm_error"] else ""))
         if d["diagnosis"] and d["final_cause_source"] == "llm_validated" and d["diagnosis"].get("explanation"):
             print(f"  llm explanation (validated cause, wording unchecked): {str(d['diagnosis']['explanation'])[:300]}")

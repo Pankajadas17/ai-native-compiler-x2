@@ -19,7 +19,8 @@ Linux, or WSL on Windows.
    and `uv.lock`:
    - `numpy` always;
    - `fasm` (extra `chip`), which the chip repo's `bit_gen.py` needs;
-   - `groq` and `google-genai` (extra `agents`), only needed for runs with a real LLM;
+   - `google-antigravity` (Google's agent harness) and `groq` (the last fallback), extra `agents`, only needed for
+     runs with a real model;
    - `pytest` (group `dev`).
 3. Install the [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build) with Yosys 0.70 or newer. Put it on
    `PATH`, unpack it to `~/tools/chip/oss-cad-suite`, or set `CHIP_CAD`.

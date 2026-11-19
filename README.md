@@ -31,7 +31,8 @@ program.
 | A3 | name the cause of a failed run from its logs | rules first; LLM answers are checked against the evidence |
 | A4 | generate tests and report the chip status | the Python oracle |
 
-Agents can use Groq or Gemini, or run with a mock or no LLM; the results do not depend on which.
+Agents run on Google's agent harness with Gemini (Groq as the last fallback), or with a fixed no-model stand-in;
+an end-of-turn check makes each agent continue until a checker or validator accepts its work, and code decides the result.
 
 ## The pipeline
 

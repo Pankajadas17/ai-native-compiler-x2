@@ -1,12 +1,13 @@
 """Run the verification agent.
   x2c agent a4                         # mock LLM (no key), healthy X2
   x2c agent a4 --inject-fault sign_flip
-  x2c agent a4 --llm gemini            # needs GEMINI_API_KEY
+  x2c agent a4 --llm gemini            # Google's agent harness with the end-of-turn check (needs GEMINI_API_KEY)
   x2c agent a4 --llm groq              # needs GROQ_API_KEY
 """
 import argparse, json
 import sys
-from x2c.agents.llm_client import MockLLM, GeminiLLM, GroqLLM, LLMUnavailable
+from x2c.agents.harness import Gemini
+from x2c.agents.llm_client import MockLLM, GroqLLM, LLMUnavailable
 from x2c.agents.verification_agent import run_agent
 from x2c.verification import tools
 
@@ -27,7 +28,7 @@ if a.inject_fault:
     from tests import faults
     tools.set_x2_backend(getattr(faults, a.inject_fault))
     print(f"[demo] deliberately broken X2 injected: {a.inject_fault}")
-llm = {"mock": lambda: MockLLM(), "gemini": lambda: GeminiLLM(model=a.model),
+llm = {"mock": lambda: MockLLM(), "gemini": lambda: Gemini(model=a.model),          # gemini: Google's harness + end-of-turn check
        "groq": lambda: GroqLLM(model=a.model)}[a.llm]()
 if hasattr(llm, "describe"):
     print("LLM config:", llm.describe(), flush=True)

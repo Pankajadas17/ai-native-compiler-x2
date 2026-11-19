@@ -5,7 +5,8 @@ Plan = generated ONCE against the healthy backend from coverage gaps only, then 
 """
 import argparse, os, sys
 import numpy as np
-from x2c.agents.llm_client import MockPlannerLLM, GeminiLLM, GroqLLM
+from x2c.agents.harness import Gemini
+from x2c.agents.llm_client import MockPlannerLLM, GroqLLM
 from x2c.agents.test_agent import plan_tests
 from x2c.commands.bmsemi_verify import run_all
 from x2c.verification import tools
@@ -28,10 +29,12 @@ CATALOGUE = [  # (label, fault function, family)
     ("LATENT_wrap16", faults.latent_wrap16, "latent"), ("LATENT_long_k", faults.latent_long_k, "latent"),
     ("LATENT_int8_min_clamp", faults.latent_int8_min_clamp, "latent")]
 
-llm = {"mock": lambda: MockPlannerLLM(), "gemini": lambda: GeminiLLM(model=a.model), "groq": lambda: GroqLLM(model=a.model)}[a.llm]()
+llm = {"mock": lambda: MockPlannerLLM(), "gemini": lambda: Gemini(model=a.model), "groq": lambda: GroqLLM(model=a.model)}[a.llm]()
 plan = plan_tests(llm)
 specs = plan["specs"]
-print(f"plan from [{a.llm}]: {plan['num_specs']} specs accepted; classes still uncovered: {plan['coverage_still_missing'] or 'none'}")
+print(f"plan from [{a.llm}]: {plan['num_specs']} specs accepted; classes still uncovered: {plan['coverage_still_missing'] or 'none'}"
+      + (f" | sent back {plan['end_of_turn_sendbacks']}x" if plan.get("end_of_turn_sendbacks") else "")
+      + (f" | model: {plan['model']}" if plan.get("model") else "") + (f" | LLM problem: {plan['llm_error']}" if plan.get("llm_error") else ""))
 if not specs:
     sys.exit("no valid specs were produced")
 

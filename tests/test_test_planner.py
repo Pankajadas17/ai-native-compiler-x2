@@ -117,3 +117,29 @@ def test_verification_agent_reports_generated_test_facts(tmp_path):
     out = run_agent(L(), "verify", log_path=str(tmp_path / "l.jsonl"))
     f = out["verified_generated_test_facts"]
     assert f["total"] >= 8 and f["failed"] == 0
+
+
+def test_on_the_harness_the_planner_must_look_first_and_close_every_gap(tmp_path):
+    """Google's harness with a stand-in model (no key): specs travel as a JSON string; the end-of-turn check sends the
+    planner back until it looked at the gaps first and no coverage class is left open."""
+    pytest.importorskip("google.antigravity", reason="the agent harness is an optional extra: uv sync --extra agents")
+    import json as _json
+    from tests.fake_model import FakeModel
+    from x2c.agents import harness
+    harness.reset_skipped()
+    plan = tp.baseline_plan()
+    steps = [("run_generated_tests", {"specs": _json.dumps(plan[:1])}), ("say", "Planned."),
+             ("coverage_gaps", {}), ("say", "Still planned."),
+             ("run_generated_tests", {"specs": _json.dumps(plan)}), ("say", "All classes covered.")]
+
+    def script(messages, request):
+        n = sum(1 for m in messages if m.get("role") == "assistant")
+        kind, value = steps[min(n, len(steps) - 1)]
+        return ("text", value) if kind == "say" else ("tool", kind, value)
+
+    with FakeModel(script) as fm:
+        out = plan_tests(harness.Gemini(model="fake", base_url=fm.url), log_path=str(tmp_path / "l.jsonl"))
+    told = " ".join(str(m.get("content")) for r in fm.requests for m in r["messages"])
+    assert fm.tools_offered() == ["coverage_gaps", "run_generated_tests"]
+    assert "Call coverage_gaps first" in told and "still uncovered" in told
+    assert out["end_of_turn_sendbacks"] == 2 and out["num_specs"] >= len(plan) and out["coverage_still_missing"] == []

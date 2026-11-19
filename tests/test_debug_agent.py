@@ -92,7 +92,13 @@ def test_hypothesis_and_reproduce_tools(make_report):
 
 # ---------- Groq "final answer as a fake tool call" recovery ----------
 import types as _types
-from x2c.agents.llm_client import GroqLLM
+from x2c.agents.llm_client import GroqLLM as _GroqLLM
+
+
+class GroqLLM(_GroqLLM):
+    """GroqLLM's own mechanics (protocol, retries, fallbacks, recoveries) without the end-of-turn check's replies;
+    those are tested in test_agent.py::test_groq_end_of_turn_reply and tests/test_agent_harness.py."""
+    send_text = None
 from tests.test_agent import _GroqClient, _gmsg
 
 
@@ -254,28 +260,6 @@ def test_groq_last_round_forbids_tools_and_agent_gets_an_answer(make_report, tmp
 
 def run_agent_for_test(llm, path, tmp_path, max_steps=2):
     return run_debug_agent(llm, path, max_steps=max_steps, log_path=str(tmp_path / "l.jsonl"))
-
-
-def test_gemini_last_round_switches_tool_calling_off(make_report, tmp_path):
-    pytest.importorskip("google.genai")
-    from x2c.agents.llm_client import GeminiLLM
-    path = make_report("sf_gem", "matmul", faults.sign_flip)
-    configs = []
-    class FC:
-        def __init__(s, n, a): s.name, s.args = n, a
-    class R:
-        def __init__(s, calls=None, text=None):
-            s.function_calls, s.text = calls, text
-            s.candidates = [type("C", (), {"content": object()})()]
-    seq = [R(calls=[FC("diagnose_report", {"report_path": path})]), R(text='{"cause_id": "unknown"}')]
-    class M:
-        def generate_content(self, model, contents, config):
-            configs.append(config); return seq.pop(0)
-    class C: models = M()
-    out = run_debug_agent(GeminiLLM(model="m", client=C(), fallback_models=[]), path, max_steps=1, log_path=str(tmp_path / "l.jsonl"))
-    assert configs[0].tool_config is None
-    assert str(configs[1].tool_config.function_calling_config.mode).endswith("NONE")
-    assert out["stopped"] == "finished"
 
 
 # ---------- LLM outage: 404 semantics and graceful degradation ----------
@@ -488,3 +472,26 @@ def test_zero_output_needs_mapper_evidence_to_blame_the_mapper():
     assert rule_based_candidates(plain) == []
     wl = [{"diagnosis": {"category": "zero_output"}, "mapping_check": {"passes_executed": 0, "mvm_ops_from_mapper": 4, "ok": False}}]
     assert rule_based_candidates(wl) == ["mapper_dropped_fold"]
+
+
+def test_the_agent_on_the_harness_is_sent_back_until_it_keeps_the_contract(make_report, tmp_path):
+    """Google's harness with a stand-in model (no key): the end-of-turn check sends back a reply that is not JSON and one
+    that misses keys; the agent sees only the three A3 tools; code still validates the cause against the evidence."""
+    pytest.importorskip("google.antigravity", reason="the agent harness is an optional extra: uv sync --extra agents")
+    from tests.fake_model import FakeModel, calls_so_far, texts_so_far
+    from x2c.agents.harness import Gemini
+    path = make_report("sign_flip", "matmul", faults.sign_flip)
+    good = json.dumps({"cause_id": "output_sign_inverted", "confidence": "high", "explanation": "actual == -expected",
+                       "proposed_fix": "fix the sign", "next_check": "rerun"})
+    replies = ["it is probably the sign", '{"cause_id": "output_sign_inverted"}', good]
+
+    def script(messages, request):
+        if "diagnose_report" not in calls_so_far(messages):
+            return ("tool", "diagnose_report", {"report_path": path})
+        return ("text", replies[min(len(texts_so_far(messages)), len(replies) - 1)])
+
+    with FakeModel(script) as fm:
+        out = run_debug_agent(Gemini(model="fake", base_url=fm.url), path, log_path=str(tmp_path / "l.jsonl"))
+    assert fm.tools_offered() == ["check_hypothesis", "diagnose_report", "reproduce_failure"]
+    assert out["end_of_turn_sendbacks"] == 2 and out["model"] == "fake"
+    assert out["final_cause"] == "output_sign_inverted" and out["final_cause_source"] == "llm_validated" and out["validated"]

@@ -8,7 +8,8 @@ Evidence level: reading of chain reports and logs (NOT a new verification result
 import json
 import re
 
-from x2c.agents.llm_client import Action, LLMUnavailable, is_provider_error
+from x2c.agents import harness
+from x2c.agents.llm_client import Action
 from x2c.verification import chain_debug as cd
 
 MENU = "\n".join(f"   - {k}: {v['suspect']}" for k, v in cd.CAUSES.items()) + "\n   - unknown: none of the above fits the evidence"
@@ -38,6 +39,7 @@ Rules:
    Write it as your normal reply text. Do NOT call a tool to deliver the answer.
 5. All evidence is netlist simulation and tool logs. Timing is nextpnr's estimate. Never claim configured-fabric or silicon findings."""
 
+ANSWER_KEYS = ("cause_id", "confidence", "explanation", "proposed_fix", "next_check")
 TOOL_SCHEMAS = [{"name": "chain_evidence",
                  "description": "Facts about the failed chain run of one operator: stage results, bitstream size, simulation result and first mismatch lines.",
                  "input_schema": {"type": "object", "properties": {"op": {"type": "string"}}}}]
@@ -84,26 +86,21 @@ def run_chain_debug_agent(llm, op, result, jobs_dir=None, max_steps=3, blind=Fal
             return {"error": f"this run is about op '{op}' only; allowed argument: op"}
         return {**ev, **({} if blind else {"rule_based_candidates": cands})}
 
-    final_text, stopped, steps, llm_error = "", "finished", 0, None
-    try:
-        action = llm.start(f"Diagnose why the chain run did not pass. op={op}", TOOL_SCHEMAS, system_prompt=prompt)
-        for step in range(1, max_steps + 1):
-            if action.kind == "final":
-                break
-            results = [(name, tool(name, args)) for name, args in action.calls]
-            steps += len(results)
-            last = step == max_steps
-            action = llm.send_tool_results(results, force_final=True) if last and getattr(llm, "supports_force_final", False) else llm.send_tool_results(results)
-        if action.kind == "final":
-            final_text = action.text
-        else:
-            stopped = "step_limit_reached"
-    except LLMUnavailable as e:
-        llm_error, stopped = str(e)[:400], "llm_unavailable"
-    except Exception as e:  # noqa: BLE001
-        if not is_provider_error(e):          # programming errors and auth problems must still raise
-            raise
-        llm_error, stopped = f"{type(e).__name__}: {str(e)[:350]}", "llm_error"
+    def chain_evidence(op: str = op) -> str:
+        """Facts about the failed chain run of one operator: stage results, bitstream size, simulation result and first mismatch lines.
+
+        Args:
+            op: The operator named in the task.
+        """
+        return json.dumps(tool("chain_evidence", {"op": op}), default=str)
+
+    menu = (set(cd.chip_menu_ids()) if target == "chip" else set(cd.CAUSES)) | {"unknown"}
+    run = harness.run(llm, prompt, f"Diagnose why the chain run did not pass. op={op}", sdk_tools=[chain_evidence],
+                      max_steps=max_steps, max_model_calls=max_steps + 5, legacy=dict(schemas=TOOL_SCHEMAS, call=tool),
+                      end_check=lambda text, used: harness.check_json_answer(
+                          text, used, first_tool="chain_evidence", keys=ANSWER_KEYS, field_name="cause_id", allowed=menu))
+    final_text, stopped, steps, llm_error = run["text"], run["stopped"], run["steps"], run["llm_error"]
+    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"]}
     parsed = _parse_json(final_text)
     cause, source, checks = cd.decide(parsed, cands, llm_error)
     info = cd.cause_info(cause)
@@ -111,4 +108,4 @@ def run_chain_debug_agent(llm, op, result, jobs_dir=None, max_steps=3, blind=Fal
             "known_fix": info.get("fix"), "seen": info.get("seen"),
             "diagnosis": parsed, "raw_answer": None if parsed else (final_text or "")[:300], "validation": checks, "validated": all(checks.values()),
             "rule_based_candidates": cands, "evidence": ev, "stopped": stopped, "steps": steps, "llm_error": llm_error,
-            "evidence_level": "reading of chain reports and logs (NOT a new verification result; NOT timing, NOT silicon)"}
+            "evidence_level": "reading of chain reports and logs (NOT a new verification result; NOT timing, NOT silicon)", **extra}

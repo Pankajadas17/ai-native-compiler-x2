@@ -3,7 +3,8 @@ Target-mapping agent (A1): an LLM proposes which hardware (X2 or eFPGA) runs eac
 code derives the numbers and compiler.partition.validate_partition alone decides if the plan is legal.
 
     x2c agent a1                          # mock LLM, the Compiler V2 MobileNetV2 graph
-    x2c agent a1 --llm groq               # a real LLM (GROQ_API_KEY must be set in this window)
+    x2c agent a1 --llm gemini             # Gemini on Google's agent harness, with the end-of-turn check
+    x2c agent a1 --llm groq               # a real LLM through the plain loop (GROQ_API_KEY must be set)
     x2c agent a1 --workload bm_deepgate_ad01_int8
     x2c agent a1 --list
 
@@ -16,7 +17,8 @@ import json
 import os
 import sys
 
-from x2c.agents.llm_client import GeminiLLM, GroqLLM, MockMappingLLM
+from x2c.agents.harness import Gemini
+from x2c.agents.llm_client import GroqLLM, MockMappingLLM
 from x2c.agents.mapping_agent import run_mapping_agent
 from x2c.compiler.ir_builder import build_ir_from_chain_workload, build_ir_from_compiler_graph
 from x2c.compiler.partition import load_hardware
@@ -45,7 +47,7 @@ def main(argv=None):
     keys = {"groq": "GROQ_API_KEY", "gemini": "GEMINI_API_KEY"}
     if a.llm in keys and not os.environ.get(keys[a.llm]):
         sys.exit(f"{keys[a.llm]} is not set in THIS terminal window. Set it with Read-Host -AsSecureString, or use --llm mock")
-    llm = {"mock": MockMappingLLM, "gemini": lambda: GeminiLLM(model=a.model), "groq": lambda: GroqLLM(model=a.model)}[a.llm]()
+    llm = {"mock": MockMappingLLM, "gemini": lambda: Gemini(model=a.model), "groq": lambda: GroqLLM(model=a.model)}[a.llm]()
     ir = build_ir(repo, wls[a.workload])
     out = run_mapping_agent(llm, ir, load_hardware())
     plan = out["final_plan"]
@@ -56,6 +58,8 @@ def main(argv=None):
     print(f"LLM plan legal (validator): {out['llm_plan_legal']} | same as baseline: {out['matches_baseline']}")
     if out["llm_errors"]:
         print("validator errors on the LLM plan:", *out["llm_errors"][:5], sep="\n  ")
+    if out.get("end_of_turn_sendbacks") or out.get("model"):
+        print(f"model: {out.get('model')} | sent back by the end-of-turn check: {out.get('end_of_turn_sendbacks', 0)}x")
     if out["llm_error"]:
         print("LLM problem:", out["llm_error"])
     print(f"FINAL PLAN SOURCE: {out['final_source']}")

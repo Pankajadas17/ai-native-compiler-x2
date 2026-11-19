@@ -31,7 +31,8 @@ from types import SimpleNamespace
 
 import x2c.commands.demo_prep as run_fab_prep
 import x2c.commands.demo_flow_check as run_flow_check
-from x2c.agents.llm_client import GeminiLLM, GroqLLM
+from x2c.agents.harness import Gemini
+from x2c.agents.llm_client import GroqLLM
 from x2c.agents.rtl_agent import MockRTLLLM, run_rtl_agent
 from x2c.verification import chain_debug
 from x2c.verification import chip_chain as cc
@@ -89,7 +90,7 @@ def wrappable_ops():
 def make_llm(name, op, model=None):
     if name == "mock":
         return MockRTLLLM(op)
-    return {"groq": GroqLLM, "gemini": GeminiLLM}[name](model=model)
+    return Gemini(model=model) if name == "gemini" else GroqLLM(model=model)      # gemini: Google's agent harness
 
 
 def build_steps(op, cfg, exec_fn=fc.run_command, preflight=None):
