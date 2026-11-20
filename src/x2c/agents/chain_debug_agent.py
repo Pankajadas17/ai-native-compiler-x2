@@ -86,21 +86,13 @@ def run_chain_debug_agent(llm, op, result, jobs_dir=None, max_steps=3, blind=Fal
             return {"error": f"this run is about op '{op}' only; allowed argument: op"}
         return {**ev, **({} if blind else {"rule_based_candidates": cands})}
 
-    def chain_evidence(op: str = op) -> str:
-        """Facts about the failed chain run of one operator: stage results, bitstream size, simulation result and first mismatch lines.
-
-        Args:
-            op: The operator named in the task.
-        """
-        return json.dumps(tool("chain_evidence", {"op": op}), default=str)
-
     menu = (set(cd.chip_menu_ids()) if target == "chip" else set(cd.CAUSES)) | {"unknown"}
-    run = harness.run(llm, prompt, f"Diagnose why the chain run did not pass. op={op}", sdk_tools=[chain_evidence],
-                      max_steps=max_steps, max_model_calls=max_steps + 5, legacy=dict(schemas=TOOL_SCHEMAS, call=tool),
+    run = harness.run(llm, prompt, f"Diagnose why the chain run did not pass. op={op}",
+                      max_steps=max_steps, max_model_calls=max_steps + 5, tools=dict(schemas=TOOL_SCHEMAS, call=tool),
                       end_check=lambda text, used: harness.check_json_answer(
                           text, used, first_tool="chain_evidence", keys=ANSWER_KEYS, field_name="cause_id", allowed=menu))
     final_text, stopped, steps, llm_error = run["text"], run["stopped"], run["steps"], run["llm_error"]
-    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"]}
+    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"], "cost_usd": run.get("cost_usd")}
     parsed = _parse_json(final_text)
     cause, source, checks = cd.decide(parsed, cands, llm_error)
     info = cd.cause_info(cause)

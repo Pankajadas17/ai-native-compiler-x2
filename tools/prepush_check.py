@@ -36,7 +36,7 @@ SECRETS = [
     ("hard-coded secret", re.compile(r"""(?i)\b(api[_-]?key|secret|token|password)\b\s*[:=]\s*["']([^"'\s]{16,})["']""")),
 ]
 PLACEHOLDER = re.compile(r"(?i)(your|example|dummy|fake|test|xxx|<|\.\.\.|changeme|placeholder)")
-IMPORT_NAME = {"google-antigravity": "google", "google-genai": "google", "google-generativeai": "google", "pyyaml": "yaml", "scikit-learn": "sklearn",
+IMPORT_NAME = {"openai-agents": "agents", "google-genai": "google", "google-generativeai": "google", "pyyaml": "yaml", "scikit-learn": "sklearn",
                "opencv-python": "cv2", "pillow": "PIL", "beautifulsoup4": "bs4", "python-dotenv": "dotenv"}
 
 

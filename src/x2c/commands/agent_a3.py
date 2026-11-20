@@ -7,7 +7,7 @@ Ask the debug agent (A3) why a chain run did not pass.
 
 Run it right after x2c chain (it reads that run's report and the job folders; it changes nothing and runs nothing in Ubuntu).
 The LLM proposes a root cause from a fixed list; code accepts it only if the evidence rules support it, otherwise the rules answer.
---llm mock (default) needs no key and is NOT a real model. For groq/gemini the key must be set in this window with Read-Host -AsSecureString.
+--llm mock (default) needs no key and is NOT a real model. For groq/openrouter the key must be set in this window with Read-Host -AsSecureString.
 Report: reports/chain_debug_report.json. Evidence level: reading of chain reports and logs (NOT a new verification result).
 """
 import argparse
@@ -21,15 +21,15 @@ from x2c.verification import chain_debug as cd
 
 OUT = Path("reports/chain_debug_report.json")
 CHIP_OUT = Path("reports/chip_chain_debug_report.json")
-KEYS = {"groq": "GROQ_API_KEY", "gemini": "GEMINI_API_KEY"}
+KEYS = {"groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY"}
 
 
 def make_llm(name, model=None):
     if name == "mock":
         return MockChainDebugLLM()
-    if name == "gemini":                                   # Google's harness with the end-of-turn check
-        from x2c.agents.harness import Gemini
-        return Gemini(model=model)
+    if name == "openrouter":                                   # OpenAI's Agents SDK with the end-of-turn check
+        from x2c.agents.harness import OpenRouter
+        return OpenRouter(model=model)
     from x2c.agents.llm_client import GroqLLM
     return GroqLLM(model=model)
 
@@ -37,7 +37,7 @@ def make_llm(name, model=None):
 def main(argv=None, llm_factory=make_llm):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--op", action="append", help="operator (repeat); default: every operator in the report that did not pass")
-    ap.add_argument("--llm", choices=["mock", "groq", "gemini"], default="mock")
+    ap.add_argument("--llm", choices=["mock", "groq", "openrouter"], default="mock")
     ap.add_argument("--model", default=None)
     ap.add_argument("--blind", action="store_true", help="hide the rules' candidates from the LLM (measures the LLM itself)")
     ap.add_argument("--target", choices=["demo", "chip"], default="demo", help="which chain's report: demo fabric or the BM Labs chip")
@@ -83,7 +83,7 @@ def main(argv=None, llm_factory=make_llm):
         said = (d["diagnosis"] or {}).get("cause_id")
         print(f"  llm said: {said if d['diagnosis'] else 'no usable answer'} | rules support: {', '.join(d['rule_based_candidates']) or 'nothing'}"
               + (f" | sent back by the end-of-turn check: {d['end_of_turn_sendbacks']}x" if d.get("end_of_turn_sendbacks") else "")
-              + (f" | model: {d['model']}" if d.get("model") else "")
+              + (f" | model: {d['model']}" if d.get("model") else "") + (f" | cost ${d['cost_usd']:.3f}" if d.get("cost_usd") else "")
               + (f" | llm error: {d['llm_error'][:120]}" if d["llm_error"] else ""))
         if d["diagnosis"] and d["final_cause_source"] == "llm_validated" and d["diagnosis"].get("explanation"):
             print(f"  llm explanation (validated cause, wording unchecked): {str(d['diagnosis']['explanation'])[:300]}")

@@ -1,7 +1,8 @@
-"""The agents' harness (Google's Antigravity SDK) and its end-of-turn check, tested OFFLINE with a stand-in model
-(tests/fake_model.py): no key and no network. The real loop, tools and hook run; only the model is scripted.
+"""The agents' harness (OpenAI's Agents SDK, models through OpenRouter) and its end-of-turn check, tested OFFLINE with a
+stand-in for OpenRouter (tests/fake_model.py): no key, no network, no cost. The real loop, tools and check run; only the model is scripted.
 Shown here: only our tools are offered, a reply that breaks the answer contract is sent back, the send-backs are limited,
-code still decides whether a cause is supported, a busy model falls back to the next one, a wrong key is raised."""
+code still decides whether a cause is supported, a busy model falls back to the next one, a used-up credit goes straight
+to the last fallback, the spending cap stops a task, a wrong key is raised."""
 import json
 
 import pytest
@@ -21,22 +22,18 @@ def _fresh_skips():
     h.reset_skipped()
 
 
-# the exact provider messages of a real run (2026-11-18): daily free quota used up, a retired model, a busy model
-REAL_429 = ("AntigravityExecutionError: agent executor error: Error 429, Message: You exceeded your current quota, please check your "
-            "plan and billing details. * Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, "
-            "limit: 20, model: gemini-3.6-flash, description: Generate content requests per day limit exceeded on Free Tier. "
-            "Please retry in 20h53m28.800033716s., Status: RESOURCE_EXHAUSTED")
-REAL_404 = ("AntigravityExecutionError: Error 404, Message: This model models/gemini-2.5-flash is no longer available to new users. "
-            "Please update your code to use models/gemini-3.8-flash for the latest features and improvements., Status: NOT_FOUND")
-REAL_503 = ("Error 503, Message: This model is currently experiencing high demand. Spikes in demand are usually temporary. "
-            "Please try again later., Status: UNAVAILABLE")
+def test_errors_are_classified():
+    assert h.classify(503) == "busy" and h.classify(500) == "busy" and h.classify(None) == "busy"
+    assert h.classify(429, "rate_limit_exceeded") == "quota" and h.classify(429, "insufficient_quota") == "billing"
+    assert h.classify(404, "model_not_found") == "missing"
+    assert h.classify(401, "invalid_api_key") == "auth" and h.classify(403) == "auth"
+    assert h.classify(400, "invalid_request_error") == "other"
 
 
-def test_the_real_provider_errors_are_classified():
-    assert h.classify(REAL_429) == "quota_daily" and h.classify(REAL_404) == "missing" and h.classify(REAL_503) == "busy"
-    assert h.classify("Error 429: rate limit, Status: RESOURCE_EXHAUSTED") == "quota"
-    assert h.classify("Error 401: API key not valid. Please pass a valid API key. Status: UNAUTHENTICATED") == "auth"
-    assert h.classify("KeyError: 'cause_id'") == "other"
+def test_cost_estimate():
+    assert h.estimate_usd("openai/gpt-5.6-luna", 1_000_000, 1_000_000) == 0.20 + 1.20
+    assert h.estimate_usd("gpt-5.6-luna", 1_000_000, 0) == 0.20                # OpenAI's own name works too
+    assert h.estimate_usd("some-new-model", 10, 10) is None        # unknown price: only the tokens are reported
 
 
 # ------------------------------------------------------------------ the end-of-turn check itself (pure code)
@@ -55,35 +52,22 @@ def test_the_json_answer_check():
 def test_model_order(monkeypatch):
     monkeypatch.delenv("BM_LLM_MODEL", raising=False)
     monkeypatch.delenv("BM_LLM_FALLBACKS", raising=False)
-    assert h.Gemini().models() == [h.DEFAULT_MODEL, *h.DEFAULT_FALLBACKS]
+    assert h.OpenRouter().models() == [h.DEFAULT_MODEL, *h.DEFAULT_FALLBACKS]
     monkeypatch.setenv("BM_LLM_MODEL", "m1")
     monkeypatch.setenv("BM_LLM_FALLBACKS", "m2, m1 ,m3")
-    assert h.Gemini().models() == ["m1", "m2", "m3"]
-    assert h.Gemini(model="a", fallbacks=("b",)).models() == ["a", "b"]
+    assert h.OpenRouter().models() == ["m1", "m2", "m3"]
+    assert h.OpenRouter(model="a", fallbacks=("b",)).models() == ["a", "b"]
 
 
-def test_tools_from_schemas():
-    """Our JSON tool schemas -> plain functions for the harness; objects travel as JSON strings (Gemini tool schemas
-    cannot hold a free-form object); the arguments the model gave reach our existing call() unchanged."""
-    import inspect
-    calls = []
-    schemas = [{"name": "t1", "description": "A tool.", "input_schema": {"type": "object", "required": ["n"], "properties": {
-        "n": {"type": "integer"}, "xs": {"type": "array", "items": {"type": "string"}},
-        "specs": {"type": "array", "items": {"type": "object", "properties": {"a": {"type": "integer"}}}}}}}]
-    (f,) = h.tools_from_schemas(schemas, lambda name, args: calls.append((name, args)) or {"ok": True})
-    sig = inspect.signature(f)
-    assert f.__name__ == "t1" and list(sig.parameters) == ["n", "xs", "specs"]
-    assert sig.parameters["n"].default is inspect.Parameter.empty and sig.parameters["xs"].default is None
-    assert "JSON array of objects with the fields a" in f.__doc__
-    assert json.loads(f(n=1, specs='[{"a": 2}]')) == {"ok": True} and calls[-1] == ("t1", {"n": 1, "specs": [{"a": 2}]})
-    assert "not valid JSON" in f(n=1, specs="[oops") and len(calls) == 1
-    gt = pytest.importorskip("google.genai.types")
-    props = gt.FunctionDeclaration.from_callable_with_api_option(callable=f, api_option="GEMINI_API").parameters.properties
-    assert props["specs"].type == "STRING" and props["xs"].type == "ARRAY" and props["n"].type == "INTEGER"
+def test_spending_cap_setting(monkeypatch):
+    monkeypatch.delenv("BM_LLM_MAX_USD", raising=False)
+    assert h.OpenRouter().budget() == h.DEFAULT_MAX_USD
+    monkeypatch.setenv("BM_LLM_MAX_USD", "0.25")
+    assert h.OpenRouter().budget() == 0.25 and h.OpenRouter(max_usd=2).budget() == 2
 
 
 # ------------------------------------------------------------------ the real harness with a stand-in model
-sdk = pytest.importorskip("google.antigravity", reason="the agent harness is an optional extra: uv sync --extra agents")
+sdk = pytest.importorskip("agents", reason="the agent harness is an optional extra: uv sync --extra agents")
 
 
 @pytest.fixture
@@ -109,25 +93,25 @@ def chain(script_answers, model="fake"):
 def test_only_our_tool_and_a_contract_breaking_reply_is_sent_back(xx):
     r, jd = xx
     with FakeModel(chain(["I think the fabric is broken, sorry.", answer("bitstream_not_loaded")])) as fm:
-        d = run_chain_debug_agent(h.Gemini(model="fake", base_url=fm.url), "add8_sat", r, jd)
-    assert fm.tools_offered() == ["chain_evidence"]              # none of the harness's own file / shell / web tools
+        d = run_chain_debug_agent(h.OpenRouter(model="fake", base_url=fm.url), "add8_sat", r, jd)
+    assert fm.tools_offered() == ["chain_evidence"]              # none of the SDK's own file / shell / web tools
     assert d["end_of_turn_sendbacks"] == 1 and d["steps"] == 1 and d["model"] == "fake"
     assert d["final_cause"] == "bitstream_not_loaded" and d["final_cause_source"] == "llm_validated" and d["validated"]
-    sent_back = [m for req in fm.requests for m in req["messages"] if "ONLY one JSON object" in str(m.get("content"))]
+    sent_back = [m for m in fm.all_chat() if m["role"] == "user" and "ONLY one JSON object" in str(m.get("content"))]
     assert sent_back, "the end-of-turn check's reason must reach the model"
 
 
 def test_an_off_menu_cause_is_sent_back(xx):
     r, jd = xx
     with FakeModel(chain([answer("cosmic_rays"), answer("bitstream_not_loaded")])) as fm:
-        d = run_chain_debug_agent(h.Gemini(model="fake", base_url=fm.url), "add8_sat", r, jd)
+        d = run_chain_debug_agent(h.OpenRouter(model="fake", base_url=fm.url), "add8_sat", r, jd)
     assert d["end_of_turn_sendbacks"] == 1 and d["final_cause_source"] == "llm_validated"
 
 
 def test_code_still_decides_whether_the_evidence_supports_the_cause(xx):
     r, jd = xx
     with FakeModel(chain([answer("pins_not_connected")])) as fm:       # on the menu, keeps the contract, but wrong
-        d = run_chain_debug_agent(h.Gemini(model="fake", base_url=fm.url), "add8_sat", r, jd)
+        d = run_chain_debug_agent(h.OpenRouter(model="fake", base_url=fm.url), "add8_sat", r, jd)
     assert d["end_of_turn_sendbacks"] == 0
     assert d["final_cause"] == "bitstream_not_loaded" and d["final_cause_source"] == "rules_fallback (llm claim rejected)"
 
@@ -135,7 +119,7 @@ def test_code_still_decides_whether_the_evidence_supports_the_cause(xx):
 def test_send_backs_are_limited_then_the_rules_answer(xx):
     r, jd = xx
     with FakeModel(chain(["still thinking"])) as fm:
-        d = run_chain_debug_agent(h.Gemini(model="fake", base_url=fm.url), "add8_sat", r, jd)
+        d = run_chain_debug_agent(h.OpenRouter(model="fake", base_url=fm.url), "add8_sat", r, jd)
     assert d["end_of_turn_sendbacks"] == 2 and d["validation"]["json_ok"] is False
     assert d["final_cause"] == "bitstream_not_loaded" and d["final_cause_source"] == "rules_fallback (no usable llm answer)"
 
@@ -143,8 +127,7 @@ def test_send_backs_are_limited_then_the_rules_answer(xx):
 def busy_then(script, busy=("busy",)):
     def s(messages, request):
         if request.get("model") in busy:
-            return ("http", 503, {"error": {"message": "This model is currently experiencing high demand.", "code": 503,
-                                            "status": "UNAVAILABLE"}})
+            return ("http", 503, {"error": {"message": "overloaded", "type": "server_error"}})
         return script(messages, request)
     return s
 
@@ -152,69 +135,68 @@ def busy_then(script, busy=("busy",)):
 def test_a_busy_model_falls_back_to_the_next(xx):
     r, jd = xx
     with FakeModel(busy_then(chain([answer("bitstream_not_loaded")]))) as fm:
-        d = run_chain_debug_agent(h.Gemini(model="busy", fallbacks=("fake",), base_url=fm.url, api_retries=0), "add8_sat", r, jd)
+        d = run_chain_debug_agent(h.OpenRouter(model="busy", fallbacks=("fake",), base_url=fm.url, api_retries=0), "add8_sat", r, jd)
     assert d["model"] == "fake" and d["final_cause_source"] == "llm_validated"
+    assert {req["model"] for req in fm.requests} == {"busy", "fake"}
 
 
 def test_every_model_busy_means_the_rules_answer(xx):
     r, jd = xx
     with FakeModel(busy_then(chain([answer("bitstream_not_loaded")]), busy=("busy", "busy2"))) as fm:
-        d = run_chain_debug_agent(h.Gemini(model="busy", fallbacks=("busy2",), base_url=fm.url, api_retries=0), "add8_sat", r, jd)
+        d = run_chain_debug_agent(h.OpenRouter(model="busy", fallbacks=("busy2",), base_url=fm.url, api_retries=0), "add8_sat", r, jd)
     assert d["stopped"] == "llm_unavailable" and "busy" in d["llm_error"]
     assert d["final_cause"] == "bitstream_not_loaded" and d["final_cause_source"] == "rules_fallback (llm unavailable)"
 
 
 def test_a_wrong_key_is_raised_not_hidden(xx):
     r, jd = xx
-    bad = lambda messages, request: ("http", 401, {"error": {"message": "API key not valid. Please pass a valid API key.",
-                                                              "code": 401, "status": "UNAUTHENTICATED"}})
-    with FakeModel(bad) as fm, pytest.raises(Exception, match="(?i)401|api key|unauthenticated"):
-        run_chain_debug_agent(h.Gemini(model="fake", fallbacks=("fake2",), base_url=fm.url, api_retries=0), "add8_sat", r, jd)
+    bad = lambda messages, request: ("http", 401, {"error": {"message": "Incorrect API key", "code": "invalid_api_key"}})
+    with FakeModel(bad) as fm, pytest.raises(Exception, match="401"):
+        run_chain_debug_agent(h.OpenRouter(model="fake", fallbacks=("fake2",), base_url=fm.url, api_retries=0), "add8_sat", r, jd)
 
 
 def test_no_key_is_a_clear_error(monkeypatch):
-    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-    with pytest.raises(RuntimeError, match="GEMINI_API_KEY"):
-        h.converse(h.Gemini(), "s", "t", [])
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    with pytest.raises(RuntimeError, match="OPENROUTER_API_KEY"):
+        h.converse(h.OpenRouter(), "s", "t", [], None)
 
 
-def test_the_tool_log(xx, tmp_path):
+EVIDENCE = {"name": "chain_evidence", "description": "Stand-in evidence tool.",
+            "input_schema": {"type": "object", "properties": {"op": {"type": "string"},
+                                                              "detail": {"type": "object", "properties": {"lines": {"type": "integer"}}}}}}
+
+
+def test_the_tool_log_and_the_schema_reaches_the_model_unchanged(xx, tmp_path):
     r, jd = xx
-    log_path = tmp_path / "log.jsonl"
+    log_path, calls = tmp_path / "log.jsonl", []
     with FakeModel(chain(["no", answer("bitstream_not_loaded")])) as fm:
-        h.converse(h.Gemini(model="fake", base_url=fm.url), "system", "task op=add8_sat",
-                   [_evidence], log=h.jsonl_logger(log_path),
-                   end_check=lambda text, used: h.check_json_answer(text, used, first_tool="chain_evidence", keys=KEYS,
-                                                                   field_name="cause_id", allowed={"bitstream_not_loaded"}))
+        run = h.converse(h.OpenRouter(model="fake", base_url=fm.url), "system", "task op=add8_sat", [EVIDENCE],
+                         lambda name, args: calls.append((name, args)) or {"op": args.get("op")}, log=h.jsonl_logger(log_path),
+                         end_check=lambda text, used: h.check_json_answer(text, used, first_tool="chain_evidence", keys=KEYS,
+                                                                         field_name="cause_id", allowed={"bitstream_not_loaded"}))
     kinds = [json.loads(line)["kind"] for line in log_path.read_text().splitlines()]
     assert kinds[0] == "start" and "tool" in kinds and kinds.count("end_of_turn") == 2
+    assert calls == [("chain_evidence", {"op": "add8_sat"})] and run["continues"] == 1 and run["stopped"] == "finished"
+    (offered,) = [t["function"] for t in fm.requests[0]["tools"] if t["function"]["name"] == "chain_evidence"]
+    assert offered["parameters"] == EVIDENCE["input_schema"]          # objects too: the schema goes to the model as it is
+    assert fm.requests[0]["messages"][0] == {"role": "system", "content": "system"}   # our system prompt reaches the model
+    assert run["tokens"] == {"input": 10 * len(fm.requests), "output": 5 * len(fm.requests)}
+    assert {req.get("max_tokens") for req in fm.requests} == {h.DEFAULT_MAX_TOKENS}    # OpenRouter reserves credit for it
+    assert run["text"] == answer("bitstream_not_loaded")               # the accepted reply only, not every reply joined
 
 
-def _evidence(op: str = "add8_sat") -> str:
-    """Stand-in evidence tool.
-
-    Args:
-        op: The operator.
-    """
-    return json.dumps({"op": op})
-
-
-_evidence.__name__ = "chain_evidence"
-
-
-def failing(script, models, status, message):
+def failing(script, models, status, message, code_for={404: "model_not_found", 429: "rate_limit_exceeded"}):
     def s(messages, request):
         if request.get("model") in models:
-            return ("http", status, {"error": {"message": message, "code": status}})
+            return ("http", status, {"error": {"message": message, "code": code_for.get(status)}})
         return script(messages, request)
     return s
 
 
-@pytest.mark.parametrize("status,message", [(404, REAL_404), (429, REAL_429)], ids=["retired_model", "daily_quota_used_up"])
-def test_a_model_that_cannot_answer_today_is_skipped_for_the_rest_of_the_run(xx, status, message):
+def test_a_model_that_does_not_exist_is_skipped_for_the_rest_of_the_run(xx):
     r, jd = xx
-    with FakeModel(failing(chain([answer("bitstream_not_loaded")]), {"gone"}, status, message)) as fm:
-        spec = h.Gemini(model="gone", fallbacks=("fake",), base_url=fm.url, api_retries=0)
+    with FakeModel(failing(chain([answer("bitstream_not_loaded")]), {"gone"}, 404, "model: gone")) as fm:
+        spec = h.OpenRouter(model="gone", fallbacks=("fake",), base_url=fm.url, api_retries=0)
         first = run_chain_debug_agent(spec, "add8_sat", r, jd)
         asked = sum(req.get("model") == "gone" for req in fm.requests)
         second = run_chain_debug_agent(spec, "add8_sat", r, jd)
@@ -222,11 +204,22 @@ def test_a_model_that_cannot_answer_today_is_skipped_for_the_rest_of_the_run(xx,
     assert asked >= 1 and sum(req.get("model") == "gone" for req in fm.requests) == asked      # not asked again
 
 
+def test_used_up_credit_stops_at_once(xx):
+    r, jd = xx
+    with FakeModel(failing(chain([answer("bitstream_not_loaded")]), {"a", "b"}, 402,
+                           "Insufficient credits. Add more using https://openrouter.ai/credits")) as fm:
+        d = run_chain_debug_agent(h.OpenRouter(model="a", fallbacks=("b",), base_url=fm.url, api_retries=0, groq_fallback=False),
+                                  "add8_sat", r, jd)
+    assert {req["model"] for req in fm.requests} == {"a"}                  # the other model uses the same credit: not asked
+    assert d["stopped"] == "llm_unavailable" and "credit used up" in d["llm_error"]
+    assert d["final_cause_source"] == "rules_fallback (llm unavailable)"
+
+
 def test_when_no_model_is_left_the_rules_answer(xx):
     r, jd = xx
-    with FakeModel(failing(chain([answer("bitstream_not_loaded")]), {"a", "b"}, 429, REAL_429)) as fm:
-        d = run_chain_debug_agent(h.Gemini(model="a", fallbacks=("b",), base_url=fm.url, api_retries=0), "add8_sat", r, jd)
-    assert d["stopped"] == "llm_unavailable" and "daily free quota used up" in d["llm_error"]
+    with FakeModel(failing(chain([answer("bitstream_not_loaded")]), {"a", "b"}, 429, "rate limit")) as fm:
+        d = run_chain_debug_agent(h.OpenRouter(model="a", fallbacks=("b",), base_url=fm.url, api_retries=0), "add8_sat", r, jd)
+    assert d["stopped"] == "llm_unavailable" and "rate limit" in d["llm_error"]
     assert d["final_cause"] == "bitstream_not_loaded" and d["final_cause_source"] == "rules_fallback (llm unavailable)"
 
 
@@ -270,13 +263,13 @@ def test_the_no_model_stand_ins_behave_as_before(xx):
     assert d["end_of_turn_sendbacks"] == 0 and d["model"] is None and d["final_cause"] == "bitstream_not_loaded"
 
 
-def test_groq_is_the_last_resort_when_every_gemini_model_is_out(xx, monkeypatch):
+def test_groq_is_the_last_resort_when_no_model_is_left(xx, monkeypatch):
     from x2c.agents import llm_client
     r, jd = xx
     monkeypatch.setenv("GROQ_API_KEY", "test")
     monkeypatch.setattr(llm_client, "GroqLLM", lambda *a, **k: _Replying([answer("bitstream_not_loaded")]))
-    with FakeModel(failing(chain([answer("bitstream_not_loaded")]), {"a", "b"}, 429, REAL_429)) as fm:
-        d = run_chain_debug_agent(h.Gemini(model="a", fallbacks=("b",), base_url=fm.url, api_retries=0), "add8_sat", r, jd)
+    with FakeModel(failing(chain([answer("bitstream_not_loaded")]), {"a", "b"}, 429, "rate limit")) as fm:
+        d = run_chain_debug_agent(h.OpenRouter(model="a", fallbacks=("b",), base_url=fm.url, api_retries=0), "add8_sat", r, jd)
     assert d["model"] == "groq:groq-test" and d["final_cause_source"] == "llm_validated" and d["llm_error"] is None
 
 
@@ -289,8 +282,17 @@ def test_without_groq_the_rules_answer(xx, monkeypatch, why):
     else:
         monkeypatch.setenv("GROQ_API_KEY", "test")
     monkeypatch.setattr(llm_client, "GroqLLM", lambda *a, **k: pytest.fail("Groq must not be used"))
-    with FakeModel(failing(chain([answer("bitstream_not_loaded")]), {"a"}, 429, REAL_429)) as fm:
-        spec = h.Gemini(model="a", fallbacks=(), base_url=fm.url, api_retries=0, groq_fallback=(why != "groq_fallback_off"))
+    with FakeModel(failing(chain([answer("bitstream_not_loaded")]), {"a"}, 429, "rate limit")) as fm:
+        spec = h.OpenRouter(model="a", fallbacks=(), base_url=fm.url, api_retries=0, groq_fallback=(why != "groq_fallback_off"))
         spec.fallbacks = ("a",)                       # only one model
         d = run_chain_debug_agent(spec, "add8_sat", r, jd)
     assert d["stopped"] == "llm_unavailable" and d["final_cause_source"] == "rules_fallback (llm unavailable)"
+
+
+def test_the_spending_cap_stops_a_task_and_the_rules_answer(xx):
+    r, jd = xx
+    with FakeModel(chain(["not json", answer("bitstream_not_loaded")])) as fm:
+        d = run_chain_debug_agent(h.OpenRouter(model="openai/gpt-5.6-luna", base_url=fm.url, max_usd=0.000001), "add8_sat", r, jd)
+    assert len(fm.requests) == 1                                             # stopped after the first model call
+    assert d["stopped"] == "budget_reached" and d["final_cause"] == "bitstream_not_loaded"
+    assert d["cost_usd"] > 0.000001

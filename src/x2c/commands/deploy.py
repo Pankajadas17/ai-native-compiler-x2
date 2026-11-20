@@ -73,9 +73,9 @@ def plan(g, hw, llm_name, log):
     elif llm_name == "mock":
         from x2c.agents.llm_client import MockMappingLLM
         llm = MockMappingLLM()
-    elif llm_name == "gemini":                         # Google's agent harness with the end-of-turn check
-        from x2c.agents.harness import Gemini
-        llm = Gemini()
+    elif llm_name == "openrouter":                         # OpenAI's Agents SDK with the end-of-turn check
+        from x2c.agents.harness import OpenRouter
+        llm = OpenRouter()
     else:
         from x2c.agents.llm_client import GroqLLM
         llm = GroqLLM()
@@ -271,7 +271,7 @@ def main(argv=None):
     ap.add_argument("--ir", help="IR JSON instead of reading BMsemi_Model")
     ap.add_argument("--synthetic", action="store_true", help="DeepGate/MNIST stand-in data (no BMsemi_Model)")
     ap.add_argument("--weights", help="mobilenetv2: .npz of real INT8 weights, one array per layer name (see apply_weights)")
-    ap.add_argument("--llm", choices=["none", "mock", "groq", "gemini"], default="none", help="A1's model (none: baseline + code schedule)")
+    ap.add_argument("--llm", choices=["none", "mock", "groq", "openrouter"], default="none", help="A1's model (none: baseline + code schedule)")
     ap.add_argument("--sim", action="store_true", help="also run every layer on the 1-bit two-block engine (Ubuntu, Icarus)")
     ap.add_argument("--max-tiles", type=int, default=64)
     ap.add_argument("--out", default=None)

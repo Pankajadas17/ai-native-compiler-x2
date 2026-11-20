@@ -44,21 +44,20 @@ def end_check(tools_used):
 
 
 def plan_tests(llm, max_steps=5, log_path="reports/test_agent_log.jsonl"):
-    """llm: harness.Gemini(...) (Google's harness, then Groq if every Gemini model is out), or an object with start /
+    """llm: harness.OpenRouter(...) (OpenAI's Agents SDK via OpenRouter, then Groq if no model is left), or an object with start /
     send_tool_results (the stand-in MockPlannerLLM, GroqLLM, test doubles). The oracle and the replay are code."""
     from x2c.agents import harness
     Path(log_path).parent.mkdir(parents=True, exist_ok=True)
     tools.reset_generated()
     schemas = [s for s in tools.TOOL_SCHEMAS if s["name"] in PLANNER_TOOLS]
     log = harness.jsonl_logger(log_path)
-    run = harness.run(llm, TEST_PROMPT, "Plan independent tests to close the coverage gaps.",
-                      sdk_tools=harness.tools_from_schemas(schemas, call_planner_tool), max_steps=max_steps,
+    run = harness.run(llm, TEST_PROMPT, "Plan independent tests to close the coverage gaps.", max_steps=max_steps,
                       max_model_calls=2 * max_steps + 4, log=log, catch_llm_errors=False,
                       end_check=lambda reply, used: end_check(used),
-                      legacy=dict(schemas=schemas, call=call_planner_tool, force_final=False,
+                      tools=dict(schemas=schemas, call=call_planner_tool, force_final=False,
                                   on_tool=lambda step, name, args, res: log("tool", step=step, tool=name, ok="error" not in res)))
     final_text, stopped = run["text"], run["stopped"]
-    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"], "llm_error": run["llm_error"]}
+    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"], "cost_usd": run.get("cost_usd"), "llm_error": run["llm_error"]}
     from x2c.verification import test_planner as tp
     specs = tools.get_generated_specs()
     return {"stopped": stopped, "summary": final_text, "specs": specs, "num_specs": len(specs),

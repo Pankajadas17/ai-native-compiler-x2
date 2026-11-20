@@ -13,7 +13,6 @@ decides legality and computes the cycles (calibrated on the X2 engine simulation
 The system keeps the LLM's schedule only if it is legal and at least as fast as code's; otherwise code's.
 """
 import copy
-import json
 from pathlib import Path
 
 from x2c.agents import harness
@@ -157,58 +156,6 @@ def end_check(session, tools_used):
     return None
 
 
-def _sdk_tools(session):
-    """A1's tools as plain functions for the harness. They go through session.call, which checks every argument.
-    Gemini tool schemas cannot hold a free-form object, so targets are 'node=target' strings and tiles a JSON string."""
-    def describe_graph() -> str:
-        """List the IR nodes with their allowed targets, and the hardware facts."""
-        return json.dumps(session.call("describe_graph", {}), default=str)
-
-    def propose_assignment(targets: list[str], rationale: str = "") -> str:
-        """Propose a target for every node; returns the validator's verdict. The last proposal counts.
-
-        Args:
-            targets: One entry per node, written as 'node_name=target' where target is x2, efpga or io.
-            rationale: Why you chose these targets.
-        """
-        parsed, bad = {}, []
-        for item in targets or []:
-            name, sep, target = str(item).partition("=")
-            if sep and name.strip():
-                parsed[name.strip()] = target.strip()
-            else:
-                bad.append(str(item)[:60])
-        if bad:
-            return json.dumps({"error": f"write each entry as 'node_name=target'; not understood: {bad[:5]}"})
-        return json.dumps(session.call("propose_assignment", {"targets": parsed, "rationale": rationale}), default=str)
-
-    tools = [describe_graph, propose_assignment]
-    if has_chip(session.hw):
-        def describe_schedule() -> str:
-            """Chip only: X2 layers, per-tile program/compute cycles, dependencies, legal resident sets, policies, today's latency."""
-            return json.dumps(session.call("describe_schedule", {}), default=str)
-
-        def propose_schedule(resident: list[str], policy: str = "earliest_free", tiles: str = "", rationale: str = "") -> str:
-            """Chip only: propose which layers stay programmed and how the 2 blocks are used; returns the validator's verdict and cycles.
-
-            Args:
-                resident: X2 layers kept programmed.
-                policy: earliest_free, round_robin or single_block (ignored when tiles is given).
-                tiles: Optional explicit issue order as a JSON array [[layer, tile_index, block], ...] covering every X2 tile;
-                    leave empty to use the policy.
-                rationale: Why you chose this schedule.
-            """
-            args = {"resident": list(resident or []), "policy": policy, "rationale": rationale}
-            if tiles and tiles.strip():
-                try:
-                    args["tiles"] = json.loads(tiles)
-                except ValueError as e:
-                    return json.dumps({"error": f"tiles is not valid JSON: {e}"})
-            return json.dumps(session.call("propose_schedule", args), default=str)
-        tools += [describe_schedule, propose_schedule]
-    return tools
-
-
 def final_plan_chip_summary(plan):
     c = plan.get("chip")
     return None if c is None else {"totals": c["totals"], "resident": c["resident"], "findings": c["findings"]}
@@ -255,21 +202,21 @@ def choose_schedule(g, hw, plan, session):
 
 
 def run_mapping_agent(llm, g, hw=None, max_steps=5, log_path="reports/mapping_agent_log.jsonl"):
-    """llm: harness.Gemini(...) (Google's harness, then Groq if every Gemini model is out), or an object with start /
+    """llm: harness.OpenRouter(...) (OpenAI's Agents SDK via OpenRouter, then Groq if no model is left), or an object with start /
     send_tool_results (the stand-in MockMappingLLM the deploy stage uses, GroqLLM, test doubles). Code decides the plan."""
     hw = hw or load_hardware()
     Path(log_path).parent.mkdir(parents=True, exist_ok=True)
     session, chip = _Session(g, hw), has_chip(hw)
     goal = f"Choose a target for every node of graph {g.name}." + (" Then choose the X2 schedule." if chip else "")
     log = harness.jsonl_logger(log_path)
-    run = harness.run(llm, MAPPING_PROMPT + (SCHEDULE_PROMPT if chip else ""), goal, sdk_tools=_sdk_tools(session),
+    run = harness.run(llm, MAPPING_PROMPT + (SCHEDULE_PROMPT if chip else ""), goal,
                       max_steps=max_steps, max_model_calls=max_steps + 7, log=log,
                       end_check=lambda reply, used: end_check(session, used),
-                      legacy=dict(schemas=MAPPING_TOOL_SCHEMAS, call=session.call,
+                      tools=dict(schemas=MAPPING_TOOL_SCHEMAS, call=session.call,
                                   on_tool=lambda step, name, args, res: log("tool", step=step, tool=name, ok="error" not in res,
                                                                             legal=res.get("legal"))))
     text, stopped, steps, llm_error = run["text"], run["stopped"], run["steps"], run["llm_error"]
-    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"]}
+    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"], "cost_usd": run.get("cost_usd")}
 
     baseline = propose_partition_baseline(g, hw)
     baseline_errors = validate_partition(g, baseline, hw)

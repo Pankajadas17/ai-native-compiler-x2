@@ -1,12 +1,12 @@
-"""An offline stand-in model for the agent harness tests: a tiny OpenAI-compatible /chat/completions server in a thread.
-
-The harness talks to it exactly as it talks to Gemini (same loop, tools and end-of-turn hook), so the tests check the real
-wiring without a key or a network. A script decides each reply from the conversation so far:
+"""An offline stand-in for OpenRouter for the agent harness tests: a tiny OpenAI-compatible /chat/completions server in
+a thread. The harness talks to it exactly as it talks to OpenRouter (same loop, tools and end-of-turn check), so the
+tests check the real wiring without a key, a network or any cost. Every reply reports 10 input and 5 output tokens.
+A script decides each reply from the conversation so far:
 
     def script(messages, request):            # -> ("tool", name, args) | ("text", content) | ("http", status, body)
         ...
     with FakeModel(script) as fm:
-        run = harness.converse(harness.Gemini(model="m", base_url=fm.url), ...)
+        run = harness.converse(harness.OpenRouter(model="m", base_url=fm.url), ...)
         fm.requests      # what the harness sent (messages, tools offered, model name)
 """
 import json
@@ -90,3 +90,7 @@ class FakeModel:
     def tools_offered(self):
         """Tool names the harness showed the model (union over all requests)."""
         return sorted({t.get("function", {}).get("name") for r in self.requests for t in r.get("tools", [])})
+
+    def all_chat(self):
+        """Every request's messages, one flat list."""
+        return [m for r in self.requests for m in r.get("messages", [])]

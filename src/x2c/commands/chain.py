@@ -31,7 +31,7 @@ from types import SimpleNamespace
 
 import x2c.commands.demo_prep as run_fab_prep
 import x2c.commands.demo_flow_check as run_flow_check
-from x2c.agents.harness import Gemini
+from x2c.agents.harness import OpenRouter
 from x2c.agents.llm_client import GroqLLM
 from x2c.agents.rtl_agent import MockRTLLLM, run_rtl_agent
 from x2c.verification import chain_debug
@@ -44,7 +44,7 @@ from x2c.verification.rtl_check import OPS, check_rtl
 
 JOBS = Path("reports/fab_jobs")
 REPORT = Path("reports/fab_chain_report.json")
-KEYS = {"groq": "GROQ_API_KEY", "gemini": "GEMINI_API_KEY"}
+KEYS = {"groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY"}
 
 
 def say(msg):
@@ -90,7 +90,7 @@ def wrappable_ops():
 def make_llm(name, op, model=None):
     if name == "mock":
         return MockRTLLLM(op)
-    return Gemini(model=model) if name == "gemini" else GroqLLM(model=model)      # gemini: Google's agent harness
+    return OpenRouter(model=model) if name == "openrouter" else GroqLLM(model=model)      # openrouter: OpenAI's Agents SDK
 
 
 def build_steps(op, cfg, exec_fn=fc.run_command, preflight=None):
@@ -344,7 +344,7 @@ def main(argv=None, exec_fn=fc.run_command, host_reader=wp.read_host_memory):
     ap.add_argument("--from-stage", choices=fc.STAGES, default="rtl")
     ap.add_argument("--runner", choices=["auto", "wsl", "native"], default="auto")
     ap.add_argument("--distro", default="Ubuntu")
-    ap.add_argument("--llm", choices=["mock", "groq", "gemini"], default="mock")
+    ap.add_argument("--llm", choices=["mock", "groq", "openrouter"], default="mock")
     ap.add_argument("--model", default=None)
     ap.add_argument("--regen-rtl", action="store_true", help="ask A2 for new Verilog even if hardware/operators/<op>.v already passes")
     ap.add_argument("--timeout", type=int, default=1800, help="seconds allowed for each Ubuntu stage")

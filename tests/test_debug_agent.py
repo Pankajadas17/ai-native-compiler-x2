@@ -475,11 +475,11 @@ def test_zero_output_needs_mapper_evidence_to_blame_the_mapper():
 
 
 def test_the_agent_on_the_harness_is_sent_back_until_it_keeps_the_contract(make_report, tmp_path):
-    """Google's harness with a stand-in model (no key): the end-of-turn check sends back a reply that is not JSON and one
+    """OpenAI's Agents SDK with a stand-in model (no key): the end-of-turn check sends back a reply that is not JSON and one
     that misses keys; the agent sees only the three A3 tools; code still validates the cause against the evidence."""
-    pytest.importorskip("google.antigravity", reason="the agent harness is an optional extra: uv sync --extra agents")
+    pytest.importorskip("agents", reason="the agent harness is an optional extra: uv sync --extra agents")
     from tests.fake_model import FakeModel, calls_so_far, texts_so_far
-    from x2c.agents.harness import Gemini
+    from x2c.agents.harness import OpenRouter
     path = make_report("sign_flip", "matmul", faults.sign_flip)
     good = json.dumps({"cause_id": "output_sign_inverted", "confidence": "high", "explanation": "actual == -expected",
                        "proposed_fix": "fix the sign", "next_check": "rerun"})
@@ -491,7 +491,7 @@ def test_the_agent_on_the_harness_is_sent_back_until_it_keeps_the_contract(make_
         return ("text", replies[min(len(texts_so_far(messages)), len(replies) - 1)])
 
     with FakeModel(script) as fm:
-        out = run_debug_agent(Gemini(model="fake", base_url=fm.url), path, log_path=str(tmp_path / "l.jsonl"))
+        out = run_debug_agent(OpenRouter(model="fake", base_url=fm.url), path, log_path=str(tmp_path / "l.jsonl"))
     assert fm.tools_offered() == ["check_hypothesis", "diagnose_report", "reproduce_failure"]
     assert out["end_of_turn_sendbacks"] == 2 and out["model"] == "fake"
     assert out["final_cause"] == "output_sign_inverted" and out["final_cause_source"] == "llm_validated" and out["validated"]

@@ -1,82 +1,102 @@
 """
-The agents' harness: Google's Antigravity SDK (the harness Gemini models are trained with), wrapped in ONE function.
+The agents' harness: OpenAI's Agents SDK (the agent loop for GPT models), wrapped in ONE function. The models are
+reached through OpenRouter (one key, OpenAI-compatible API, many models).
 
-This is the only file that imports the SDK. An agent gives it a system prompt, a task, its tools (plain Python functions
-with type hints and docstrings) and an END-OF-TURN CHECK. The SDK runs the loop (model call -> tool calls -> model call ...);
-when the agent says it is done, the harness calls the check (a StopHook). The check returns None ("done, accepted") or a
-reason; with a reason the agent must continue (at most max_continues times). The check is code, not the model's choice.
+This is the only file that imports the SDK. An agent gives it a system prompt, a task, its tools (our JSON tool schemas
+and the function that runs them) and an END-OF-TURN CHECK. The SDK runs the loop (model call -> tool calls -> model
+call ...). When the agent ends its turn with a final answer, the check runs: it returns None ("done, accepted") or a
+reason; with a reason the conversation continues with that reason as the next message (at most max_continues times).
+The check is code, not the model's choice.
 
-    run = converse(Gemini(), system, task, tools=[...], end_check=check)
-    run["text"], run["stopped"], run["tools_used"], run["continues"], run["llm_error"]
+    run = converse(OpenRouter(), system, task, schemas, call, end_check=check)
+    run["text"], run["stopped"], run["tools_used"], run["continues"], run["llm_error"], run["cost_usd"]
 
-Only our tools exist for the agent: the SDK's own file / shell / web tools are switched off.
-Models: BM_LLM_MODEL (default gemini-3.5-flash), then BM_LLM_FALLBACKS (default gemini-3.8-flash, gemini-3.5-flash-lite).
-The next model is tried when one is busy (503), out of quota (429) or not available (404). A model whose DAILY free quota
-is used up, or that does not exist, is skipped for the rest of the run (no wasted requests). When no Gemini model is left
-and GROQ_API_KEY is set, the task runs once more on Groq through plain_loop (our small fallback loop, same tools, same
-end-of-turn check). With no model at all the agent returns llm_unavailable and its code decides (rules, baseline, or
-"not verified"). A wrong or missing key is NOT that: it raises.
+Only our tools exist for the agent, and the SDK's tracing (which would send the run to OpenAI's trace dashboard) is off.
+Models: BM_LLM_MODEL (default openai/gpt-5.6-luna, OpenRouter's name for it), then BM_LLM_FALLBACKS (none by default).
+The next model is tried when one is busy (5xx) or rate limited (429); a model that does not exist (404) is skipped for
+the rest of the run. Every request asks for at most BM_LLM_MAX_TOKENS output tokens (default 8000): OpenRouter reserves
+credit for the maximum, so an unset limit could refuse a request on a small balance. When the OpenRouter credit is used
+up, or no model is left, and GROQ_API_KEY is set, the task runs once more on Groq through
+plain_loop (our small fallback loop, same tools, same end-of-turn check). With no model at all the agent returns
+llm_unavailable and its code decides (rules, baseline, or "not verified"). A wrong or missing key is NOT that: it raises.
+Each task has a spending cap: BM_LLM_MAX_USD (default 1.00 US dollar), checked after every model call from the tokens
+the provider reports and the list prices below (an estimate; the exact amount is on openrouter.ai/activity).
 
-run(...) is what the agents call: a Gemini(...) spec goes to Google's harness; any object with start / send_tool_results
-(the no-model stand-ins the pipeline uses, Groq, test doubles) goes to plain_loop.
-Key: GEMINI_API_KEY in the environment (never in a file of this project).
+run(...) is what the agents call: an OpenRouter(...) spec goes to the Agents SDK; any object with start /
+send_tool_results (the no-model stand-ins the pipeline uses, Groq, test doubles) goes to plain_loop.
+Key: OPENROUTER_API_KEY in the environment (never in a file of this project).
 """
 import asyncio
 import json
 import logging
 import os
-import sys
 import re
-import tempfile
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
-DEFAULT_MODEL = "gemini-3.5-flash"
-DEFAULT_FALLBACKS = ("gemini-3.8-flash", "gemini-3.5-flash-lite")
-AUTH = re.compile(r"\b(401|403)\b|PERMISSION_DENIED|UNAUTHENTICATED|API key not valid|API_KEY_INVALID|invalid API key", re.I)
-QUOTA = re.compile(r"\b429\b|RESOURCE_EXHAUSTED|quota|rate.?limit", re.I)
-DAILY = re.compile(r"per ?day|PerDay", re.I)
-MISSING = re.compile(r"\b404\b|NOT_FOUND|no longer available|is not found|not supported", re.I)
-BUSY = re.compile(r"\b503\b|UNAVAILABLE|high demand|overloaded|try again later|network issue|failed to send HTTP request"
-                  r"|deadline|timed? ?out", re.I)
-_SKIP = {}                                   # model -> why it is skipped for the rest of this run (daily quota, not available)
+OPENROUTER_URL = "https://openrouter.ai/api/v1"
+DEFAULT_MODEL = "openai/gpt-5.6-luna"
+DEFAULT_FALLBACKS = ()
+DEFAULT_MAX_USD = 1.00
+DEFAULT_MAX_TOKENS = 8000
+PRICES = {"openai/gpt-5.6-luna": (0.20, 1.20), "openai/gpt-5.6-terra": (2.00, 12.00),     # US$ per 1M tokens in / out
+          "openai/gpt-5.6-sol": (5.00, 30.00)}
+_SKIP = {}                                   # model -> why it is skipped for the rest of this run (not available)
 
 
 def reset_skipped():
-    """Forget the skipped models (tests; a new day)."""
+    """Forget the skipped models (tests; a new run)."""
     _SKIP.clear()
 
 
-def classify(msg):
-    """auth | quota_daily | quota | missing | busy | other  (auth and other are raised, the rest move to the next model)."""
-    if AUTH.search(msg) and not QUOTA.search(msg):
+def estimate_usd(model, input_tokens, output_tokens):
+    """List-price estimate for a model in PRICES, else None (unknown model: only the tokens are reported)."""
+    price = PRICES.get(model) or PRICES.get(f"openai/{model}")
+    return None if price is None else (input_tokens * price[0] + output_tokens * price[1]) / 1e6
+
+
+def classify(status, code=""):
+    """auth | billing | quota | missing | busy | other, from the HTTP status and the error code.
+    auth and other are raised; billing (402: no credit left) ends the run on OpenRouter; quota and busy try the next
+    model; missing skips it."""
+    if status in (401, 403):
         return "auth"
-    if QUOTA.search(msg):
-        return "quota_daily" if DAILY.search(msg) else "quota"
-    if MISSING.search(msg):
+    if code == "insufficient_quota" or status == 402:
+        return "billing"
+    if status == 429:
+        return "quota"
+    if status == 404 or code == "model_not_found":
         return "missing"
-    if BUSY.search(msg):
+    if status is None or status >= 500:              # None: no answer at all (connection, timeout)
         return "busy"
     return "other"
 
 
-WHY = {"quota_daily": "daily free quota used up", "quota": "rate limit (429)", "missing": "not available (404)",
-       "busy": "busy (503)"}
+WHY = {"billing": "OpenRouter credit used up", "quota": "rate limit (429)", "missing": "not available (404)",
+       "busy": "busy or not reachable"}
 
 
 class HarnessUnavailable(RuntimeError):
     """The SDK is not installed in this environment."""
 
 
+class BudgetReached(RuntimeError):
+    """The task reached its spending cap (BM_LLM_MAX_USD)."""
+
+
 @dataclass
-class Gemini:
-    """Which model(s) to use. base_url: an OpenAI-compatible stand-in model (tests only; no key needed)."""
+class OpenRouter:
+    """Which model(s) to use (OpenRouter names, e.g. openai/gpt-5.6-luna). base_url: an offline stand-in for OpenRouter
+    (tests only; no key needed)."""
     model: str | None = None
     fallbacks: tuple = ()
     base_url: str | None = None
     api_retries: int = 2
-    groq_fallback: bool = True          # last resort when every Gemini model is out: Groq through plain_loop
+    max_usd: float | None = None
+    max_tokens: int | None = None
+    groq_fallback: bool = True          # last resort when no model is left: Groq through plain_loop
     extra: dict = field(default_factory=dict)
 
     def models(self):
@@ -85,57 +105,165 @@ class Gemini:
         rest = self.fallbacks or env_fb or DEFAULT_FALLBACKS
         return [first] + [m for m in rest if m != first]
 
+    def budget(self):
+        return float(self.max_usd if self.max_usd is not None else os.environ.get("BM_LLM_MAX_USD", DEFAULT_MAX_USD))
+
+    def output_limit(self):
+        return int(self.max_tokens or os.environ.get("BM_LLM_MAX_TOKENS", DEFAULT_MAX_TOKENS))
+
     def describe(self):
-        return {"harness": "google-antigravity", "models": self.models(), **({"base_url": self.base_url} if self.base_url else {})}
+        return {"harness": "openai-agents via OpenRouter", "models": self.models(), "max_usd_per_task": self.budget(),
+                "max_output_tokens": self.output_limit(), **({"base_url": self.base_url} if self.base_url else {})}
 
 
 def _sdk():
     try:
-        from google import antigravity as ag
-        from google.antigravity import types as agt
-        from google.antigravity.hooks import hooks
+        import agents
+        from openai import AsyncOpenAI
     except ImportError as e:
         raise HarnessUnavailable("the agent harness is not installed: uv sync --extra agents") from e
-    return ag, agt, hooks
+    agents.set_tracing_disabled(True)
+    return agents, AsyncOpenAI
 
 
-def converse(spec, system, task, tools, end_check=None, *, max_model_calls=12, max_continues=2, log=None):
+def converse(spec, system, task, schemas, call, end_check=None, *, max_model_calls=12, max_continues=2, log=None,
+             on_tool=None):
     """Run one agent task. end_check(text, tools_used) -> None (accept) or a reason (send the agent back).
-    Returns {text, stopped, steps, tools_used, continues, llm_error, model}. stopped: finished | step_limit_reached |
-    llm_unavailable. Raises on a missing/wrong key and on programming errors."""
-    ag, agt, hooks = _sdk()
+    Returns {text, stopped, steps, tools_used, continues, llm_error, model, tokens, cost_usd}. stopped: finished |
+    step_limit_reached | budget_reached | llm_unavailable. Raises on a missing/wrong key and on programming errors."""
+    sdk, AsyncOpenAI = _sdk()
     log = log or (lambda kind, **data: None)
-    if not spec.base_url and not os.environ.get("GEMINI_API_KEY"):
-        raise RuntimeError("GEMINI_API_KEY is not set in this terminal (see docs/agents.md)")
-    errors = []
+    if not spec.base_url and not os.environ.get("OPENROUTER_API_KEY"):
+        raise RuntimeError("OPENROUTER_API_KEY is not set in this terminal (see docs/agents.md)")
+    errors, tokens = [], {"input": 0, "output": 0}
+    cost = 0.0
     candidates = spec.models()
     for model in candidates:
         if model in _SKIP:
             errors.append(f"{model}: {_SKIP[model]} (skipped)")
             continue
-        state = {"tools_used": [], "continues": 0, "stop_reason": None, "last_reply": None}
+        state = {"tools_used": [], "continues": 0, "tokens": {"input": 0, "output": 0}, "cost": 0.0}
         try:
             with _quiet_sdk(log):
-                text = asyncio.run(_one_run(ag, agt, hooks, spec, model, system, task, tools, end_check, state,
-                                            max_model_calls, max_continues, log))
+                text, stopped = asyncio.run(_one_run(sdk, AsyncOpenAI, spec, model, system, task, schemas, call, end_check,
+                                                     state, max_model_calls, max_continues, log, on_tool))
         except Exception as e:  # noqa: BLE001  (classified: a wrong key or a bug is raised, never hidden behind a fallback)
-            msg = f"{type(e).__name__}: {e}"
-            kind = classify(msg)
-            if kind in ("auth", "other"):
+            status, code = getattr(e, "status_code", None), (getattr(e, "code", None) or "")
+            if status is None and not _is_connection_error(e):
                 raise
-            if kind in ("quota_daily", "missing"):
-                _SKIP[model] = WHY[kind]
-            errors.append(f"{model}: {WHY[kind]}")
-            log("model_unavailable", model=model, why=kind, error=msg[:300])
+            why = classify(status, code)
+            _add(tokens, state["tokens"])
+            cost += state["cost"]
+            if why in ("auth", "other"):
+                raise
+            log("model_unavailable", model=model, why=why, error=f"{type(e).__name__}: {str(e)[:300]}")
+            errors.append(f"{model}: {WHY[why]}")
+            if why == "billing":
+                print(f"({WHY[why]}: add credit on openrouter.ai/credits)", end=" ", file=sys.stderr, flush=True)
+                break                                             # every model draws on the same credit
+            if why == "missing":
+                _SKIP[model] = WHY[why]
             rest = [m for m in candidates[candidates.index(model) + 1:] if m not in _SKIP]
-            print(f"({model}: {WHY[kind]}{'; trying ' + rest[0] if rest else '; no Gemini model left'})",
+            print(f"({model}: {WHY[why]}{'; trying ' + rest[0] if rest else '; no model left'})",
                   end=" ", file=sys.stderr, flush=True)
             continue
-        stopped = "step_limit_reached" if "EXCEEDED" in str(state["stop_reason"] or "") else "finished"
+        _add(tokens, state["tokens"])
+        cost += state["cost"]
         return {"text": text, "stopped": stopped, "steps": len(state["tools_used"]), "tools_used": state["tools_used"],
-                "continues": state["continues"], "llm_error": None, "model": model}
+                "continues": state["continues"], "llm_error": None, "model": model, "tokens": tokens,
+                "cost_usd": round(cost, 6)}
     return {"text": "", "stopped": "llm_unavailable", "steps": 0, "tools_used": [], "continues": 0,
-            "llm_error": "no model available: " + " | ".join(errors), "model": None}
+            "llm_error": "no model available: " + " | ".join(errors), "model": None, "tokens": tokens,
+            "cost_usd": round(cost, 6)}
+
+
+def _add(total, part):
+    for k in total:
+        total[k] += part[k]
+
+
+def _is_connection_error(e):
+    return type(e).__name__ in ("APIConnectionError", "APITimeoutError", "ModelTimeoutError")
+
+
+async def _one_run(sdk, AsyncOpenAI, spec, model, system, task, schemas, call, end_check, state, max_model_calls,
+                   max_continues, log, on_tool):
+    client = AsyncOpenAI(base_url=spec.base_url or OPENROUTER_URL, api_key=os.environ.get("OPENROUTER_API_KEY") or "test",
+                         max_retries=spec.api_retries)
+    agent = sdk.Agent(name="x2c", instructions=system, tools=[_sdk_tool(sdk, s, call, state, log, on_tool) for s in schemas],
+                      model=sdk.OpenAIChatCompletionsModel(model, openai_client=client),      # OpenRouter: chat completions
+                      model_settings=sdk.ModelSettings(max_tokens=spec.output_limit()), **spec.extra)
+    budget, calls = spec.budget(), [0]
+
+    class Meter(sdk.RunHooks):
+        """After every model call: count the tokens, estimate the cost, stop the task at the spending cap."""
+        async def on_llm_end(self, context, agent_, response):
+            calls[0] += 1
+            usage = getattr(response, "usage", None)
+            state["tokens"]["input"] += int(getattr(usage, "input_tokens", 0) or 0)
+            state["tokens"]["output"] += int(getattr(usage, "output_tokens", 0) or 0)
+            state["cost"] = estimate_usd(model, state["tokens"]["input"], state["tokens"]["output"]) or 0.0
+            if state["cost"] > budget:
+                raise BudgetReached(f"estimated ${state['cost']:.3f} > cap ${budget:.2f} (BM_LLM_MAX_USD)")
+
+    log("start", model=model, tools=[s["name"] for s in schemas], max_usd=budget)
+    items = task
+    while True:
+        try:
+            result = await sdk.Runner.run(agent, items, max_turns=max(1, max_model_calls - calls[0]), hooks=Meter())
+        except sdk.MaxTurnsExceeded:
+            return "", "step_limit_reached"
+        except BudgetReached as e:
+            log("budget_reached", detail=str(e))
+            return "", "budget_reached"
+        reply = str(result.final_output or "")
+        reason = None
+        if end_check is not None and state["continues"] < max_continues:
+            reason = end_check(reply, list(state["tools_used"]))
+        log("end_of_turn", continuation=state["continues"], accepted=reason is None, reason=reason)
+        if not reason:
+            return reply, "finished"
+        if calls[0] >= max_model_calls:
+            return reply, "step_limit_reached"
+        state["continues"] += 1
+        items = result.to_input_list() + [{"role": "user", "content": reason}]
+
+
+def _sdk_tool(sdk, schema, call, state, log, on_tool):
+    """One of our tools for the SDK: the JSON schema goes to the model as it is; call(name, args) runs it and checks
+    the arguments exactly as for Groq and the stand-ins. Each call is recorded (the end-of-turn checks use the names)."""
+    name = schema["name"]
+    params = dict(schema.get("input_schema") or {})
+    params.setdefault("type", "object")
+    params.setdefault("properties", {})
+
+    async def invoke(ctx, args_json):
+        try:
+            args = json.loads(args_json or "{}")
+        except ValueError as e:
+            return json.dumps({"error": f"the arguments are not valid JSON: {e}"})
+        state["tools_used"].append(name)
+        t0 = time.time()
+        res = call(name, args if isinstance(args, dict) else {"_invalid_arguments": args})
+        if on_tool:
+            on_tool(len(state["tools_used"]), name, args, res)
+        log("tool", tool=name, seconds=round(time.time() - t0, 2))
+        return res if isinstance(res, str) else json.dumps(res, default=str)
+    return sdk.FunctionTool(name=name, description=schema.get("description", name), params_json_schema=params,
+                            on_invoke_tool=invoke, strict_json_schema=False)
+
+
+class _quiet_sdk:
+    """The SDK logs every failed request as an ERROR with a traceback. Keep those in the agent's log, not on the screen."""
+    def __init__(self, log):
+        self.log, self.logger, self.level = log, logging.getLogger("openai.agents"), None
+
+    def __enter__(self):
+        self.level = self.logger.level
+        self.logger.setLevel(logging.CRITICAL)
+
+    def __exit__(self, *exc):
+        self.logger.setLevel(self.level)
 
 
 def plain_loop(llm, task, schemas, call, *, system=None, end_check=None, max_steps=6, max_continues=2, force_final=True,
@@ -184,19 +312,20 @@ def plain_loop(llm, task, schemas, call, *, system=None, end_check=None, max_ste
             raise
         llm_error, stopped = f"{type(e).__name__}: {str(e)[:350]}", "llm_error"
     return {"text": text, "stopped": stopped, "steps": steps, "tools_used": used, "continues": continues,
-            "llm_error": llm_error, "model": getattr(llm, "model_used", None)}
+            "llm_error": llm_error, "model": getattr(llm, "model_used", None), "cost_usd": None}
 
 
-def run(llm, system, task, *, sdk_tools, legacy, end_check=None, max_steps=6, max_continues=2, max_model_calls=None,
-        log=None, catch_llm_errors=True):
-    """One agent task, whatever the model. legacy = dict(schemas, call, system (may differ: None = the model's default),
-    force_final, on_tool) for plain_loop; sdk_tools are the same tools as plain functions for Google's harness."""
-    loop_args = dict(system=legacy.get("system", system), end_check=end_check, max_steps=max_steps, max_continues=max_continues,
-                     force_final=legacy.get("force_final", True), on_tool=legacy.get("on_tool"))
-    if not isinstance(llm, Gemini):
-        return plain_loop(llm, task, legacy["schemas"], legacy["call"], catch_llm_errors=catch_llm_errors, **loop_args)
-    out = converse(llm, system, task, sdk_tools, end_check, max_model_calls=max_model_calls or 2 * max_steps + 4,
-                   max_continues=max_continues, log=log)
+def run(llm, system, task, *, tools, end_check=None, max_steps=6, max_continues=2, max_model_calls=None, log=None,
+        catch_llm_errors=True):
+    """One agent task, whatever the model. tools = dict(schemas, call, system (for plain_loop; None = the model's
+    default), force_final, on_tool). The same tools and end-of-turn check are used on every path."""
+    loop_args = dict(system=tools.get("system", system), end_check=end_check, max_steps=max_steps, max_continues=max_continues,
+                     force_final=tools.get("force_final", True), on_tool=tools.get("on_tool"))
+    if not isinstance(llm, OpenRouter):
+        return plain_loop(llm, task, tools["schemas"], tools["call"], catch_llm_errors=catch_llm_errors, **loop_args)
+    out = converse(llm, system, task, tools["schemas"], tools["call"], end_check,
+                   max_model_calls=max_model_calls or 2 * max_steps + 4, max_continues=max_continues, log=log,
+                   on_tool=tools.get("on_tool"))
     if out["stopped"] != "llm_unavailable" or not llm.groq_fallback or not os.environ.get("GROQ_API_KEY"):
         return out
     try:
@@ -207,168 +336,12 @@ def run(llm, system, task, *, sdk_tools, legacy, end_check=None, max_steps=6, ma
         return out
     print("(trying Groq)", end=" ", file=sys.stderr, flush=True)
     (log or (lambda *a, **k: None))("groq_fallback", reason=out["llm_error"][:300])
-    g = plain_loop(groq, task, legacy["schemas"], legacy["call"], catch_llm_errors=True, **loop_args)
+    g = plain_loop(groq, task, tools["schemas"], tools["call"], catch_llm_errors=True, **loop_args)
     g["model"] = f"groq:{g['model']}"
+    g["cost_usd"] = out["cost_usd"]
     if g["llm_error"]:
         g["llm_error"] = f"{out['llm_error']} | groq: {g['llm_error']}"
     return g
-
-
-class _QuietSDK(logging.Filter):
-    """The SDK prints every retry as a long WARNING. Keep those in the agent's log file, not on the screen."""
-    NOISE = ("System step error", "use_json_schema is not True")
-
-    def __init__(self, log):
-        super().__init__()
-        self.log = log
-
-    def filter(self, record):
-        msg = record.getMessage()
-        if any(n in msg for n in self.NOISE):
-            self.log("sdk_warning", message=msg[:400])
-            return False
-        return True
-
-
-class _quiet_sdk:
-    def __init__(self, log):
-        self.f, self.targets = _QuietSDK(log), []
-
-    def __enter__(self):
-        root = logging.getLogger()
-        self.targets = [root, *root.handlers, logging.getLogger("google_genai.types")]
-        for t in self.targets:
-            t.addFilter(self.f)
-
-    def __exit__(self, *exc):
-        for t in self.targets:
-            t.removeFilter(self.f)
-
-
-async def _one_run(ag, agt, hooks, spec, model, system, task, tools, end_check, state, max_model_calls, max_continues, log):
-    wrapped = [_recording(t, state, log) for t in tools]
-
-    @hooks.stop
-    def end_of_turn(data: agt.StopArgs) -> agt.StopHookResult:
-        state["stop_reason"] = data.stop_reason
-        reason = None
-        if not data.error_message and data.continuation_count < max_continues and end_check is not None:
-            reason = end_check(data.response_text or "", list(state["tools_used"]))
-        log("end_of_turn", continuation=data.continuation_count, accepted=reason is None, reason=reason,
-            stop_reason=str(data.stop_reason), error=data.error_message or None)
-        if reason:
-            state["continues"] += 1
-            return agt.StopHookResult(decision=agt.StopDecision.CONTINUE, reason=reason)
-        state["last_reply"] = data.response_text or ""     # the accepted reply (resp.text() joins every reply of the turn)
-        return agt.StopHookResult(decision=agt.StopDecision.ALLOW_STOP)
-
-    common = dict(
-        system_instructions=system,
-        tools=wrapped,
-        hooks=[end_of_turn],
-        capabilities=agt.CapabilitiesConfig(enabled_tools=[], enable_subagents=False),     # only our tools
-        budget_config=agt.BudgetConfig(max_model_calls=max_model_calls),
-        retry_config=agt.RetryConfig(api_retry=agt.ModelAPIRetryConfig(max_retries=spec.api_retries,
-                                                                       initial_sleep_duration_ms=1000)),
-        **spec.extra,
-    )
-    with tempfile.TemporaryDirectory(prefix="x2c_agent_") as save_dir:
-        if spec.base_url:
-            config = ag.LocalOpenAIAgentConfig(model=model, base_url=spec.base_url, save_dir=save_dir, **common)
-        else:
-            config = ag.LocalAgentConfig(model=model, save_dir=save_dir, **common)
-        log("start", model=model, tools=[t.__name__ for t in tools])
-        async with ag.Agent(config) as agent:
-            resp = await agent.chat(task)
-            joined = await resp.text()
-        return state["last_reply"] if state["last_reply"] is not None else joined
-
-
-def _recording(fn, state, log):
-    """Same name, signature and docstring (the SDK builds the tool schema from them); records each call."""
-    import functools
-
-    @functools.wraps(fn)
-    def wrapper(*args, **kwargs):
-        state["tools_used"].append(fn.__name__)
-        t0 = time.time()
-        out = fn(*args, **kwargs)
-        log("tool", tool=fn.__name__, args={k: (v if len(str(v)) < 200 else str(v)[:200] + "...") for k, v in kwargs.items()},
-            seconds=round(time.time() - t0, 2))
-        return out if isinstance(out, str) else json.dumps(out, default=str)
-    return wrapper
-
-
-_SIMPLE = {"string": str, "integer": int, "number": float, "boolean": bool}
-
-
-def _py_type(prop):
-    """JSON-schema property -> (Python annotation, takes_json). Gemini tool schemas hold simple values and arrays of them;
-    an object, or an array of objects, is passed as a JSON string and parsed back here."""
-    kind = prop.get("type")
-    if kind in _SIMPLE:
-        return _SIMPLE[kind], False
-    if kind == "array":
-        item = prop.get("items") or {}
-        if item.get("type") in _SIMPLE:
-            return list[_SIMPLE[item["type"]]], False
-        inner = item.get("items") or {}
-        if item.get("type") == "array" and inner.get("type") in _SIMPLE:
-            return list[list[_SIMPLE[inner["type"]]]], False
-    return str, True
-
-
-def _json_hint(prop):
-    item = prop.get("items") or {}
-    fields = ", ".join((item.get("properties") or prop.get("properties") or {}).keys())
-    shape = "a JSON array of objects" if prop.get("type") == "array" else "a JSON object"
-    return f"Pass {shape}" + (f" with the fields {fields}." if fields else ".")
-
-
-def tools_from_schemas(schemas, call):
-    """Plain functions for the harness from our existing JSON tool schemas ({name, description, input_schema}).
-    Each function calls call(name, args) with only the arguments the model gave, so the existing argument checks run.
-    Every argument is optional unless the schema requires it."""
-    import inspect
-    fns = []
-    for s in schemas:
-        props = s.get("input_schema", {}).get("properties", {}) or {}
-        required = set(s.get("input_schema", {}).get("required") or [])
-        params, json_args, doc_args = [], set(), []
-        for name, prop in props.items():
-            ann, takes_json = _py_type(prop)
-            if takes_json:
-                json_args.add(name)
-            optional = name not in required
-            params.append(inspect.Parameter(name, inspect.Parameter.KEYWORD_ONLY, default=None if optional else inspect.Parameter.empty,
-                                            annotation=(ann | None) if optional else ann))
-            desc = prop.get("description", "")
-            if takes_json:
-                desc = (desc + " " if desc else "") + _json_hint(prop)
-            doc_args.append(f"    {name}: {desc or name.replace('_', ' ')}")
-
-        def make(tool_name, jargs):
-            def fn(**kwargs):
-                args = {}
-                for k, v in kwargs.items():
-                    if v is None:
-                        continue
-                    if k in jargs and isinstance(v, str):
-                        try:
-                            v = json.loads(v)
-                        except ValueError as e:
-                            return json.dumps({"error": f"{k} is not valid JSON: {e}"})
-                    args[k] = v
-                out = call(tool_name, args)
-                return out if isinstance(out, str) else json.dumps(out, default=str)
-            return fn
-        fn = make(s["name"], json_args)
-        fn.__name__ = fn.__qualname__ = s["name"]
-        fn.__doc__ = s.get("description", s["name"]) + ("\n\nArgs:\n" + "\n".join(doc_args) if doc_args else "")
-        fn.__signature__ = inspect.Signature(params, return_annotation=str)
-        fn.__annotations__ = {p.name: p.annotation for p in params} | {"return": str}
-        fns.append(fn)
-    return fns
 
 
 def parse_json_object(text):

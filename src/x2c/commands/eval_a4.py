@@ -1,11 +1,11 @@
 """
-Does generated testing find bugs the fixed suite cannot?   x2c eval a4 [--llm mock|groq|gemini]
+Does generated testing find bugs the fixed suite cannot?   x2c eval a4 [--llm mock|groq|openrouter]
 Plan = generated ONCE against the healthy backend from coverage gaps only, then replayed against every injected bug.
-(--llm mock uses the deterministic baseline planner; groq/gemini let a real model write the specs.)
+(--llm mock uses the deterministic baseline planner; groq/openrouter let a real model write the specs.)
 """
 import argparse, os, sys
 import numpy as np
-from x2c.agents.harness import Gemini
+from x2c.agents.harness import OpenRouter
 from x2c.agents.llm_client import MockPlannerLLM, GroqLLM
 from x2c.agents.test_agent import plan_tests
 from x2c.commands.bmsemi_verify import run_all
@@ -13,10 +13,10 @@ from x2c.verification import tools
 from tests import faults
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--llm", choices=["mock", "gemini", "groq"], default="mock")
+ap.add_argument("--llm", choices=["mock", "openrouter", "groq"], default="mock")
 ap.add_argument("--model", default=None)
 a = ap.parse_args()
-_KEYS = {"groq": "GROQ_API_KEY", "gemini": "GEMINI_API_KEY"}
+_KEYS = {"groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY"}
 if a.llm in _KEYS and not os.environ.get(_KEYS[a.llm]):
     sys.exit(f"{_KEYS[a.llm]} is not set in THIS terminal window. Set it first (see README), or use --llm mock")
 
@@ -29,12 +29,12 @@ CATALOGUE = [  # (label, fault function, family)
     ("LATENT_wrap16", faults.latent_wrap16, "latent"), ("LATENT_long_k", faults.latent_long_k, "latent"),
     ("LATENT_int8_min_clamp", faults.latent_int8_min_clamp, "latent")]
 
-llm = {"mock": lambda: MockPlannerLLM(), "gemini": lambda: Gemini(model=a.model), "groq": lambda: GroqLLM(model=a.model)}[a.llm]()
+llm = {"mock": lambda: MockPlannerLLM(), "openrouter": lambda: OpenRouter(model=a.model), "groq": lambda: GroqLLM(model=a.model)}[a.llm]()
 plan = plan_tests(llm)
 specs = plan["specs"]
 print(f"plan from [{a.llm}]: {plan['num_specs']} specs accepted; classes still uncovered: {plan['coverage_still_missing'] or 'none'}"
       + (f" | sent back {plan['end_of_turn_sendbacks']}x" if plan.get("end_of_turn_sendbacks") else "")
-      + (f" | model: {plan['model']}" if plan.get("model") else "") + (f" | LLM problem: {plan['llm_error']}" if plan.get("llm_error") else ""))
+      + (f" | model: {plan['model']}" if plan.get("model") else "") + (f" | cost ${plan['cost_usd']:.3f}" if plan.get("cost_usd") else "") + (f" | LLM problem: {plan['llm_error']}" if plan.get("llm_error") else ""))
 if not specs:
     sys.exit("no valid specs were produced")
 

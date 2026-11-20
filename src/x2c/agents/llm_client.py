@@ -1,5 +1,5 @@
 """
-The small fallback side of the agents (the main path is Google's agent harness, x2c.agents.harness).
+The small fallback side of the agents (the main path is OpenAI's Agents SDK, x2c.agents.harness).
 
 Objects with this tiny interface run in harness.plain_loop:
     llm.start(goal, tool_schemas, system_prompt=None) -> Action
@@ -7,7 +7,7 @@ Objects with this tiny interface run in harness.plain_loop:
     llm.send_text(text)                               -> Action   (optional: lets the end-of-turn check reply)
 An Action is either tool calls (kind="tool_calls") or a final answer (kind="final").
 
-Here: GroqLLM (the last fallback when every Gemini model is out, or --llm groq) and the no-model stand-ins (MockLLM,
+Here: GroqLLM (the last fallback when no OpenRouter model is left, or --llm groq) and the no-model stand-ins (MockLLM,
 MockDebugLLM, MockMappingLLM, MockPlannerLLM): fixed, rule-based behaviour the pipeline and the tests use. They are NOT
 models and are labelled as such in every report.
 """

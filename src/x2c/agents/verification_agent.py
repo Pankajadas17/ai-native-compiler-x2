@@ -57,7 +57,7 @@ def end_check(state, full_size):
 
 
 def run_agent(llm, goal, max_steps=6, log_path=LOG_PATH):
-    """llm: harness.Gemini(...) (Google's harness, then Groq if every Gemini model is out), or an object with start /
+    """llm: harness.OpenRouter(...) (OpenAI's Agents SDK via OpenRouter, then Groq if no model is left), or an object with start /
     send_tool_results (the stand-in MockLLM, GroqLLM, test doubles). The facts are recomputed from the reports by code."""
     from x2c.agents import harness
     Path(log_path).parent.mkdir(parents=True, exist_ok=True)
@@ -75,14 +75,13 @@ def run_agent(llm, goal, max_steps=6, log_path=LOG_PATH):
         return _compact(res)
 
     full = len(make_cases())
-    run = harness.run(llm, SYSTEM_PROMPT, goal, sdk_tools=harness.tools_from_schemas(tools.TOOL_SCHEMAS, call),
-                      max_steps=max_steps, max_model_calls=2 * max_steps + 6, log=log, catch_llm_errors=False,
+    run = harness.run(llm, SYSTEM_PROMPT, goal, max_steps=max_steps, max_model_calls=2 * max_steps + 6, log=log, catch_llm_errors=False,
                       end_check=lambda reply, used: end_check(state, full),
-                      legacy=dict(schemas=tools.TOOL_SCHEMAS, call=call, system=None, force_final=False,
+                      tools=dict(schemas=tools.TOOL_SCHEMAS, call=call, system=None, force_final=False,
                                   on_tool=lambda step, name, args, res: log("tool", step=step, tool=name, args=args,
                                                                             ok="error" not in res)))
     final_text, stopped, llm_error = run["text"], run["stopped"], run["llm_error"]
-    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"], "llm_error": llm_error}
+    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"], "cost_usd": run.get("cost_usd"), "llm_error": llm_error}
     last_report, last_workload = state["reports"].get("suite"), state["reports"].get("workloads")
     last_bench, last_gen, last_model = state["reports"].get("benchmark"), state["reports"].get("generated"), state["reports"].get("model")
     steps, chip_used = state["steps"], state["chip_used"]

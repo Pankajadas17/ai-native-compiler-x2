@@ -19,7 +19,7 @@ Linux, or WSL on Windows.
    and `uv.lock`:
    - `numpy` always;
    - `fasm` (extra `chip`), which the chip repo's `bit_gen.py` needs;
-   - `google-antigravity` (Google's agent harness) and `groq` (the last fallback), extra `agents`, only needed for
+   - `openai-agents` (OpenAI's Agents SDK) and `groq` (the last fallback), extra `agents`, only needed for
      runs with a real model;
    - `pytest` (group `dev`).
 3. Install the [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build) with Yosys 0.70 or newer. Put it on

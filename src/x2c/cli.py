@@ -61,7 +61,7 @@ GROUPS = {
     },
     "Check the setup": {
         "doctor env": ("commands.doctor_env", ANY, "Python, packages and BMsemi_Model found"),
-        "doctor llm": ("commands.doctor_llm", ANY, "LLM keys and models answer (Groq / Gemini)"),
+        "doctor llm": ("commands.doctor_llm", ANY, "LLM keys and models answer (OpenRouter / Groq)"),
         "doctor wsl": ("commands.doctor_wsl", ANY, "from Windows: can WSL/Ubuntu run the tools, memory"),
     },
     "BMsemi simulator workloads (first project stage)": {

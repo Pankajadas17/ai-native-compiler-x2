@@ -1,12 +1,12 @@
 """
 Benchmark for the debug agent: inject 7 known bugs, let the agent diagnose each failing report, score against
-the ground-truth cause.   x2c eval a3 [--llm mock|gemini|groq] [--model NAME]
+the ground-truth cause.   x2c eval a3 [--llm mock|openrouter|groq] [--model NAME]
 (The mock LLM just echoes the rule-based top candidate, so it scores what the RULES can do. A real LLM is
  interesting where it differs from the rules, or explains better; check 'validated' and 'agrees_with_rules'.)
 """
 import argparse, json, sys, time
 from x2c.agents.debug_agent import run_debug_agent
-from x2c.agents.harness import Gemini
+from x2c.agents.harness import OpenRouter
 from x2c.agents.llm_client import MockDebugLLM, GroqLLM
 from x2c.verification import tools, workloads, debug_tools
 from tests import faults
@@ -34,7 +34,7 @@ HOLDOUT = [  # created AFTER the prompt/rules were tuned on UNSEEN: do NOT tune 
 ]
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--llm", choices=["mock", "gemini", "groq"], default="mock")
+ap.add_argument("--llm", choices=["mock", "openrouter", "groq"], default="mock")
 ap.add_argument("--model", default=None)
 ap.add_argument("--budget", type=float, default=None, help="max seconds of LLM time per bug (default 120, env BM_LLM_BUDGET_S)")
 ap.add_argument("--blind", action="store_true", help="hide the rule engine's ranked answer from the agent")
@@ -42,11 +42,11 @@ ap.add_argument("--holdout", action="store_true", help="add 3 fresh unseen bugs 
 ap.add_argument("--unseen", action="store_true", help="add bugs the knowledge base does not cover (truth = unknown)")
 a = ap.parse_args()
 import os
-_KEYS = {"groq": "GROQ_API_KEY", "gemini": "GEMINI_API_KEY"}
+_KEYS = {"groq": "GROQ_API_KEY", "openrouter": "OPENROUTER_API_KEY"}
 if a.llm in _KEYS and not os.environ.get(_KEYS[a.llm]):
     sys.exit(f"{_KEYS[a.llm]} is not set in THIS terminal window (it only lasts for the window where you set it).\n"
              f'Set it, then rerun:  $env:{_KEYS[a.llm]} = "your-key"      (or use --llm mock)')
-make = {"mock": lambda: MockDebugLLM(), "gemini": lambda: Gemini(model=a.model),          # gemini: Google's harness + end-of-turn check
+make = {"mock": lambda: MockDebugLLM(), "openrouter": lambda: OpenRouter(model=a.model),          # openrouter: OpenAI's Agents SDK + end-of-turn check
         "groq": lambda: GroqLLM(model=a.model)}[a.llm]
 
 if a.blind:
@@ -57,7 +57,7 @@ if hasattr(probe, "describe"):
     print("LLM config:", probe.describe(), flush=True)
 rows = []
 print(f"{len(bench)} bugs to diagnose with [{a.llm}]; progress is printed as each one finishes (Ctrl+C to stop)", flush=True)
-t_all = time.time()
+t_all, cost_all = time.time(), 0.0
 for i, (label, kind, fault, truth) in enumerate(bench, 1):
     t0 = time.time()
     print(f"[{i}/{len(bench)}] {label} ...", end=" ", flush=True)
@@ -89,8 +89,10 @@ for i, (label, kind, fault, truth) in enumerate(bench, 1):
            (f"-> system: {out['final_cause']} [{out['final_cause_source']}]" if out["final_cause_source"] not in ("llm_validated", "llm_unknown_confirmed_by_rules") else "")
     rows.append((label, truth, got, got == truth, out["validated"], out["agrees_with_rules"], out["steps"],
                  out["final_cause"] == truth, note))
-    print(f"{got} ({time.time() - t0:.0f}s)" + (f"  [{out['llm_error'][:100]}]" if out["llm_error"] else ""), flush=True)
-print(f"total time {time.time() - t_all:.0f}s", flush=True)
+    cost_all += out.get("cost_usd") or 0
+    print(f"{got} ({time.time() - t0:.0f}s)" + (f" ${out['cost_usd']:.3f}" if out.get("cost_usd") else "")
+          + (f"  [{out['llm_error'][:100]}]" if out["llm_error"] else ""), flush=True)
+print(f"total time {time.time() - t_all:.0f}s" + (f", total cost ${cost_all:.3f}" if cost_all else ""), flush=True)
 
 print(f"\n{'injected bug':34} {'truth':30} {'LLM said':30} LLM  valid rules steps SYSTEM")
 for r in rows:

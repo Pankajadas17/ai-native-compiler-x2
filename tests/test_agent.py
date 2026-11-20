@@ -154,7 +154,7 @@ def test_agent_reports_workload_facts(tmp_path):
     assert out["verified_workload_facts"]["failed"] == 0 and out["warnings"] == []
 
 
-# ------------------------------------------------------------ the agent on Google's harness (stand-in model, no key)
+# ------------------------------------------------------------ the agent on OpenAI's Agents SDK (stand-in model, no key)
 def _scripted(steps):
     from tests.fake_model import calls_so_far
     def s(messages, request):
@@ -166,7 +166,7 @@ def _scripted(steps):
 
 @pytest.fixture
 def harness_sdk():
-    pytest.importorskip("google.antigravity", reason="the agent harness is an optional extra: uv sync --extra agents")
+    pytest.importorskip("agents", reason="the agent harness is an optional extra: uv sync --extra agents")
     from tests.fake_model import FakeModel
     from x2c.agents import harness
     harness.reset_skipped()
@@ -178,8 +178,8 @@ def test_on_the_harness_nothing_verified_and_reduced_coverage_are_sent_back(tmp_
     steps = [("say", "Everything passes."), ("run_suite", {"n_random": 1}), ("say", "Suite passed."),
              ("run_suite", {}), ("say", "The full suite passed.")]
     with FakeModel(_scripted(steps)) as fm:
-        out = run_agent(harness.Gemini(model="fake", base_url=fm.url), "verify", log_path=str(tmp_path / "log.jsonl"))
-    told = " ".join(str(m.get("content")) for r in fm.requests for m in r["messages"])
+        out = run_agent(harness.OpenRouter(model="fake", base_url=fm.url), "verify", log_path=str(tmp_path / "log.jsonl"))
+    told = " ".join(str(m.get("content")) for m in fm.all_chat())
     assert "Nothing has been verified yet" in told and "standard tests" in told
     assert out["end_of_turn_sendbacks"] == 2 and out["model"] == "fake" and not out["warnings"]
     facts = out["verified_facts_from_report"]
@@ -192,13 +192,13 @@ def test_on_the_harness_a_failing_suite_must_be_diagnosed(tmp_path, harness_sdk)
     tools.set_x2_backend(faults.sign_flip)
     steps = [("run_suite", {}), ("say", "Some tests failed."), ("get_failures", {}), ("say", "The output sign is inverted.")]
     with FakeModel(_scripted(steps)) as fm:
-        out = run_agent(harness.Gemini(model="fake", base_url=fm.url), "verify", log_path=str(tmp_path / "log.jsonl"))
+        out = run_agent(harness.OpenRouter(model="fake", base_url=fm.url), "verify", log_path=str(tmp_path / "log.jsonl"))
     assert out["end_of_turn_sendbacks"] == 1
     assert out["verified_facts_from_report"]["failed"] > 0 and "sign_inverted" in out["verified_facts_from_report"]["failure_categories"]
 
 
 def test_groq_end_of_turn_reply(tmp_path):
-    """The real Groq adapter in the small fallback loop gets the same end-of-turn check as Google's harness:
+    """The real Groq adapter in the small fallback loop gets the same end-of-turn check as OpenAI's Agents SDK:
     a reduced suite is sent back, and the reply reaches the model as a user message."""
     from x2c.agents.llm_client import GroqLLM
     c = _GroqClient([_gmsg(calls=[("c1", "run_suite", '{"n_random": 3}')]), _gmsg(content="All good."),

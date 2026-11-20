@@ -5,7 +5,6 @@ against a NumPy golden model. The LLM sees the checker's verdict (stage, errors,
 Rule: only a checker 'pass' counts. Nothing the LLM says about its own code is evidence. Verilog is saved only after a pass.
 Evidence level: Yosys RTL evaluation vs NumPy golden (NOT nextpnr, NOT bitstream, NOT silicon).
 """
-import json
 from pathlib import Path
 
 from x2c.agents import harness
@@ -115,41 +114,22 @@ def end_check(session, tools_used):
             "left). Only a checker 'pass' counts.")
 
 
-def _sdk_tools(session):
-    """A2's two tools as plain functions for the harness; the session enforces the submission limit."""
-    def get_spec() -> str:
-        """Return the operator specification: module name, ports (names, directions, widths, signedness) and behaviour."""
-        return json.dumps(session.get_spec())
-
-    def submit_verilog(verilog: str) -> str:
-        """Check one complete Verilog module in Yosys against the golden model.
-
-        Args:
-            verilog: The complete module text.
-
-        Returns:
-            JSON with status (pass or fail), the stage that failed, errors and a few mismatching vectors.
-        """
-        return json.dumps(session.submit_verilog(verilog), default=str)[:6000]
-    return [get_spec, submit_verilog]
-
-
 def run_rtl_agent(llm, op, out_dir="hardware/operators", max_steps=10, log_path="reports/rtl_agent_log.jsonl"):
-    """llm: harness.Gemini(...) (Google's harness, then Groq if every Gemini model is out), or an object with start /
+    """llm: harness.OpenRouter(...) (OpenAI's Agents SDK via OpenRouter, then Groq if no model is left), or an object with start /
     send_tool_results (the stand-in MockRTLLLM the pipeline uses, GroqLLM, test doubles). Only a checker pass is saved."""
     if op not in OPS:
         raise ValueError(f"unknown op '{op}'; known: {sorted(OPS)}")
     Path(log_path).parent.mkdir(parents=True, exist_ok=True)
     session = _Session(op)
     log = harness.jsonl_logger(log_path)
-    run = harness.run(llm, RTL_PROMPT, f"Write Verilog for operator '{op}'.", sdk_tools=_sdk_tools(session), max_steps=max_steps,
+    run = harness.run(llm, RTL_PROMPT, f"Write Verilog for operator '{op}'.", max_steps=max_steps,
                       max_model_calls=max_steps + 4, max_continues=MAX_SUBMISSIONS - 1, log=log,
                       end_check=lambda reply, used: end_check(session, used),
-                      legacy=dict(schemas=RTL_TOOL_SCHEMAS, call=session.call,
+                      tools=dict(schemas=RTL_TOOL_SCHEMAS, call=session.call,
                                   on_tool=lambda step, name, args, res: log("tool", step=step, tool=name, status=res.get("status"),
                                                                             stage=res.get("stage"))))
     text, stopped, steps, llm_error = run["text"], run["stopped"], run["steps"], run["llm_error"]
-    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"]}
+    extra = {"end_of_turn_sendbacks": run["continues"], "model": run["model"], "cost_usd": run.get("cost_usd")}
     ok = session.best_pass is not None
     path = None
     if ok:
